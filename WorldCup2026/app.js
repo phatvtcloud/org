@@ -2,17 +2,20 @@
  * WORLD CUP 2026 PREDICTION SYSTEM - FRONTEND APP
  */
 
+// CẤU HÌNH URL GOOGLE APPS SCRIPT Ở ĐÂY ĐỂ NHÂN VIÊN KHÔNG PHẢI NHẬP LẠI
+const DEFAULT_API_URL = "https://script.google.com/macros/s/AKfycbwfVY2LtzMaWSYS53PROoOv46ZoWdPijbC4pamSBiDcK0WnCkdkdwSuIpaR1lJj5WixKQ/exec";
+
 class WCApp {
     constructor() {
-        this.apiUrl = localStorage.getItem("wc_api_url") || "";
+        this.apiUrl = localStorage.getItem("wc_api_url") || DEFAULT_API_URL || "";
         this.currentUser = JSON.parse(localStorage.getItem("wc_user")) || null;
         this.matches = [];
         this.userPredictions = {};
         this.leaderboard = [];
-        
+
         this.currentSection = "matches"; // matches hoặc leaderboard
         this.matchFilter = "upcoming";   // upcoming hoặc completed
-        
+
         // Cập nhật giao diện ban đầu
         this.init();
     }
@@ -94,7 +97,7 @@ class WCApp {
             matchSec.classList.remove("hidden");
             userBadge.classList.remove("hidden");
             usernameDisp.textContent = `${this.currentUser.fullname} (${this.currentUser.department})`;
-            
+
             // Đang xem phần nào thì hiện phần đó
             this.switchSection(this.currentSection);
         } else {
@@ -214,12 +217,12 @@ class WCApp {
         try {
             const response = await fetch(`${this.apiUrl}?action=getInitData&username=${usernameParam}`);
             if (!response.ok) throw new Error("HTTP error " + response.status);
-            
+
             const data = await response.json();
-            
+
             this.matches = data.matches || [];
             this.leaderboard = data.leaderboard || [];
-            
+
             // Lưu dự đoán của user hiện tại dưới dạng Map
             this.userPredictions = {};
             if (data.userPredictions) {
@@ -230,7 +233,7 @@ class WCApp {
 
             this.renderMatches();
             this.renderLeaderboard();
-            
+
             if (!silent) {
                 this.showToast("Đã cập nhật dữ liệu mới nhất!", "success");
             }
@@ -248,7 +251,7 @@ class WCApp {
     // ------------------------------------------------------------------
     switchSection(section) {
         this.currentSection = section;
-        
+
         const matchesBtn = document.getElementById("nav-matches");
         const leaderboardBtn = document.getElementById("nav-leaderboard");
         const matchesSec = document.getElementById("matches-section");
@@ -311,11 +314,11 @@ class WCApp {
 
         filtered.forEach(m => {
             const matchDate = new Date(m.date);
-            
+
             // Format thời gian hiển thị theo giờ Việt Nam
             const formattedDate = matchDate.toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' });
             const formattedTime = matchDate.toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit', hour12: false });
-            
+
             // Lấy dự đoán cũ của user
             const pred = this.userPredictions[m.match_id];
             const hasPred = pred !== undefined;
@@ -328,7 +331,7 @@ class WCApp {
 
             let footerHTML = "";
             let cardClasses = "match-card";
-            
+
             if (isLocked) {
                 cardClasses += " completed";
                 if (m.status === "FT" || m.status === "Finished") {
@@ -336,7 +339,7 @@ class WCApp {
                     const points = this.calculateMatchPoints(m, pred);
                     let pointsLabel = "";
                     let pointsClass = "";
-                    
+
                     if (points === 3) {
                         pointsLabel = "+3 Điểm (Chính xác)";
                         pointsClass = "points-exact";
@@ -350,7 +353,7 @@ class WCApp {
                         pointsLabel = "Không tham gia dự đoán";
                         pointsClass = "points-none";
                     }
-                    
+
                     footerHTML = `
                         <div class="match-footer">
                             <span class="prediction-status">Kết quả: ${m.home_score} - ${m.away_score}</span>
@@ -399,10 +402,10 @@ class WCApp {
 
                     <!-- Tỷ số & Trạng thái giữa trận -->
                     <div class="vs-container">
-                        ${isLocked && (m.status === "FT" || m.status === "Finished") ? 
-                            `<span class="score-display">${m.home_score} - ${m.away_score}</span>` : 
-                            (m.status === "Live" ? `<span class="live-badge">LIVE</span>` : `<span class="vs-text">VS</span>`)
-                        }
+                        ${isLocked && (m.status === "FT" || m.status === "Finished") ?
+                    `<span class="score-display">${m.home_score} - ${m.away_score}</span>` :
+                    (m.status === "Live" ? `<span class="live-badge">LIVE</span>` : `<span class="vs-text">VS</span>`)
+                }
                         
                         <!-- Ô nhập tỉ số dự đoán -->
                         <div class="predict-inputs">
@@ -434,7 +437,7 @@ class WCApp {
                 const minutesLeft = (matchDate - now) / (1000 * 60);
                 return minutesLeft >= 15 && m.status !== "FT" && m.status !== "Finished" && m.status !== "Live";
             });
-            
+
             if (this.currentUser && this.matchFilter === "upcoming" && hasEditableMatch) {
                 submitAllContainer.classList.remove("hidden");
             } else {
@@ -457,17 +460,17 @@ class WCApp {
         // Thu thập các giá trị người dùng đã điền
         const predictions = [];
         const matchCards = document.querySelectorAll(".match-card:not(.completed)");
-        
+
         matchCards.forEach(card => {
             const inputs = card.querySelectorAll(".predict-input");
             if (inputs.length === 2) {
                 const homeInput = inputs[0];
                 const awayInput = inputs[1];
-                
+
                 const matchId = homeInput.id.replace("pred-home-", "");
                 const homeVal = homeInput.value.trim();
                 const awayVal = awayInput.value.trim();
-                
+
                 // Chỉ lấy các trận được người dùng điền tỉ số đầy đủ
                 if (homeVal !== "" && awayVal !== "") {
                     predictions.push({
@@ -500,7 +503,7 @@ class WCApp {
 
             if (res.success) {
                 this.showToast(res.message, "success");
-                
+
                 // Đồng bộ cục bộ
                 predictions.forEach(p => {
                     this.userPredictions[p.match_id] = {
@@ -509,7 +512,7 @@ class WCApp {
                         predicted_away: p.predicted_away
                     };
                 });
-                
+
                 this.renderMatches();
                 this.fetchData(true); // Tải lại ngầm để cập nhật BXH
             } else {
@@ -536,7 +539,7 @@ class WCApp {
 
         this.leaderboard.forEach((row, index) => {
             const tr = document.createElement("tr");
-            
+
             // Đánh dấu dòng của User hiện tại để dễ tìm
             if (this.currentUser && row.username === this.currentUser.username) {
                 tr.style.backgroundColor = "rgba(99, 102, 241, 0.12)";
@@ -571,12 +574,12 @@ class WCApp {
     // ------------------------------------------------------------------
     calculateMatchPoints(match, prediction) {
         if (!prediction) return 0;
-        
+
         const realHome = parseInt(match.home_score);
         const realAway = parseInt(match.away_score);
         const predHome = parseInt(prediction.predicted_home);
         const predAway = parseInt(prediction.predicted_away);
-        
+
         if (isNaN(realHome) || isNaN(realAway) || isNaN(predHome) || isNaN(predAway)) {
             return 0;
         }
@@ -589,9 +592,9 @@ class WCApp {
         // Đoán chính xác kết quả thắng/hòa/thua
         const realDiff = realHome - realAway;
         const predDiff = predHome - predAway;
-        
-        if ((realDiff > 0 && predDiff > 0) || 
-            (realDiff < 0 && predDiff < 0) || 
+
+        if ((realDiff > 0 && predDiff > 0) ||
+            (realDiff < 0 && predDiff < 0) ||
             (realDiff === 0 && predDiff === 0)) {
             return 1;
         }
@@ -606,7 +609,7 @@ class WCApp {
         }
         const hours = Math.floor(minutesLeft / 60);
         const days = Math.floor(hours / 24);
-        
+
         if (days > 0) {
             return `${days} ngày ${hours % 24} giờ`;
         }
@@ -655,16 +658,16 @@ class WCApp {
 
             if (res.success) {
                 this.showToast(res.message, "success");
-                
+
                 // Cập nhật local dự đoán để giao diện đổi màu
                 this.userPredictions[matchId] = {
                     match_id: matchId,
                     predicted_home: predicted_home,
                     predicted_away: predicted_away
                 };
-                
+
                 this.renderMatches();
-                
+
                 // Tải lại dữ liệu ngầm để cập nhật bảng xếp hạng
                 this.fetchData(true);
             } else {
@@ -694,7 +697,7 @@ class WCApp {
         // Để tránh việc này và lấy được kết quả JSON chính xác, Apps Script Backend API của chúng ta đã được lập trình
         // để hỗ trợ xử lý bằng cách trả về đúng kiểu ContentService.MimeType.JSON và cho phép CORS.
         // Vì vậy ta nên gọi fetch ở mode "cors" bình thường:
-        
+
         try {
             const corsResponse = await fetch(this.apiUrl, {
                 method: "POST",
@@ -715,7 +718,7 @@ class WCApp {
     showLoadingButton(formId, isLoading) {
         const btn = document.querySelector(`#${formId} button[type="submit"]`);
         if (!btn) return;
-        
+
         if (isLoading) {
             btn.disabled = true;
             btn.innerHTML = `<div class="loading-spinner" style="width: 18px; height: 18px;"></div> Đang xử lý...`;
@@ -733,7 +736,7 @@ class WCApp {
         const container = document.getElementById("toast-container");
         const toast = document.createElement("div");
         toast.className = `toast ${type}`;
-        
+
         let icon = "fa-circle-check";
         if (type === "error") icon = "fa-triangle-exclamation";
         else if (type === "info") icon = "fa-circle-info";
@@ -742,9 +745,9 @@ class WCApp {
             <i class="fa-solid ${icon}"></i>
             <span>${message}</span>
         `;
-        
+
         container.appendChild(toast);
-        
+
         // Tự động xóa toast sau 4 giây
         setTimeout(() => {
             toast.style.animation = "slideUp 0.3s reverse forwards";
