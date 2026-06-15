@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup: Giám sát chuyến kết hợp Map</title>
+    <!-- Thêm Bootstrap để UI nhìn gọn gàng và giống hệ thống Admin -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+        }
+        
+        .header {
+            height: 60px;
+            background-color: #2b303b;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h4 {
+            margin: 0;
+            color: #f3c74c;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100% - 60px);
+            width: 100%;
+        }
+
+        .map-section {
+            flex: 1; /* Chiếm 50% hoặc phần còn lại */
+            border-right: 1px solid #ddd;
+            position: relative;
+        }
+
+        /* Responsive iframe cho Map */
+        .map-section iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .data-section {
+            flex: 1; /* Chiếm 50% */
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .data-header {
+            padding: 15px;
+            background-color: #fffff7;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-header h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .table th {
+            background-color: #fafafa;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            box-shadow: 0 1px 0 #ddd;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .table td {
+            font-size: 13px;
+            vertical-align: middle;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .table tbody tr.active-row {
+            background-color: #e6f7ff;
+            border-left: 3px solid #1890ff;
+        }
+
+        .badge-status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .badge-new { background-color: #333; color: white; }
+        .badge-progress { background-color: #1890ff; color: white; }
+        .badge-done { background-color: #52c41a; color: white; }
+        
+        /* Leaflet custom map */
+        #map { width: 100%; height: 100%; }
+        .custom-marker {
+            background-color: #1890ff;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 4px rgba(0,0,0,0.4);
+        }
+        .vehicle-marker {
+            background-color: #f3c74c;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 6px rgba(0,0,0,0.5);
+        }
+        .pulse {
+            animation: pulse-animation 1.5s infinite;
+        }
+        @keyframes pulse-animation {
+            0% { box-shadow: 0 0 0 0 rgba(243, 199, 76, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(243, 199, 76, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(243, 199, 76, 0); }
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+
+    <div class="header">
+        <h4>Hệ thống Quản lý Giám sát chuyến</h4>
+    </div>
+
+    <div class="main-container">
+        
+        <!-- Cột trái: Bản đồ (Map) -->
+        <div class="map-section">
+            <!-- Sử dụng Leaflet Map cho mockup -->
+            <div id="map"></div>
+        </div>
+
+        <!-- Cột phải: Danh sách Giám sát chuyến (Admin) -->
+        <div class="data-section">
+            <div class="data-header">
+                <h5>Giám sát chuyến</h5>
+                <div>
+                    <button class="btn btn-sm btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#columnConfigModal">⚙ Tùy chỉnh cột</button>
+                    <button class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#filterModal">Bộ lọc</button>
+                    <button class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editModal">Chỉnh sửa chuyến</button>
+                    <button class="btn btn-sm btn-secondary">Xuất báo cáo</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Mã chuyến</th>
+                            <th>Loại chuyến</th>
+                            <th>Trạng thái</th>
+                            <th>Mã tuyến</th>
+                            <th>Tổng đơn</th>
+                            <th>Đối tác</th>
+                            <th>Người tạo</th>
+                            <th>Ngày tạo chuyến</th>
+                            <th>Biển số xe</th>
+                            <th>T.gian lấy hàng thành công</th>
+                            <th>T.gian đến điểm giao</th>
+                            <th>T.gian giao thành công</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tripTableBody">
+                        <tr onclick="selectTrip(this, 0)">
+                            <td><a href="#">TRIP_EYPEY46277</a></td>
+                            <td>-</td>
+                            <td><span class="badge-status badge-new">Mới</span></td>
+                            <td>-</td>
+                            <td>2</td>
+                            <td>Trần Văn Hoàn</td>
+                            <td>Đỗ Thị Phương<br><small class="text-muted">0559911580</small></td>
+                            <td>09:33 12/05/2026</td>
+                            <td>51C-123.45</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><button class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation()" data-bs-toggle="modal" data-bs-target="#tripActionModal">Thao tác</button></td>
+                        </tr>
+                        <tr onclick="selectTrip(this, 1)">
+                            <td><a href="#">TRIP_MTPZP42210</a></td>
+                            <td>-</td>
+                            <td><span class="badge-status badge-progress">Đang lấy hàng</span></td>
+                            <td>-</td>
+                            <td>1</td>
+                            <td>Nguyễn Văn Tý</td>
+                            <td>Đỗ Thị Phương<br><small class="text-muted">0559911580</small></td>
+                            <td>09:30 12/05/2026</td>
+                            <td>29H-987.65</td>
+                            <td>09:15 12/05</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><button class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation()" data-bs-toggle="modal" data-bs-target="#tripActionModal">Thao tác</button></td>
+                        </tr>
+                        <tr onclick="selectTrip(this, 2)">
+                            <td><a href="#">TRIP_CQWXW09611</a></td>
+                            <td>-</td>
+                            <td><span class="badge-status badge-progress">Đang đi giao</span></td>
+                            <td>-</td>
+                            <td>3</td>
+                            <td>Nguyễn Minh Quang</td>
+                            <td>Nguyễn Thị Bích<br><small class="text-muted">0559016491</small></td>
+                            <td>09:25 12/05/2026</td>
+                            <td>61C-456.78</td>
+                            <td>08:30 12/05</td>
+                            <td>10:05 12/05</td>
+                            <td>-</td>
+                            <td><button class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation()" data-bs-toggle="modal" data-bs-target="#tripActionModal">Thao tác</button></td>
+                        </tr>
+                        <tr onclick="selectTrip(this, 3)">
+                            <td><a href="#">TRIP_ECCLK69382</a></td>
+                            <td>-</td>
+                            <td><span class="badge-status badge-done">Hoàn thành</span></td>
+                            <td>-</td>
+                            <td>1</td>
+                            <td>Phạm Quang Thanh</td>
+                            <td>Hoàng Văn Thắng<br><small class="text-muted">0977600529</small></td>
+                            <td>09:24 12/05/2026</td>
+                            <td>60C-333.22</td>
+                            <td>07:00 12/05</td>
+                            <td>08:45 12/05</td>
+                            <td>09:10 12/05</td>
+                            <td><button class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation()" data-bs-toggle="modal" data-bs-target="#tripActionModal">Thao tác</button></td>
+                        </tr>
+                        <tr onclick="selectTrip(this, 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.319350036697!2d106.69538561480082!3d10.786834992314545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f3690d797eb%3A0x868bba1e9ba50b06!2sMasan%20Group!5e0!3m2!1sen!2s!4v1684305886438!5m2!1sen!2s')">
+                            <td><a href="#">TRIP_YDXXP40584</a></td>
+                            <td>-</td>
+                            <td><span class="badge-status badge-new">Mới</span></td>
+                            <td>-</td>
+                            <td>1</td>
+                            <td>Lê Quốc Dũng</td>
+                            <td>Phạm Anh Tuấn<br><small class="text-muted">0903190966</small></td>
+                            <td>09:14 12/05/2026</td>
+                            <td>59D-111.99</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><button class="btn btn-sm btn-outline-secondary">Thao tác</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hàm xử lý khi click vào từng chuyến xe
+        function selectTrip(rowElement, mapUrl) {
+            // Xóa class 'active-row' của tất cả các dòng
+            var rows = document.querySelectorAll('#tripTableBody tr');
+            rows.forEach(function(row) {
+                row.classList.remove('active-row');
+            });
+
+            // Thêm class 'active-row' cho dòng đang được click
+            rowElement.classList.add('active-row');
+
+            // Cập nhật URL của bản đồ (iframe) ở cột bên trái
+            document.getElementById('mapFrame').src = mapUrl;
+        }
+    </script>
+
+    <!-- Modal cấu hình cột -->
+    <div class="modal fade" id="columnConfigModal" tabindex="-1" aria-labelledby="columnConfigModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="columnConfigModalLabel">Tùy chỉnh hiển thị cột</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small mb-3">Kéo thả để thay đổi thứ tự. Chọn/bỏ chọn để ẩn/hiện cột.</p>
+                    <ul class="list-group" id="columnList">
+                        <li class="list-group-item d-flex justify-content-between align-items-center" data-col-index="0">
+                            <div><input class="form-check-input me-2" type="checkbox" checked> Mã chuyến</div>
+                            <span style="cursor: grab;">&#9776;</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center" data-col-index="1">
+                            <div><input class="form-check-input me-2" type="checkbox" checked> Loại chuyến</div>
+                            <span style="cursor: grab;">&#9776;</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center" data-col-index="2">
+                            <div><input class="form-check-input me-2" type="checkbox" checked> Trạng thái</div>
+                            <span style="cursor: grab;">&#9776;</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center" data-col-index="3">
+                            <div><input class="form-check-input me-2" type="checkbox" checked> Mã tuyến</div>
+                            <span style="cursor: grab;">&#9776;</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center" data-col-index="4">
+                            <div><input class="form-check-input me-2" type="checkbox" checked> Tổng đơn</div>
+                            <span style="cursor: grab;">&#9776;</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center" data-col-index="5">
+                            <div><input class="form-check-input me-2" type="checkbox" checked> Đối tác</div>
+                            <span style="cursor: grab;">&#9776;</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center" data-col-index="6">
+                            <div><input class="form-check-input me-2" type="checkbox" checked> Người tạo</div>
+                            <span style="cursor: grab;">&#9776;</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center" data-col-index="7">
+                            <div><input class="form-check-input me-2" type="checkbox" checked> Ngày tạo chuyến</div>
+                            <span style="cursor: grab;">&#9776;</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center" data-col-index="8">
+                            <div><input class="form-check-input me-2" type="checkbox" checked> Biển số xe</div>
+                            <span style="cursor: grab;">&#9776;</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center" data-col-index="9">
+                            <div><input class="form-check-input me-2" type="checkbox" checked> T.gian lấy hàng thành công</div>
+                            <span style="cursor: grab;">&#9776;</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center" data-col-index="10">
+                            <div><input class="form-check-input me-2" type="checkbox" checked> T.gian đến điểm giao</div>
+                            <span style="cursor: grab;">&#9776;</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center" data-col-index="11">
+                            <div><input class="form-check-input me-2" type="checkbox" checked> T.gian giao thành công</div>
+                            <span style="cursor: grab;">&#9776;</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center" data-col-index="12">
+                            <div><input class="form-check-input me-2" type="checkbox" checked> Thao tác</div>
+                            <span style="cursor: grab;">&#9776;</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="applyColumnConfig()">Áp dụng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Bộ lọc -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-body p-4">
+                    <form>
+                        <div class="row g-3 mb-3">
+                            <div class="col-3">
+                                <label class="form-label fw-bold">Khách hàng/ Kho</label>
+                                <input type="text" class="form-control" placeholder="Tên/Số điện thoại">
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label fw-bold">Mã chuyến</label>
+                                <input type="text" class="form-control" placeholder="Nhập mã chuyến">
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label fw-bold">Mã tuyến</label>
+                                <input type="text" class="form-control" placeholder="Nhập mã tuyến">
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label fw-bold">Loại chuyến</label>
+                                <input type="text" class="form-control" placeholder="Nhập loại chuyến">
+                            </div>
+                            
+                            <div class="col-3">
+                                <label class="form-label fw-bold">Mã đơn hàng / Mã DO</label>
+                                <input type="text" class="form-control" placeholder="Nhập Mã đơn hàng/Mã DO">
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label fw-bold">Tài xế</label>
+                                <input type="text" class="form-control" placeholder="Nhập Tên/Số điện thoại">
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label fw-bold">Người tạo</label>
+                                <input type="text" class="form-control" placeholder="Tên/Số điện thoại">
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label fw-bold">Trạng thái</label>
+                                <select class="form-select">
+                                    <option value="">Tất cả</option>
+                                    <option value="new">Mới</option>
+                                    <option value="progress">Đang lấy hàng</option>
+                                    <option value="progress">Đang đi giao</option>
+                                    <option value="done">Hoàn thành</option>
+                                </select>
+                            </div>
+
+                            <div class="col-3">
+                                <label class="form-label fw-bold">Ngày tạo chuyến</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Từ ngày">
+                                    <span class="input-group-text">→</span>
+                                    <input type="text" class="form-control" placeholder="Đến ngày">
+                                </div>
+                            </div>
+                            <div class="col-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary me-2">Tìm</button>
+                                <button type="button" class="btn btn-light border">Khôi phục</button>
+                            </div>
+                            <div class="col-3"></div>
+                            <div class="col-3 d-flex align-items-end justify-content-end">
+                                <button type="button" class="btn btn-primary">Xuất dữ liệu chuyến giao hàng</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Chỉnh sửa chuyến -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cập nhật thông tin chuyến</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4 align-items-center">
+                        <div class="col-4 fw-bold">Upload danh sách chuyến:</div>
+                        <div class="col-8">
+                            <button class="btn btn-outline-secondary me-3">Chọn tập tin</button>
+                            <span class="text-muted me-3">Chưa chọn tập tin</span>
+                            <a href="#" class="text-decoration-none">Tải file mẫu</a>
+                        </div>
+                    </div>
+                    
+                    <ul class="nav nav-tabs mb-3">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Danh sách chuyến</a>
+                        </li>
+                    </ul>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Mã chuyến</th>
+                                    <th>Tải trọng booking(kg)</th>
+                                    <th>Loại xe</th>
+                                    <th>Chuyến tách</th>
+                                    <th>Ghi chú thay đổi</th>
+                                    <th>Trạng thái cập nhật</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">Không có dữ liệu</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary px-4" disabled>CẬP NHẬT</button>
+                    <button type="button" class="btn btn-light border px-4" data-bs-dismiss="modal">ĐÓNG</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Thao tác (Danh sách SO) -->
+    <div class="modal fade" id="tripActionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Danh sách SO</h5>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-success me-2">Xuất dữ liệu</button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover table-sm text-center align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Mã SO</th>
+                                    <th>Mã tham chiếu</th>
+                                    <th>Tổng kiện</th>
+                                    <th>Mã CH/NPP</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td><a href="#">130000240129</a></td><td>10001559110</td><td>245</td><td></td><td>Đã hoàn thành</td></tr>
+                                <tr><td>2</td><td><a href="#">130000240128</a></td><td>10001559109</td><td>567</td><td></td><td>Đã hoàn thành</td></tr>
+                                <tr><td>3</td><td><a href="#">130000240119</a></td><td>10001559097</td><td>57</td><td></td><td>Đã hoàn thành</td></tr>
+                                <tr><td>4</td><td><a href="#">130000240121</a></td><td>10001559099</td><td>1715</td><td></td><td>Đã hoàn thành</td></tr>
+                                <tr><td>5</td><td><a href="#">130000240122</a></td><td>10001559100</td><td>19</td><td></td><td>Đã hoàn thành</td></tr>
+                                <tr><td>6</td><td><a href="#">130000240118</a></td><td>10001559094</td><td>1</td><td></td><td>Đã hoàn thành</td></tr>
+                                <tr><td>7</td><td><a href="#">130000240115</a></td><td>10001559091</td><td>15</td><td></td><td>Đã hoàn thành</td></tr>
+                                <tr><td>8</td><td><a href="#">130000240114</a></td><td>10001559090</td><td>13</td><td></td><td>Đã hoàn thành</td></tr>
+                                <tr><td>9</td><td><a href="#">130000240108</a></td><td>10001559082</td><td>229</td><td></td><td>Đã hoàn thành</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="text-muted" style="font-size: 13px;">Hiển thị 1-9. Tổng cộng 9 kết quả</span>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item disabled"><a class="page-link" href="#">Trang Trước</a></li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item disabled"><a class="page-link" href="#">Trang Kế</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Thêm thư viện SortableJS để hỗ trợ kéo thả -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script>
+        // Khởi tạo SortableJS cho danh sách tùy chỉnh cột
+        new Sortable(document.getElementById('columnList'), {
+            animation: 150,
+            ghostClass: 'bg-light'
+        });
+
+        // Xử lý UX ẩn/hiện và sắp xếp lại cột
+        function applyColumnConfig() {
+            var listItems = document.querySelectorAll('#columnList li');
+            var table = document.querySelector('.table');
+            var theadTr = table.querySelector('thead tr');
+            var tbodyRows = table.querySelectorAll('tbody tr');
+            
+            // Lấy thứ tự mới và trạng thái ẩn/hiện
+            var newOrder = [];
+            listItems.forEach(function(li) {
+                var originalIndex = parseInt(li.getAttribute('data-col-index'));
+                var isChecked = li.querySelector('input').checked;
+                newOrder.push({ index: originalIndex, visible: isChecked });
+            });
+
+            // Lấy mảng các th gốc
+            var ths = Array.from(theadTr.querySelectorAll('th'));
+            // Xóa rỗng tr hiện tại
+            theadTr.innerHTML = '';
+            // Gắn lại th theo thứ tự mới
+            newOrder.forEach(function(col) {
+                var th = ths[col.index];
+                if(th) {
+                    th.style.display = col.visible ? '' : 'none';
+                    theadTr.appendChild(th);
+                }
+            });
+
+            // Gắn lại td cho từng dòng theo thứ tự mới
+            tbodyRows.forEach(function(row) {
+                var tds = Array.from(row.querySelectorAll('td'));
+                row.innerHTML = '';
+                newOrder.forEach(function(col) {
+                    var td = tds[col.index];
+                    if(td) {
+                        td.style.display = col.visible ? '' : 'none';
+                        row.appendChild(td);
+                    }
+                });
+            });
+        }
+
+        // ================= MAP INITIALIZATION =================
+        var map = L.map('map').setView([10.7868, 106.6953], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        var currentPolylines = [];
+        var currentMarkers = [];
+
+        var tripsData = [
+            { // Mới (TRIP_EYPEY46277)
+                start: [10.7868, 106.6953],
+                end: [10.8479, 106.7699],
+                vehicle: [10.7868, 106.6953],
+                route: [[10.7868, 106.6953], [10.8000, 106.7200], [10.8479, 106.7699]]
+            },
+            { // Đang lấy hàng (TRIP_MTPZP42210)
+                start: [10.7618, 106.6575],
+                end: [10.7868, 106.6953],
+                vehicle: [10.7710, 106.6710],
+                route: [[10.7618, 106.6575], [10.7710, 106.6710], [10.7868, 106.6953]]
+            },
+            { // Đang đi giao (TRIP_CQWXW09611)
+                start: [10.8479, 106.7699],
+                end: [10.7618, 106.6575],
+                vehicle: [10.8000, 106.7000],
+                route: [[10.8479, 106.7699], [10.8200, 106.7300], [10.8000, 106.7000], [10.7618, 106.6575]]
+            },
+            { // Hoàn thành (TRIP_ECCLK69382)
+                start: [10.7868, 106.6953],
+                end: [10.8017, 106.7122],
+                vehicle: [10.8017, 106.7122],
+                route: [[10.7868, 106.6953], [10.7950, 106.7050], [10.8017, 106.7122]]
+            }
+        ];
+
+        function selectTrip(rowElement, tripIndex) {
+            // Remove active class from all rows
+            var rows = document.querySelectorAll('#tripTableBody tr');
+            rows.forEach(r => r.classList.remove('active-row'));
+            rowElement.classList.add('active-row');
+
+            // Clear map
+            currentPolylines.forEach(p => map.removeLayer(p));
+            currentMarkers.forEach(m => map.removeLayer(m));
+            currentPolylines = [];
+            currentMarkers = [];
+
+            var data = tripsData[tripIndex];
+            if (!data) return;
+
+            // Draw route
+            var polyline = L.polyline(data.route, {color: '#1890ff', weight: 5, opacity: 0.8}).addTo(map);
+            currentPolylines.push(polyline);
+
+            // Draw start and end markers
+            var startIcon = L.divIcon({className: 'custom-marker', html: '<div style="color:white; text-align:center; line-height:20px; font-size:12px; font-weight:bold;">A</div>', iconSize: [24, 24]});
+            var endIcon = L.divIcon({className: 'custom-marker', html: '<div style="color:white; text-align:center; line-height:20px; font-size:12px; font-weight:bold;">B</div>', iconSize: [24, 24]});
+            
+            var mStart = L.marker(data.start, {icon: startIcon}).addTo(map).bindPopup('Điểm xuất phát');
+            var mEnd = L.marker(data.end, {icon: endIcon}).addTo(map).bindPopup('Điểm kết thúc');
+            
+            // Draw vehicle marker
+            var vehicleIcon = L.divIcon({className: 'vehicle-marker pulse', html: '<div style="color:black; text-align:center; line-height:26px; font-size:16px;">🚚</div>', iconSize: [32, 32], iconAnchor: [16, 16]});
+            var mVehicle = L.marker(data.vehicle, {icon: vehicleIcon, zIndexOffset: 1000}).addTo(map).bindPopup('Tọa độ hiện tại của xe');
+
+            currentMarkers.push(mStart, mEnd, mVehicle);
+
+            // Fit bounds with padding
+            map.fitBounds(polyline.getBounds(), {padding: [50, 50]});
+        }
+        
+        // Select the first trip by default
+        setTimeout(() => {
+            var firstRow = document.querySelector('#tripTableBody tr');
+            if(firstRow) selectTrip(firstRow, 0);
+        }, 500);
+    </script>
+</body>
+</html>

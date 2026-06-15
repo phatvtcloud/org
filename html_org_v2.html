@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ đồ Tổ chức FMCG (V2 - Miễn phí hoàn toàn)</title>
+    <!-- Thư viện D3.js (Mã nguồn mở) -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Thư viện d3-flextree (Bắt buộc cho d3-org-chart) -->
+    <script src="https://cdn.jsdelivr.net/npm/d3-flextree@2.1.2/build/d3-flextree.js"></script>
+    <!-- Thư viện d3-org-chart (Mã nguồn mở, không giới hạn node) -->
+    <script src="https://cdn.jsdelivr.net/npm/d3-org-chart@3.1.1"></script>
+    
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fcfcfc; /* Màu nền web sáng nhẹ */
+            font-family: Arial, Helvetica, sans-serif;
+            overflow: hidden; /* Ẩn cuộn thừa do thư viện sẽ tự hỗ trợ kéo thả */
+        }
+
+        #tree {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="tree"></div>
+
+    <script>
+        // Gọi dữ liệu json Version 2
+        fetch('data_org_v2.json')
+            .then(response => response.json())
+            .then(data => {
+                const chart = new d3.OrgChart()
+                    .container('#tree')
+                    .data(data)
+                    // Thiết lập kích thước mỗi ô chức vụ
+                    .nodeWidth(d => 260)
+                    .nodeHeight(d => 85)
+                    // Khoảng cách giữa các ô
+                    .childrenMargin(d => 40)
+                    .compactMarginBetween(d => 25)
+                    .compactMarginPair(d => 40)
+                    .nodeContent(function(d, i, arr, state) {
+                        // Xác định màu sắc mặc định (Màu đen)
+                        let borderColor = "#000000";
+                        let textColor = "#000000";
+
+                        // Logic đổi màu cho các trường hợp Ghi chú (m1, m2, m3)
+                        const colors = {
+                            "m1": { border: "#005461", text: "#005461" },
+                            "m2": { border: "#0056b3", text: "#0056b3" },
+                            "m3": { border: "#5E0006", text: "#5E0006" }
+                        };
+                        
+                        if (d.data.note && colors[d.data.note]) {
+                            borderColor = colors[d.data.note].border;
+                            textColor = colors[d.data.note].text;
+                        }
+
+                        // Vẽ HTML cho từng ô (Node) với CSS đẹp mắt, hiện đại
+                        // d.width - 4, d.height - 4 để chừa không gian cho viền (border)
+                        return `
+                            <div style="font-family: Arial; background-color: #ffffff; border: 2px solid ${borderColor}; border-radius: 8px; width: ${d.width - 4}px; height: ${d.height - 4}px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 8px rgba(0,0,0,0.06); margin: 2px;">
+                                <div style="font-size: 15px; font-weight: bold; color: ${textColor}; text-align: center; padding: 0 10px; line-height: 1.3;">
+                                    ${d.data.name}
+                                </div>
+                                <div style="font-size: 14px; color: ${textColor}; text-align: center; margin-top: 6px;">
+                                    ${d.data.manager}
+                                </div>
+                            </div>
+                        `;
+                    })
+                    .render();
+                
+                // Mở rộng tất cả các nhánh để xem toàn bộ sơ đồ
+                chart.expandAll();
+                // Tự động thu phóng (Zoom out) để nhét vừa toàn bộ sơ đồ vào giữa màn hình
+                chart.fit();
+            })
+            .catch(error => {
+                console.error("Lỗi khi tải dữ liệu JSON:", error);
+                alert("Lỗi hiển thị biểu đồ: " + error.message);
+            });
+    </script>
+</body>
+</html>

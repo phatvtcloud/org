@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="vi" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EBS Flow - SO to DO to BBGN to Trip</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: {
+                                DEFAULT: '#0284c7',
+                                light: '#e0f2fe',
+                                dark: '#0369a1',
+                                border: '#bae6fd',
+                                text: '#0369a1',
+                                textDark: '#38bdf8'
+                            },
+                            green: {
+                                DEFAULT: '#16a34a',
+                                light: '#f0fdf4',
+                                dark: '#15803d',
+                                border: '#bbf7d0',
+                                text: '#15803d',
+                                textDark: '#4ade80'
+                            },
+                            purple: {
+                                DEFAULT: '#7c3aed',
+                                light: '#f5f3ff',
+                                dark: '#6d28d9',
+                                border: '#ddd6fe',
+                                text: '#6d28d9',
+                                textDark: '#a78bfa'
+                            },
+                            orange: {
+                                DEFAULT: '#ea580c',
+                                light: '#fff7ed',
+                                dark: '#c2410c',
+                                border: '#fed7aa',
+                                text: '#c2410c',
+                                textDark: '#fb923c'
+                            }
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .dark body {
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+
+        /* SVG Connection lines style */
+        .connection-path {
+            fill: none;
+            stroke-width: 2px;
+            transition: stroke-width 0.3s ease, stroke 0.3s ease, filter 0.3s ease, opacity 0.3s ease, stroke-dashoffset 0.3s ease;
+            opacity: 0.45;
+        }
+
+        /* Flow card transition */
+        .flow-card {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.3s ease,
+                background-color 0.3s ease,
+                opacity 0.3s ease;
+        }
+
+        /* Dim state for inactive nodes */
+        .dimmed {
+            opacity: 0.15 !important;
+        }
+
+        /* Highlight state for active nodes */
+        .highlighted {
+            opacity: 1 !important;
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Border highlights based on category */
+        .highlighted.so-card {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 15px rgba(2, 132, 199, 0.3);
+        }
+
+        .dark .highlighted.so-card {
+            border-color: #38bdf8 !important;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .highlighted.do-card {
+            border-color: #16a34a !important;
+            box-shadow: 0 0 15px rgba(22, 163, 74, 0.3);
+        }
+
+        .dark .highlighted.do-card {
+            border-color: #4ade80 !important;
+            box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+        }
+
+        .highlighted.bbgn-card {
+            border-color: #7c3aed !important;
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+        }
+
+        .dark .highlighted.bbgn-card {
+            border-color: #a78bfa !important;
+            box-shadow: 0 0 15px rgba(167, 139, 250, 0.3);
+        }
+
+        .highlighted.trip-card {
+            border-color: #ea580c !important;
+            box-shadow: 0 0 15px rgba(234, 88, 12, 0.3);
+        }
+
+        .dark .highlighted.trip-card {
+            border-color: #fb923c !important;
+            box-shadow: 0 0 15px rgba(251, 146, 60, 0.3);
+        }
+
+        /* SVG flow animations */
+        @keyframes flowDash {
+            to {
+                stroke-dashoffset: -24;
+            }
+        }
+
+        .path-highlighted {
+            stroke-width: 3.5px !important;
+            opacity: 1 !important;
+            stroke-dasharray: 8, 4;
+            animation: flowDash 1.2s linear infinite;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen pb-12 transition-colors duration-300">
+
+    <!-- Top Navigation Bar -->
+    <header
+        class="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md transition-colors duration-300">
+        <div class="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-gradient-to-tr from-brand-blue to-brand-purple rounded-xl text-white shadow-md">
+                    <i class="fa-solid fa-network-wired text-xl"></i>
+                </div>
+                <div>
+                    <h1
+                        class="text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                        I> Quy Trình Phân Tách & Tổ Hợp DO/SO/Trip trên EBS
+                    </h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Hệ thống Điều phối Vận tải DC FMCG</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <!-- Reset Highlight -->
+                <button onclick="resetHighlight()"
+                    class="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                </button>
+
+                <!-- Dark Mode Toggle -->
+                <button id="theme-toggle" onclick="toggleTheme()"
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:scale-105 transition-all border border-slate-200 dark:border-slate-700">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1600px] mx-auto px-6 mt-8 space-y-8">
+
+        <!-- TOP STAGE PROGRESSION -->
+        <section
+            class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm transition-colors duration-300">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-4">
+                <!-- SO -->
+                <div
+                    class="flex-1 flex flex-col items-center text-center p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <span
+                        class="px-5 py-2 rounded-full text-white bg-brand-blue text-sm font-bold shadow-md shadow-brand-blue/20">SO</span>
+                    <h3 class="mt-3 font-semibold text-slate-800 dark:text-slate-200 text-sm">Sales Order</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Khách hàng đặt gì</p>
+                </div>
+
+                <i class="fa-solid fa-arrow-right text-slate-300 dark:text-slate-700 text-lg hidden md:block"></i>
+
+                <!-- DO -->
+                <div
+                    class="flex-1 flex flex-col items-center text-center p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <span
+                        class="px-5 py-2 rounded-full text-white bg-brand-green text-sm font-bold shadow-md shadow-brand-green/20">DO</span>
+                    <h3 class="mt-3 font-semibold text-slate-800 dark:text-slate-200 text-sm">Delivery Order</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Giao cái gì (chẻ nhỏ các SO)</p>
+                </div>
+
+                <i class="fa-solid fa-arrow-right text-slate-300 dark:text-slate-700 text-lg hidden md:block"></i>
+
+                <!-- BBGN -->
+                <div
+                    class="flex-1 flex flex-col items-center text-center p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <span
+                        class="px-5 py-2 rounded-full text-white bg-brand-purple text-sm font-bold shadow-md shadow-brand-purple/20">BIÊN
+                        BẢN GIAO NHẬN</span>
+                    <h3 class="mt-3 font-semibold text-slate-800 dark:text-slate-200 text-sm">Biên Bản Giao Nhận</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Giao nhận với nhà phân phối (tổ hợp DO)
+                    </p>
+                </div>
+
+                <i class="fa-solid fa-arrow-right text-slate-300 dark:text-slate-700 text-lg hidden md:block"></i>
+
+                <!-- TRIP -->
+                <div
+                    class="flex-1 flex flex-col items-center text-center p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <span
+                        class="px-5 py-2 rounded-full text-white bg-brand-orange text-sm font-bold shadow-md shadow-brand-orange/20">TRIP
+                        NUMBER</span>
+                    <h3 class="mt-3 font-semibold text-slate-800 dark:text-slate-200 text-sm">Trip Number</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Biển số xe nào, giao gì, đi đâu</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FLOW CHART CONTAINER -->
+        <section
+            class="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm overflow-visible transition-colors duration-300">
+            <!-- Absolute SVG Overlay for connections -->
+            <svg id="connections-svg" class="absolute inset-0 pointer-events-none w-full h-full z-10">
+                <defs>
+                    <!-- Light Mode Arrow Markers -->
+                    <marker id="arrow-blue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6"
+                        orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 7 5 L 0 8.5 z" fill="#0284c7" />
+                    </marker>
+                    <marker id="arrow-green" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6"
+                        orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 7 5 L 0 8.5 z" fill="#16a34a" />
+                    </marker>
+                    <marker id="arrow-purple" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6"
+                        orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 7 5 L 0 8.5 z" fill="#7c3aed" />
+                    </marker>
+                    <marker id="arrow-orange" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6"
+                        orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 7 5 L 0 8.5 z" fill="#ea580c" />
+                    </marker>
+
+                    <!-- Dark Mode Arrow Markers -->
+                    <marker id="arrow-blue-dark" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6"
+                        orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 7 5 L 0 8.5 z" fill="#38bdf8" />
+                    </marker>
+                    <marker id="arrow-green-dark" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6"
+                        orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 7 5 L 0 8.5 z" fill="#4ade80" />
+                    </marker>
+                    <marker id="arrow-purple-dark" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6"
+                        markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 7 5 L 0 8.5 z" fill="#a78bfa" />
+                    </marker>
+                    <marker id="arrow-orange-dark" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6"
+                        markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 7 5 L 0 8.5 z" fill="#fb923c" />
+                    </marker>
+                </defs>
+            </svg>
+
+            <!-- 4 COLUMNS LAYOUT -->
+            <div class="grid grid-cols-1 xl:grid-cols-4 gap-12 relative z-20">
+
+                <!-- COLUMN 1: SHIP TO -->
+                <div class="flex flex-col space-y-6">
+                    <div
+                        class="text-xs font-extrabold uppercase tracking-widest text-brand-blue dark:text-brand-blue-textDark flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot"></i> 1 Ship To
+                    </div>
+
+                    <!-- Container Blue Box -->
+                    <div id="ship_to_container"
+                        class="border-2 border-dashed border-sky-200 dark:border-sky-900 bg-sky-50/20 dark:bg-sky-950/10 p-6 rounded-3xl flex flex-col space-y-8 flex-grow justify-center transition-colors">
+                        <div class="text-center pb-2 border-b border-sky-100 dark:border-sky-900/50">
+                            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">1 Khách hàng / 1 Điểm
+                                giao</span>
+                        </div>
+
+                        <!-- SO01 Card -->
+                        <div id="so01" onmouseover="highlightNode('so01')" onmouseout="resetHighlightDelayed()"
+                            class="flow-card so-card cursor-pointer border border-sky-200 dark:border-sky-800/80 bg-white dark:bg-slate-800 p-5 rounded-2xl text-center shadow-sm">
+                            <h4 class="text-lg font-bold text-brand-blue dark:text-brand-blue-textDark">SO01</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">(Sales Order 1)</p>
+                            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200 mt-2">Khách hàng đặt</p>
+                        </div>
+
+                        <!-- SO02 Card -->
+                        <div id="so02" onmouseover="highlightNode('so02')" onmouseout="resetHighlightDelayed()"
+                            class="flow-card so-card cursor-pointer border border-sky-200 dark:border-sky-800/80 bg-white dark:bg-slate-800 p-5 rounded-2xl text-center shadow-sm">
+                            <h4 class="text-lg font-bold text-brand-blue dark:text-brand-blue-textDark">SO02</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">(Sales Order 2)</p>
+                            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200 mt-2">Khách hàng đặt</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMN 2: DO -->
+                <div class="flex flex-col space-y-6">
+                    <div
+                        class="text-xs font-extrabold uppercase tracking-widest text-brand-green dark:text-brand-green-textDark flex items-center gap-2">
+                        <i class="fa-solid fa-box-open"></i> DO (Delivery Order)
+                    </div>
+
+                    <div class="flex flex-col space-y-6 flex-grow justify-center">
+                        <div
+                            class="text-xs font-medium text-slate-400 dark:text-slate-500 mb-1 border-b border-dashed border-slate-200 dark:border-slate-800 pb-2">
+                            Chẻ nhỏ từ các SO
+                        </div>
+
+                        <!-- Group of DOs from SO01 -->
+                        <div class="space-y-3">
+                            <!-- DO1 từ SO01 -->
+                            <div id="do1_so01" onmouseover="highlightNode('do1_so01')"
+                                onmouseout="resetHighlightDelayed()"
+                                class="flow-card do-card cursor-pointer border border-green-200 dark:border-green-800/80 bg-emerald-50/30 dark:bg-emerald-950/10 p-3.5 rounded-xl flex justify-between items-center shadow-sm">
+                                <div>
+                                    <h4 class="font-bold text-brand-green dark:text-brand-green-textDark">DO1</h4>
+                                    <p class="text-[10px] text-slate-400 dark:text-slate-500">(từ SO01)</p>
+                                </div>
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-900/40 text-brand-green dark:text-brand-green-textDark">Solid
+                                    DO</span>
+                            </div>
+
+                            <!-- DO2 từ SO01 -->
+                            <div id="do2_so01" onmouseover="highlightNode('do2_so01')"
+                                onmouseout="resetHighlightDelayed()"
+                                class="flow-card do-card cursor-pointer border border-green-200 dark:border-green-800/80 bg-emerald-50/30 dark:bg-emerald-950/10 p-3.5 rounded-xl flex justify-between items-center shadow-sm">
+                                <div>
+                                    <h4 class="font-bold text-brand-green dark:text-brand-green-textDark">DO2</h4>
+                                    <p class="text-[10px] text-slate-400 dark:text-slate-500">(từ SO01)</p>
+                                </div>
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-900/40 text-brand-green dark:text-brand-green-textDark">Solid
+                                    DO</span>
+                            </div>
+
+                            <!-- DO3 từ SO01 -->
+                            <div id="do3_so01" onmouseover="highlightNode('do3_so01')"
+                                onmouseout="resetHighlightDelayed()"
+                                class="flow-card do-card cursor-pointer border border-green-200 dark:border-green-800/80 bg-emerald-50/30 dark:bg-emerald-950/10 p-3.5 rounded-xl flex justify-between items-center shadow-sm">
+                                <div>
+                                    <h4 class="font-bold text-brand-green dark:text-brand-green-textDark">DO3</h4>
+                                    <p class="text-[10px] text-slate-400 dark:text-slate-500">(từ SO01)</p>
+                                </div>
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-900/40 text-brand-green dark:text-brand-green-textDark">Solid
+                                    DO</span>
+                            </div>
+                        </div>
+
+                        <!-- Divider line -->
+                        <div class="h-[1px] bg-slate-100 dark:bg-slate-800"></div>
+
+                        <!-- Group of DOs from SO02 -->
+                        <div class="space-y-3">
+                            <!-- DO4 từ SO02 -->
+                            <div id="do4_so02" onmouseover="highlightNode('do4_so02')"
+                                onmouseout="resetHighlightDelayed()"
+                                class="flow-card do-card cursor-pointer border border-green-200 dark:border-green-800/80 bg-emerald-50/30 dark:bg-emerald-950/10 p-3.5 rounded-xl flex justify-between items-center shadow-sm">
+                                <div>
+                                    <h4 class="font-bold text-brand-green dark:text-brand-green-textDark">DO4</h4>
+                                    <p class="text-[10px] text-slate-400 dark:text-slate-500">(từ SO02)</p>
+                                </div>
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-900/40 text-brand-green dark:text-brand-green-textDark">Solid
+                                    DO</span>
+                            </div>
+
+                            <!-- DO5 từ SO02 -->
+                            <div id="do5_so02" onmouseover="highlightNode('do5_so02')"
+                                onmouseout="resetHighlightDelayed()"
+                                class="flow-card do-card cursor-pointer border border-green-200 dark:border-green-800/80 bg-emerald-50/30 dark:bg-emerald-950/10 p-3.5 rounded-xl flex justify-between items-center shadow-sm">
+                                <div>
+                                    <h4 class="font-bold text-brand-green dark:text-brand-green-textDark">DO5</h4>
+                                    <p class="text-[10px] text-slate-400 dark:text-slate-500">(từ SO02)</p>
+                                </div>
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-900/40 text-brand-green dark:text-brand-green-textDark">Solid
+                                    DO</span>
+                            </div>
+
+                            <!-- DO1 từ SO02 (Tách để thỏa mãn khung C) - Dashed -->
+                            <div id="do1_so02" onmouseover="highlightNode('do1_so02')"
+                                onmouseout="resetHighlightDelayed()"
+                                class="flow-card do-card cursor-pointer border-2 border-dashed border-emerald-400 dark:border-emerald-700/80 bg-emerald-50/10 dark:bg-emerald-950/5 p-3 rounded-xl flex justify-between items-center shadow-sm relative group">
+                                <div>
+                                    <h4
+                                        class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                        DO1 <i class="fa-solid fa-scissors text-[10px]"></i>
+                                    </h4>
+                                    <p class="text-[10px] text-slate-400 dark:text-slate-500">(từ SO02)</p>
+                                    <span
+                                        class="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-[9px] py-1 px-2 rounded shadow-md w-36 text-center z-30 mb-1">
+                                        Tách để thỏa mãn khung C
+                                    </span>
+                                </div>
+                                <span
+                                    class="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">Tách
+                                    Khung C</span>
+                            </div>
+
+                            <!-- DO2 từ SO02 (Tách để thỏa mãn khung C) - Dashed -->
+                            <div id="do2_so02" onmouseover="highlightNode('do2_so02')"
+                                onmouseout="resetHighlightDelayed()"
+                                class="flow-card do-card cursor-pointer border-2 border-dashed border-emerald-400 dark:border-emerald-700/80 bg-emerald-50/10 dark:bg-emerald-950/5 p-3 rounded-xl flex justify-between items-center shadow-sm relative group">
+                                <div>
+                                    <h4
+                                        class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                        DO2 <i class="fa-solid fa-scissors text-[10px]"></i>
+                                    </h4>
+                                    <p class="text-[10px] text-slate-400 dark:text-slate-500">(từ SO02)</p>
+                                    <span
+                                        class="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-[9px] py-1 px-2 rounded shadow-md w-36 text-center z-30 mb-1">
+                                        Tách để thỏa mãn khung C
+                                    </span>
+                                </div>
+                                <span
+                                    class="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">Tách
+                                    Khung C</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMN 3: BIÊN BẢN GIAO NHẬN -->
+                <div class="flex flex-col space-y-6">
+                    <div
+                        class="text-xs font-extrabold uppercase tracking-widest text-brand-purple dark:text-brand-purple-textDark flex items-center gap-2">
+                        <i class="fa-solid fa-file-invoice"></i> Biên bản giao nhận (POD)
+                    </div>
+
+                    <div class="flex flex-col space-y-8 flex-grow justify-center">
+                        <div
+                            class="text-xs font-medium text-slate-400 dark:text-slate-500 mb-1 border-b border-dashed border-slate-200 dark:border-slate-800 pb-2">
+                            Tổ hợp các DO
+                        </div>
+
+                        <!-- Biên bản giao nhận số 1 Container -->
+                        <div id="bbgn_container1" onmouseover="highlightNode('bbgn_container1')"
+                            onmouseout="resetHighlightDelayed()"
+                            class="flow-card bbgn-card border-2 border-dashed border-violet-300 dark:border-violet-800 bg-violet-50/10 dark:bg-violet-950/5 p-4 rounded-2xl flex flex-col space-y-3 transition-colors">
+                            <span
+                                class="text-xs font-bold text-brand-purple dark:text-brand-purple-textDark text-center pb-2 border-b border-violet-100 dark:border-violet-900/30">
+                                Biên bản giao nhận số 1
+                            </span>
+
+                            <!-- DO1 inside BBGN1 -->
+                            <div id="bbgn1_do1"
+                                class="p-3 bg-white dark:bg-slate-800 border border-violet-200 dark:border-violet-850 rounded-xl text-center">
+                                <h4 class="font-bold text-brand-purple dark:text-brand-purple-textDark">DO1</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">(SO01 & SO02)</p>
+                            </div>
+
+                            <!-- DO2 inside BBGN1 -->
+                            <div id="bbgn1_do2"
+                                class="p-3 bg-white dark:bg-slate-800 border border-violet-200 dark:border-violet-850 rounded-xl text-center">
+                                <h4 class="font-bold text-brand-purple dark:text-brand-purple-textDark">DO2</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">(SO01 & SO02)</p>
+                            </div>
+                        </div>
+
+                        <!-- Biên bản giao nhận số 2 Container -->
+                        <div id="bbgn_container2" onmouseover="highlightNode('bbgn_container2')"
+                            onmouseout="resetHighlightDelayed()"
+                            class="flow-card bbgn-card border-2 border-dashed border-violet-300 dark:border-violet-800 bg-violet-50/10 dark:bg-violet-950/5 p-4 rounded-2xl flex flex-col space-y-3 transition-colors">
+                            <span
+                                class="text-xs font-bold text-brand-purple dark:text-brand-purple-textDark text-center pb-2 border-b border-violet-100 dark:border-violet-900/30">
+                                Biên bản giao nhận số 2
+                            </span>
+
+                            <!-- DO3 inside BBGN2 -->
+                            <div id="bbgn2_do3"
+                                class="p-3 bg-white dark:bg-slate-800 border border-violet-200 dark:border-violet-850 rounded-xl text-center">
+                                <h4 class="font-bold text-brand-purple dark:text-brand-purple-textDark">DO3</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">(SO01)</p>
+                            </div>
+
+                            <!-- DO4 inside BBGN2 -->
+                            <div id="bbgn2_do4"
+                                class="p-3 bg-white dark:bg-slate-800 border border-violet-200 dark:border-violet-850 rounded-xl text-center">
+                                <h4 class="font-bold text-brand-purple dark:text-brand-purple-textDark">DO4</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">(SO02)</p>
+                            </div>
+
+                            <!-- DO5 inside BBGN2 -->
+                            <div id="bbgn2_do5"
+                                class="p-3 bg-white dark:bg-slate-800 border border-violet-200 dark:border-violet-850 rounded-xl text-center">
+                                <h4 class="font-bold text-brand-purple dark:text-brand-purple-textDark">DO5</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">(SO02)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMN 4: TRIP NUMBER -->
+                <div class="flex flex-col space-y-6">
+                    <div
+                        class="text-xs font-extrabold uppercase tracking-widest text-brand-orange dark:text-brand-orange-textDark flex items-center gap-2">
+                        <i class="fa-solid fa-truck-fast"></i> Trip Number (Biển số xe)
+                    </div>
+
+                    <div class="flex flex-col space-y-8 flex-grow justify-center">
+                        <div
+                            class="text-xs font-medium text-slate-400 dark:text-slate-500 mb-1 border-b border-dashed border-slate-200 dark:border-slate-800 pb-2">
+                            Mã số chuyến vận chuyển cuối cùng
+                        </div>
+
+                        <!-- Trip Number #1 Card -->
+                        <div id="trip1" onclick="runTripFlow('trip1')" onmouseover="highlightNode('trip1')"
+                            onmouseout="resetHighlightDelayed()"
+                            class="flow-card trip-card cursor-pointer border border-amber-200 dark:border-amber-850 bg-amber-50/20 dark:bg-amber-950/10 p-6 rounded-2xl shadow-sm flex flex-col space-y-3 hover:scale-[1.03] transition-all">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-lg font-bold text-brand-orange dark:text-brand-orange-textDark">Trip #1
+                                </h4>
+                                <span
+                                    class="p-1 px-2 text-[10px] font-bold rounded-lg bg-orange-100 dark:bg-orange-950/50 text-brand-orange dark:text-brand-orange-textDark"><i
+                                        class="fa-solid fa-play mr-1 text-[8px]"></i> Chạy Flow</span>
+                            </div>
+                            <div class="space-y-1 text-sm">
+                                <p class="text-slate-600 dark:text-slate-450"><span
+                                        class="font-semibold text-slate-700 dark:text-slate-300">Giao:</span> DO1, DO2
+                                </p>
+                                <p class="text-slate-650 dark:text-slate-450"><span
+                                        class="font-semibold text-slate-700 dark:text-slate-300">Đến:</span> Nhà phân
+                                    phối A</p>
+                            </div>
+                        </div>
+
+                        <!-- Trip Number #2 Card -->
+                        <div id="trip2" onclick="runTripFlow('trip2')" onmouseover="highlightNode('trip2')"
+                            onmouseout="resetHighlightDelayed()"
+                            class="flow-card trip-card cursor-pointer border border-amber-200 dark:border-amber-850 bg-amber-50/20 dark:bg-amber-950/10 p-6 rounded-2xl shadow-sm flex flex-col space-y-3 hover:scale-[1.03] transition-all">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-lg font-bold text-brand-orange dark:text-brand-orange-textDark">Trip #2
+                                </h4>
+                                <span
+                                    class="p-1 px-2 text-[10px] font-bold rounded-lg bg-orange-100 dark:bg-orange-950/50 text-brand-orange dark:text-brand-orange-textDark"><i
+                                        class="fa-solid fa-play mr-1 text-[8px]"></i> Chạy Flow</span>
+                            </div>
+                            <div class="space-y-1 text-sm">
+                                <p class="text-slate-600 dark:text-slate-450"><span
+                                        class="font-semibold text-slate-700 dark:text-slate-300">Giao:</span> DO3, DO4,
+                                    DO5</p>
+                                <p class="text-slate-650 dark:text-slate-450"><span
+                                        class="font-semibold text-slate-700 dark:text-slate-300">Đến:</span> Nhà phân
+                                    phối B</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- BOTTOM LEGEND AND DATA INFORMATION -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Box 1: Ghi chú (Legend) -->
+            <div
+                class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm transition-all duration-300">
+                <h3
+                    class="text-sm font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800 pb-3 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-brand-blue"></i> GHI CHÚ
+                </h3>
+                <ul class="space-y-3.5 text-xs text-slate-650 dark:text-slate-400">
+                    <li class="flex items-center gap-3">
+                        <span class="w-8 h-1 bg-brand-blue rounded-full"></span>
+                        <span><strong>SO (Sales Order)</strong>: Đơn đặt hàng từ khách hàng</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="w-8 h-1 bg-brand-green rounded-full"></span>
+                        <span><strong>DO (Delivery Order)</strong>: Yêu cầu giao nhận chi tiết</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="w-8 h-1 bg-brand-purple rounded-full"></span>
+                        <span><strong>Biên bản giao nhận (POD)</strong>: Chứng từ giao nhận</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="w-8 h-1 bg-brand-orange rounded-full"></span>
+                        <span><strong>Trip Number</strong>: Chuyến xe vận chuyển thực tế</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="w-8 h-1 border-b-2 border-dashed border-brand-green"></span>
+                        <span><strong>DO tách từ SO02</strong>: Tách nhỏ để tối ưu hóa tải trọng xe</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Box 2: Quy tắc hoạt động -->
+            <div
+                class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm transition-all duration-300">
+                <h3
+                    class="text-sm font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800 pb-3 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-brand-green"></i> QUY TẮC HOẠT ĐỘNG
+                </h3>
+                <ul class="space-y-3 list-disc pl-5 text-xs text-slate-650 dark:text-slate-400">
+                    <li>DO được chẻ nhỏ từ các SO để phù hợp với <strong>khung tải, thời gian, địa điểm giao
+                            nhận</strong>.</li>
+                    <li>Các DO có cùng mã (DO1, DO2) dù đến từ SO khác nhau, nếu giao chung chuyến xe sẽ <strong>nằm
+                            trên cùng 1 biên bản giao nhận</strong>.</li>
+                    <li>Mỗi biên bản giao nhận là <strong>tổ hợp của các DO</strong> tương ứng chuyến đó.</li>
+                    <li>Mỗi biên bản giao nhận sinh ra <strong>1 Trip Number duy nhất</strong>.</li>
+                </ul>
+            </div>
+
+            <!-- Box 3: Kết luận -->
+            <div
+                class="bg-gradient-to-tr from-amber-500/5 to-orange-500/5 dark:from-amber-950/10 dark:to-orange-950/10 border border-amber-200 dark:border-amber-900 rounded-3xl p-6 shadow-sm transition-all duration-300 relative overflow-hidden">
+                <!-- Trophy Icon BG watermark -->
+                <i
+                    class="fa-solid fa-trophy absolute right-4 bottom-4 text-7xl text-amber-500/10 dark:text-amber-500/5 pointer-events-none"></i>
+
+                <h3
+                    class="text-sm font-bold text-amber-700 dark:text-amber-400 border-b border-amber-100 dark:border-amber-900/50 pb-3 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-amber-500"></i> KẾT LUẬN
+                </h3>
+                <h4 class="text-xs font-black text-amber-800 dark:text-amber-400 mb-2 uppercase tracking-wide">
+                    TRIP NUMBER LÀ CUỐI CÙNG, DUY NHẤT
+                </h4>
+                <ul class="space-y-3.5 text-xs text-slate-700 dark:text-slate-350">
+                    <li class="flex items-start gap-2">
+                        <i class="fa-regular fa-circle-check text-amber-600 dark:text-amber-500 mt-0.5"></i>
+                        <span>Trip là kết quả tổng hợp cuối cùng của toàn bộ chuỗi: <strong>SO &rarr; DO &rarr; Biên bản
+                                giao nhận &rarr; Trip</strong>.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-regular fa-circle-check text-amber-600 dark:text-amber-500 mt-0.5"></i>
+                        <span>Trip là mã định danh duy nhất đại diện cho một chuyến giao hàng cụ thể (xác định rõ
+                            <strong>xe nào, giao gì, giao đến đâu</strong>).</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+
+
+    <!-- JS Logic -->
+    <script>
+        // Set light theme default
+        if (!localStorage.getItem('theme')) {
+            localStorage.setItem('theme', 'light');
+        }
+
+        // Apply theme immediately
+        function applyTheme() {
+            const isDark = localStorage.getItem('theme') === 'dark';
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            // Redraw connections to update colors
+            setTimeout(drawConnections, 50);
+        }
+
+        function toggleTheme() {
+            const current = localStorage.getItem('theme');
+            localStorage.setItem('theme', current === 'dark' ? 'light' : 'dark');
+            applyTheme();
+        }
+
+        applyTheme();
+
+        // Connections Definition
+        const connections = [
+            // Column 1 -> 2 (SO -> DO)
+            { from: 'so01', to: 'do1_so01', color: 'green', style: 'solid' },
+            { from: 'so01', to: 'do2_so01', color: 'green', style: 'solid' },
+            { from: 'so01', to: 'do3_so01', color: 'green', style: 'solid' },
+
+            { from: 'so02', to: 'do4_so02', color: 'green', style: 'solid' },
+            { from: 'so02', to: 'do5_so02', color: 'green', style: 'solid' },
+            { from: 'so02', to: 'do1_so02', color: 'green', style: 'dashed' },
+            { from: 'so02', to: 'do2_so02', color: 'green', style: 'dashed' },
+
+            // Column 2 -> 3 (DO -> BBGN)
+            { from: 'do1_so01', to: 'bbgn1_do1', color: 'purple', style: 'solid' },
+            { from: 'do1_so02', to: 'bbgn1_do1', color: 'green', style: 'dashed' },
+            { from: 'do2_so01', to: 'bbgn1_do2', color: 'purple', style: 'solid' },
+            { from: 'do2_so02', to: 'bbgn1_do2', color: 'green', style: 'dashed' },
+            { from: 'do3_so01', to: 'bbgn2_do3', color: 'purple', style: 'solid' },
+            { from: 'do4_so02', to: 'bbgn2_do4', color: 'purple', style: 'solid' },
+            { from: 'do5_so02', to: 'bbgn2_do5', color: 'purple', style: 'solid' },
+
+            // Column 3 -> 4 (BBGN -> Trip)
+            { from: 'bbgn_container1', to: 'trip1', color: 'purple', style: 'solid' },
+            { from: 'bbgn_container2', to: 'trip2', color: 'purple', style: 'solid' }
+        ];
+
+        // Containment Relations (Container -> Children)
+        const parentContainers = {
+            'bbgn1_do1': 'bbgn_container1',
+            'bbgn1_do2': 'bbgn_container1',
+            'bbgn2_do3': 'bbgn_container2',
+            'bbgn2_do4': 'bbgn_container2',
+            'bbgn2_do5': 'bbgn_container2'
+        };
+
+        const containerChildren = {
+            'bbgn_container1': ['bbgn1_do1', 'bbgn1_do2'],
+            'bbgn_container2': ['bbgn2_do3', 'bbgn2_do4', 'bbgn2_do5']
+        };
+
+        // Graph representation for dependency tracing
+        const adj = {};
+        function buildGraph() {
+            // Clear
+            for (const key in adj) delete adj[key];
+
+            // Add normal connections
+            connections.forEach(c => {
+                if (!adj[c.from]) adj[c.from] = new Set();
+                if (!adj[c.to]) adj[c.to] = new Set();
+                adj[c.from].add(c.to);
+                adj[c.to].add(c.from);
+            });
+
+            // Add container membership connections to make hovering parent highlight child nodes or vice versa
+            for (const childId in parentContainers) {
+                const parentId = parentContainers[childId];
+                if (!adj[parentId]) adj[parentId] = new Set();
+                if (!adj[childId]) adj[childId] = new Set();
+                adj[parentId].add(childId);
+                adj[childId].add(parentId);
+            }
+        }
+        buildGraph();
+
+        // Get tracing path for a node (Undirected BFS to find all reachable nodes)
+        function getTraceNodes(startId) {
+            const visited = new Set([startId]);
+            const queue = [startId];
+
+            while (queue.length > 0) {
+                const curr = queue.shift();
+                const neighbors = adj[curr] || [];
+                for (const n of neighbors) {
+                    if (!visited.has(n)) {
+                        visited.add(n);
+                        queue.push(n);
+                    }
+                }
+            }
+            return visited;
+        }
+
+        // Draw connections function
+        function drawConnections() {
+            const svg = document.getElementById('connections-svg');
+            const svgRect = svg.getBoundingClientRect();
+
+            // Clear existing paths except defs
+            const paths = svg.querySelectorAll('.connection-path');
+            paths.forEach(p => p.remove());
+
+            const isDark = document.documentElement.classList.contains('dark');
+
+            connections.forEach((conn, index) => {
+                const fromEl = document.getElementById(conn.from);
+                const toEl = document.getElementById(conn.to);
+
+                if (!fromEl || !toEl) return;
+
+                const fromRect = fromEl.getBoundingClientRect();
+                const toRect = toEl.getBoundingClientRect();
+
+                // Calculate relative coordinates
+                const startX = fromRect.right - svgRect.left;
+                const startY = fromRect.top + fromRect.height / 2 - svgRect.top;
+
+                const endX = toRect.left - svgRect.left;
+                const endY = toRect.top + toRect.height / 2 - svgRect.top;
+
+                // Smooth horizontal bezier curve logic
+                const dx = endX - startX;
+                const controlX1 = startX + dx * 0.4;
+                const controlY1 = startY;
+                const controlX2 = endX - dx * 0.4;
+                const controlY2 = endY;
+
+                // Color mapping
+                let colorHex = '#94a3b8'; // default
+                let hoverColor = '#7c3aed';
+                let markerId = '';
+
+                if (conn.color === 'green') {
+                    colorHex = isDark ? '#4ade80' : '#16a34a';
+                    hoverColor = colorHex;
+                    markerId = isDark ? 'arrow-green-dark' : 'arrow-green';
+                } else if (conn.color === 'purple') {
+                    colorHex = isDark ? '#a78bfa' : '#7c3aed';
+                    hoverColor = colorHex;
+                    markerId = isDark ? 'arrow-purple-dark' : 'arrow-purple';
+                } else if (conn.color === 'blue') {
+                    colorHex = isDark ? '#38bdf8' : '#0284c7';
+                    hoverColor = colorHex;
+                    markerId = isDark ? 'arrow-blue-dark' : 'arrow-blue';
+                } else if (conn.color === 'orange') {
+                    colorHex = isDark ? '#fb923c' : '#ea580c';
+                    hoverColor = colorHex;
+                    markerId = isDark ? 'arrow-orange-dark' : 'arrow-orange';
+                }
+
+                // Create path element
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const d = `M ${startX} ${startY} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${endX} ${endY}`;
+
+                path.setAttribute('d', d);
+                path.setAttribute('class', 'connection-path');
+                path.setAttribute('id', `path-${conn.from}-${conn.to}`);
+                path.setAttribute('stroke', colorHex);
+                path.setAttribute('style', `--hover-color: ${hoverColor}`);
+
+                if (conn.style === 'dashed') {
+                    path.setAttribute('stroke-dasharray', '5,5');
+                }
+
+                // Add marker arrow
+                path.setAttribute('marker-end', `url(#${markerId})`);
+
+                svg.appendChild(path);
+            });
+        }
+
+        // Highlight Interaction & Flow Tracing
+        let highlightTimeout = null;
+        let activeFlowTimeouts = [];
+        let isFlowRunning = false;
+
+        function highlightNode(nodeId) {
+            if (isFlowRunning) {
+                cancelTripFlow();
+            }
+            if (highlightTimeout) {
+                clearTimeout(highlightTimeout);
+                highlightTimeout = null;
+            }
+
+            const connectedNodes = getTraceNodes(nodeId);
+            const allCards = document.querySelectorAll('.flow-card');
+
+            // Highlight cards
+            allCards.forEach(card => {
+                const id = card.id;
+                if (connectedNodes.has(id)) {
+                    card.classList.remove('dimmed');
+                    card.classList.add('highlighted');
+                } else {
+                    card.classList.add('dimmed');
+                    card.classList.remove('highlighted');
+                }
+            });
+
+            // Highlight connections (paths)
+            const allPaths = document.querySelectorAll('.connection-path');
+            allPaths.forEach(path => {
+                const idAttr = path.getAttribute('id') || '';
+                const parts = idAttr.replace('path-', '').split('-');
+                if (parts.length === 2) {
+                    const [from, to] = parts;
+                    // Path is highlighted if BOTH endpoints are in the connected set
+                    if (connectedNodes.has(from) && connectedNodes.has(to)) {
+                        path.classList.add('path-highlighted');
+                        path.style.opacity = '1';
+                    } else {
+                        path.classList.remove('path-highlighted');
+                        path.style.opacity = '0.05';
+                    }
+                }
+            });
+        }
+
+        function resetHighlightDelayed() {
+            if (isFlowRunning) return; // Do not reset if a click flow is running
+            highlightTimeout = setTimeout(resetHighlight, 200);
+        }
+
+        function resetHighlight() {
+            const allCards = document.querySelectorAll('.flow-card');
+            allCards.forEach(card => {
+                card.classList.remove('dimmed');
+                card.classList.remove('highlighted');
+            });
+
+            const allPaths = document.querySelectorAll('.connection-path');
+            allPaths.forEach(path => {
+                path.classList.remove('path-highlighted');
+                path.style.opacity = '0.45';
+            });
+        }
+
+        // Trip Click Flow Script
+        function runTripFlow(tripId) {
+            cancelTripFlow();
+            isFlowRunning = true;
+            resetHighlight();
+
+            const connectedNodes = getTraceNodes(tripId);
+
+            // Filter nodes by column type
+            const sos = Array.from(connectedNodes).filter(id => id.startsWith('so'));
+            const dos = Array.from(connectedNodes).filter(id => id.startsWith('do'));
+            const bbgns = Array.from(connectedNodes).filter(id => id.startsWith('bbgn') || id === 'bbgn_container1' || id === 'bbgn_container2');
+
+            // Dim all elements first
+            const allCards = document.querySelectorAll('.flow-card');
+            allCards.forEach(card => {
+                card.classList.add('dimmed');
+                card.classList.remove('highlighted');
+            });
+            const allPaths = document.querySelectorAll('.connection-path');
+            allPaths.forEach(path => {
+                path.style.opacity = '0.05';
+                path.classList.remove('path-highlighted');
+            });
+
+            // Step 1: Highlight SOs (Immediate)
+            sos.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.remove('dimmed');
+                    el.classList.add('highlighted');
+                }
+            });
+
+            // Step 2: Flow to DOs (after 800ms)
+            activeFlowTimeouts.push(setTimeout(() => {
+                dos.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.classList.remove('dimmed');
+                        el.classList.add('highlighted');
+                    }
+                });
+
+                allPaths.forEach(path => {
+                    const idAttr = path.getAttribute('id') || '';
+                    const parts = idAttr.replace('path-', '').split('-');
+                    if (parts.length === 2) {
+                        const [from, to] = parts;
+                        if (sos.includes(from) && dos.includes(to)) {
+                            path.classList.add('path-highlighted');
+                            path.style.opacity = '1';
+                        }
+                    }
+                });
+            }, 800));
+
+            // Step 3: Flow to BBGN containers & items (after 1600ms)
+            activeFlowTimeouts.push(setTimeout(() => {
+                bbgns.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.classList.remove('dimmed');
+                        el.classList.add('highlighted');
+                    }
+                });
+
+                allPaths.forEach(path => {
+                    const idAttr = path.getAttribute('id') || '';
+                    const parts = idAttr.replace('path-', '').split('-');
+                    if (parts.length === 2) {
+                        const [from, to] = parts;
+                        // Path from Column 2 DO to Column 3 BBGN (item or parent container)
+                        if (dos.includes(from) && (bbgns.includes(to) || containerChildren[to]?.some(c => bbgns.includes(c)))) {
+                            path.classList.add('path-highlighted');
+                            path.style.opacity = '1';
+                        }
+                    }
+                });
+            }, 1600));
+
+            // Step 4: Flow to target Trip Card (after 2400ms)
+            activeFlowTimeouts.push(setTimeout(() => {
+                const tripEl = document.getElementById(tripId);
+                if (tripEl) {
+                    tripEl.classList.remove('dimmed');
+                    tripEl.classList.add('highlighted');
+                }
+
+                allPaths.forEach(path => {
+                    const idAttr = path.getAttribute('id') || '';
+                    const parts = idAttr.replace('path-', '').split('-');
+                    if (parts.length === 2) {
+                        const [from, to] = parts;
+                        if (bbgns.includes(from) && to === tripId) {
+                            path.classList.add('path-highlighted');
+                            path.style.opacity = '1';
+                        }
+                    }
+                });
+
+                isFlowRunning = false; // complete
+            }, 2400));
+        }
+
+        function cancelTripFlow() {
+            activeFlowTimeouts.forEach(t => clearTimeout(t));
+            activeFlowTimeouts = [];
+            isFlowRunning = false;
+        }
+
+        // Initialize SVGs after window is loaded and on window resizing
+        window.addEventListener('load', () => {
+            drawConnections();
+        });
+
+        window.addEventListener('resize', () => {
+            drawConnections();
+        });
+
+        // Watch for font loads to ensure layout boundaries are final
+        document.fonts.ready.then(() => {
+            drawConnections();
+        });
+    </script>
+</body>
+
+</html>

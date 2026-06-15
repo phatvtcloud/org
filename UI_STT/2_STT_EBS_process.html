@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quy Trình EBS - DC - Nhà Vận Tải - Nhà Phân Phối</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#0284c7',
+                            green: '#16a34a',
+                            purple: '#7c3aed',
+                            orange: '#ea580c',
+                            navy: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .dark body {
+            background-color: #0b0f19;
+            color: #cbd5e1;
+        }
+
+        /* Smooth page transition */
+        .theme-transition {
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Glassmorphism custom components */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .dark .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+
+        /* Flow connection lines animation */
+        @keyframes pulseGlow {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 0.9;
+            }
+        }
+
+        .line-glow {
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+
+        /* Horizontal scrolling indicators */
+        .step-active {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
+            transform: scale(1.02);
+        }
+
+        .dark .step-active {
+            border-color: #60a5fa !important;
+            box-shadow: 0 0 25px rgba(96, 165, 250, 0.3);
+        }
+
+        /* Custom dash scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Floating effect */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-4px);
+            }
+        }
+
+        .float-animation {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Flowing dots along SVG paths */
+        @keyframes dashOffset {
+            to {
+                stroke-dashoffset: -40;
+            }
+        }
+
+        .flowing-dash {
+            stroke-dasharray: 8, 4;
+            animation: dashOffset 1.5s linear infinite;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen pb-16 theme-transition">
+
+    <!-- Top Navigation Bar -->
+    <header
+        class="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md transition-colors duration-300">
+        <div class="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-gradient-to-tr from-brand-blue to-brand-purple rounded-xl text-white shadow-md">
+                    <i class="fa-solid fa-arrows-spin text-xl animate-spin" style="animation-duration: 8s;"></i>
+                </div>
+                <div>
+                    <h1
+                        class="text-xl font-black font-sans tracking-wide text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                        II> QUY TRÌNH EBS – DC – NHÀ VẬN TẢI – NHÀ PHÂN PHỐI
+                    </h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Hệ thống điều phối điều hành &
+                        quản lý chứng từ Masan DC FMCG</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" onclick="toggleTheme()"
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-650 dark:text-slate-300 hover:scale-105 transition-all border border-slate-200 dark:border-slate-700">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1600px] mx-auto px-6 mt-8 space-y-8">
+
+        <!-- SECTION 1: NỀN TẢNG HỆ THỐNG & MỤC TIÊU -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Nền tảng hệ thống -->
+            <div
+                class="lg:col-span-2 glass-panel rounded-3xl p-6 shadow-sm relative overflow-hidden transition-all duration-300">
+                <div
+                    class="absolute -right-16 -top-16 w-32 h-32 bg-sky-400/10 dark:bg-sky-500/5 rounded-full blur-2xl pointer-events-none">
+                </div>
+
+                <h3
+                    class="text-xs font-extrabold uppercase tracking-widest text-brand-blue mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-brand-blue"></span>
+                    1. Nền tảng hệ thống (Đồng bộ dữ liệu)
+                </h3>
+
+                <!-- System flow chart -->
+                <div class="relative flex flex-col md:flex-row items-center justify-between gap-6 py-4 z-10">
+                    <!-- Absolute SVG for connecting lines -->
+                    <svg class="absolute inset-0 hidden md:block w-full h-full pointer-events-none z-0"
+                        id="platform-svg"></svg>
+
+                    <!-- EBS -->
+                    <div id="ebs-node"
+                        class="relative w-full md:w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl shadow-sm text-center z-10 flex flex-col items-center hover:scale-105 transition-transform duration-300">
+                        <div
+                            class="w-12 h-12 bg-blue-50 dark:bg-blue-950/50 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 mb-2">
+                            <i class="fa-solid fa-database text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-850 dark:text-slate-100">EBS</h4>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">Hệ thống gốc</p>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-right text-slate-400 dark:text-slate-500 block md:hidden rotate-90"></i>
+
+                    <!-- Onetech -->
+                    <div id="Onetech-node"
+                        class="relative w-full md:w-40 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl shadow-sm text-center z-10 flex flex-col items-center hover:scale-105 transition-transform duration-300">
+                        <div
+                            class="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl flex items-center justify-center text-emerald-600 dark:emerald-400 mb-2">
+                            <i class="fa-solid fa-circle-nodes text-xl"></i>
+                        </div>
+                        <h4
+                            class="font-bold text-sm text-slate-850 dark:text-slate-100 flex items-center gap-1.5 justify-center">
+                            Onetech
+                        </h4>
+                        <p
+                            class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full mt-1">
+                            Đồng bộ</p>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-right text-slate-400 dark:text-slate-500 block md:hidden rotate-90"></i>
+
+                    <!-- Rocket -->
+                    <div id="rocket-node"
+                        class="relative w-full md:w-40 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl shadow-sm text-center z-10 flex flex-col items-center hover:scale-105 transition-transform duration-300">
+                        <div
+                            class="w-12 h-12 bg-orange-50 dark:bg-orange-950/50 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mb-2">
+                            <i class="fa-solid fa-rocket text-xl"></i>
+                        </div>
+                        <h4
+                            class="font-bold text-sm text-slate-850 dark:text-slate-100 flex items-center gap-1.5 justify-center">
+                            Rocket
+                        </h4>
+                        <p
+                            class="text-[10px] text-orange-600 dark:text-orange-400 font-bold bg-orange-50 dark:bg-orange-950/50 px-2 py-0.5 rounded-full mt-1">
+                            Đồng bộ</p>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-right text-slate-400 dark:text-slate-500 block md:hidden rotate-90"></i>
+
+                    <!-- STT -->
+                    <div id="stt-node"
+                        class="relative w-full md:w-40 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl shadow-sm text-center z-10 flex flex-col items-center hover:scale-105 transition-transform duration-300">
+                        <div
+                            class="w-12 h-12 bg-purple-50 dark:bg-purple-950/50 rounded-xl flex items-center justify-center text-purple-600 dark:text-purple-400 mb-2">
+                            <i class="fa-solid fa-network-wired text-xl"></i>
+                        </div>
+                        <h4
+                            class="font-bold text-sm text-slate-850 dark:text-slate-100 flex items-center gap-1.5 justify-center">
+                            STT
+                        </h4>
+                        <p
+                            class="text-[10px] text-purple-600 dark:text-purple-400 font-bold bg-purple-50 dark:bg-purple-950/50 px-2 py-0.5 rounded-full mt-1">
+                            Đồng bộ</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mục tiêu -->
+            <div
+                class="bg-gradient-to-tr from-brand-purple/10 via-brand-blue/5 to-transparent border border-violet-200 dark:border-violet-900 rounded-3xl p-6 shadow-sm flex flex-col justify-center relative overflow-hidden transition-all duration-300">
+                <!-- Target Icon BG watermark -->
+                <i
+                    class="fa-solid fa-bullseye absolute right-4 bottom-4 text-7xl text-purple-500/10 pointer-events-none float-animation"></i>
+
+                <h3
+                    class="text-xs font-extrabold uppercase tracking-widest text-brand-purple mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-bullseye text-sm"></i>
+                    Mục tiêu chính
+                </h3>
+                <p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed font-medium">
+                    Đảm bảo <strong class="text-brand-purple dark:text-violet-400">D&T tại DC</strong> tạo DO và Trip
+                    <strong class="text-brand-blue dark:text-sky-400">đúng kế hoạch</strong> của nhà vận tải, để xe giao
+                    hàng đúng tải trọng, đúng thời gian.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECTION 2: TIẾN TRÌNH THỜI GIAN PHỐI HỢP (Steps 2 to 6) -->
+        <section class="space-y-4">
+            <h3 class="text-xs font-extrabold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                <i class="fa-regular fa-clock"></i>
+                Lịch Trình Chi Tiết Các Bước Vận Hành
+            </h3>
+
+            <div class="flex flex-col xl:flex-row xl:items-stretch justify-between gap-4 xl:gap-2">
+
+                <!-- STEP 2: SO RELEASE -->
+                <div id="step-card-2"
+                    class="glass-panel border-l-4 border-l-blue-500 rounded-2xl p-5 flex flex-col justify-between flex-1 transition-all duration-300 hover:shadow-md cursor-pointer relative"
+                    onclick="highlightTimelineStep(2)">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span
+                                class="px-3 py-1 text-xs font-sans font-extrabold rounded-lg bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400">17:00</span>
+                            <span class="text-xs font-bold text-slate-400">Bước 2</span>
+                        </div>
+                        <h4 class="font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2 mt-3">
+                            2. SO RELEASE
+                        </h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium">
+                            Hệ thống EBS tự động Release các Sales Order (SO).
+                        </p>
+                    </div>
+                    <div
+                        class="pt-2 mt-4 border-t border-slate-100 dark:border-slate-800/85 text-[11px] font-semibold text-blue-500 flex items-center gap-1.5">
+                        <i class="fa-solid fa-server"></i> EBS &rarr; Sales Order (SO)
+                    </div>
+                </div>
+
+                <!-- Connecting Arrow 2 -> 3 -->
+                <div class="flex flex-col items-center justify-center py-2 xl:py-0 xl:px-2 min-w-[70px]">
+                    <span class="text-[10px] font-bold text-slate-450 dark:text-slate-500 mb-1">30 phút</span>
+                    <i
+                        class="fa-solid fa-arrow-right-long text-slate-400 dark:text-slate-600 text-xl hidden xl:block"></i>
+                    <i
+                        class="fa-solid fa-arrow-down-long text-slate-400 dark:text-slate-600 text-xl block xl:hidden"></i>
+                </div>
+
+                <!-- STEP 3: DC TỔNG HỢP SO -->
+                <div id="step-card-3"
+                    class="glass-panel border-l-4 border-l-emerald-500 rounded-2xl p-5 flex flex-col justify-between flex-1 transition-all duration-300 hover:shadow-md cursor-pointer relative"
+                    onclick="highlightTimelineStep(3)">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span
+                                class="px-3 py-1 text-xs font-sans font-extrabold rounded-lg bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400">17:30</span>
+                            <span class="text-xs font-bold text-slate-400">Bước 3</span>
+                        </div>
+                        <h4 class="font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2 mt-3">
+                            3. DC TỔNG HỢP SO
+                        </h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium">
+                            DC có 30 phút để tổng hợp SO và gửi danh sách cho nhà vận tải.
+                        </p>
+                    </div>
+                    <div
+                        class="pt-2 mt-4 border-t border-slate-100 dark:border-slate-800/85 text-[11px] font-semibold text-emerald-500 flex items-center gap-1.5">
+                        <i class="fa-solid fa-business-time"></i> Tổng hợp & Gửi danh sách SO
+                    </div>
+                </div>
+
+                <!-- Connecting Arrow 3 -> 4 -->
+                <div class="flex items-center justify-center py-2 xl:py-0 xl:px-2">
+                    <i
+                        class="fa-solid fa-chevron-right text-slate-400 dark:text-slate-600 text-xl hidden xl:block animate-pulse"></i>
+                    <i
+                        class="fa-solid fa-chevron-down text-slate-400 dark:text-slate-600 text-xl block xl:hidden animate-pulse"></i>
+                </div>
+
+                <!-- STEP 4: NHÀ VẬN TẢI & D&T TẠI DC (Song song) -->
+                <div id="step-card-4"
+                    class="bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex flex-col justify-between flex-[2] transition-all duration-300 relative"
+                    onclick="highlightTimelineStep(4)">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span
+                                class="px-3 py-1 text-xs font-sans font-extrabold rounded-lg bg-violet-100 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400">19:00
+                                - 22:00 <span class="text-[10px] font-normal">(hoặc đến 06:00 sáng)</span></span>
+                            <span class="text-xs font-bold text-slate-400">Bước 4</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-9 gap-4 items-center mt-3">
+                            <!-- 4A. Nhà Vận Tải -->
+                            <div
+                                class="md:col-span-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 p-4 rounded-xl shadow-sm text-center">
+                                <span
+                                    class="text-[10px] font-extrabold text-violet-600 dark:text-violet-400 uppercase tracking-wider bg-violet-50 dark:bg-violet-950/50 px-2 py-0.5 rounded-md">4A.
+                                    NHÀ VẬN TẢI</span>
+                                <p
+                                    class="text-xs text-slate-650 dark:text-slate-300 mt-2.5 font-medium leading-relaxed">
+                                    Lập kế hoạch chia xe và gửi lại kế hoạch cho DC.
+                                </p>
+                            </div>
+
+                            <!-- Song Song Icon -->
+                            <div class="md:col-span-1 flex flex-col items-center justify-center text-center">
+                                <div class="w-8 h-8 rounded-full bg-violet-500/10 dark:bg-violet-500/20 text-violet-500 flex items-center justify-center mb-1 animate-spin"
+                                    style="animation-duration: 4s;">
+                                    <i class="fa-solid fa-arrows-rotate text-sm"></i>
+                                </div>
+                                <span class="text-[9px] font-extrabold text-violet-500 tracking-wider">SONG SONG</span>
+                            </div>
+
+                            <!-- 4B. D&T Tại DC -->
+                            <div
+                                class="md:col-span-4 bg-white dark:bg-slate-800 border-2 border-violet-500 dark:border-violet-400/80 p-4 rounded-xl shadow-md text-center relative overflow-hidden ring-4 ring-violet-500/10">
+                                <div
+                                    class="absolute top-0 right-0 bg-violet-500 text-white text-[8px] font-extrabold uppercase px-2 py-0.5 rounded-bl-md">
+                                    QUAN TRỌNG</div>
+                                <span
+                                    class="text-[10px] font-extrabold text-violet-600 dark:text-violet-400 uppercase tracking-wider bg-violet-50 dark:bg-violet-950/50 px-2 py-0.5 rounded-md">4B.
+                                    D&T TẠI DC</span>
+                                <p
+                                    class="text-xs text-slate-650 dark:text-slate-300 mt-2.5 font-semibold leading-relaxed">
+                                    Tạo DO và tạo Trip trên EBS dựa trên kế hoạch của nhà vận tải.
+                                </p>
+                                <p class="text-[9px] text-violet-500 dark:text-violet-400 font-bold mt-1.5">
+                                    <i class="fa-solid fa-circle-exclamation"></i> Bước tạo DO quan trọng
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Connecting Arrow 4 -> 5 -->
+                <div class="flex items-center justify-center py-2 xl:py-0 xl:px-2">
+                    <i
+                        class="fa-solid fa-chevron-right text-slate-400 dark:text-slate-600 text-xl hidden xl:block animate-pulse"></i>
+                    <i
+                        class="fa-solid fa-chevron-down text-slate-400 dark:text-slate-600 text-xl block xl:hidden animate-pulse"></i>
+                </div>
+
+                <!-- STEP 5: XE ĐẾN DC -->
+                <div id="step-card-5"
+                    class="glass-panel border-l-4 border-l-amber-500 rounded-2xl p-5 flex flex-col justify-between flex-1 transition-all duration-300 hover:shadow-md cursor-pointer"
+                    onclick="highlightTimelineStep(5)">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span
+                                class="px-2.5 py-0.5 text-[11px] font-sans font-extrabold rounded-lg bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400">06:00
+                                <span class="font-normal text-[9px]">(Sáng hôm sau)</span></span>
+                            <span class="text-xs font-bold text-slate-400">Bước 5</span>
+                        </div>
+                        <h4 class="font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-1.5 mt-3">
+                            5. XE ĐẾN DC
+                        </h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium leading-relaxed">
+                            Xe tới DC. DC in Phiếu xuất kho (DO) gửi cho tài xế và in Picking List gửi cho nhân viên
+                            kho.
+                        </p>
+                    </div>
+                    <div
+                        class="pt-2 mt-4 border-t border-slate-100 dark:border-slate-800/85 text-[11px] font-semibold text-amber-500 flex items-center gap-1.5">
+                        <i class="fa-solid fa-truck-ramp-box"></i> Xe tới DC & In DO
+                    </div>
+                </div>
+
+                <!-- Connecting Arrow 5 -> 6 -->
+                <div class="flex items-center justify-center py-2 xl:py-0 xl:px-2">
+                    <i
+                        class="fa-solid fa-chevron-right text-slate-400 dark:text-slate-600 text-xl hidden xl:block animate-pulse"></i>
+                    <i
+                        class="fa-solid fa-chevron-down text-slate-400 dark:text-slate-600 text-xl block xl:hidden animate-pulse"></i>
+                </div>
+
+                <!-- STEP 6: PICK HÀNG XONG -->
+                <div id="step-card-6"
+                    class="glass-panel border-l-4 border-l-blue-500 rounded-2xl p-5 flex flex-col justify-between flex-1 transition-all duration-300 hover:shadow-md cursor-pointer"
+                    onclick="highlightTimelineStep(6)">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span
+                                class="px-2.5 py-0.5 text-[11px] font-sans font-extrabold rounded-lg bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400">09:00</span>
+                            <span class="text-xs font-bold text-slate-400">Bước 6</span>
+                        </div>
+                        <h4 class="font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-1.5 mt-3">
+                            6. PICK HÀNG XONG
+                        </h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium leading-relaxed">
+                            Kho pick hàng xong. Nhà vận tải cầm Phiếu xuất kho (DO) xuống đưa cho D&T tại DC để lấy Biên
+                            bản giao nhận.
+                        </p>
+                    </div>
+                    <div
+                        class="pt-2 mt-4 border-t border-slate-100 dark:border-slate-800/85 text-[11px] font-semibold text-blue-500 flex items-center gap-1.5">
+                        <i class="fa-solid fa-clipboard-check"></i> Lấy Biên bản giao nhận
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 3: CHI TIẾT QUY TRÌNH CHỨNG TỪ (Steps 7 & 8) -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Step 7: Quy trình phiếu xuất kho -->
+            <div
+                class="lg:col-span-2 glass-panel rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-colors">
+                <div>
+                    <h3
+                        class="text-xs font-extrabold uppercase tracking-widest text-brand-orange mb-6 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-brand-orange animate-pulse"></span>
+                        7. Quy Trình Phiếu Xuất Kho (DO)
+                    </h3>
+
+                    <!-- Horizontal process nodes -->
+                    <div class="grid grid-cols-1 sm:grid-cols-5 gap-4 relative">
+                        <!-- Card 1 -->
+                        <div
+                            class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 p-4 rounded-xl text-center shadow-sm relative flex flex-col items-center hover:-translate-y-1 transition-transform">
+                            <div
+                                class="w-10 h-10 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center mb-2">
+                                <i class="fa-solid fa-truck"></i>
+                            </div>
+                            <p class="text-[10px] text-slate-700 dark:text-slate-350 font-semibold leading-relaxed">
+                                Nhà vận tải cầm Phiếu xuất kho (DO) xuống đưa cho D&T tại DC
+                            </p>
+                            <span
+                                class="absolute top-2 right-2 w-4 h-4 bg-slate-100 dark:bg-slate-750 text-slate-400 rounded-full flex items-center justify-center text-[9px] font-bold">1</span>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div
+                            class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 p-4 rounded-xl text-center shadow-sm relative flex flex-col items-center hover:-translate-y-1 transition-transform">
+                            <div
+                                class="w-10 h-10 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center mb-2">
+                                <i class="fa-solid fa-user-check"></i>
+                            </div>
+                            <p class="text-[10px] text-slate-700 dark:text-slate-350 font-semibold leading-relaxed">
+                                D&T tại DC kiểm tra thông tin, đối chiếu thực tế
+                            </p>
+                            <span
+                                class="absolute top-2 right-2 w-4 h-4 bg-slate-100 dark:bg-slate-750 text-slate-400 rounded-full flex items-center justify-center text-[9px] font-bold">2</span>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div
+                            class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 p-4 rounded-xl text-center shadow-sm relative flex flex-col items-center hover:-translate-y-1 transition-transform">
+                            <div
+                                class="w-10 h-10 rounded-full bg-purple-500/10 text-purple-500 flex items-center justify-center mb-2">
+                                <i class="fa-solid fa-file-signature"></i>
+                            </div>
+                            <p class="text-[10px] text-slate-700 dark:text-slate-350 font-semibold leading-relaxed">
+                                Hoàn thành lập Biên bản giao nhận (Proof of Delivery)
+                            </p>
+                            <span
+                                class="absolute top-2 right-2 w-4 h-4 bg-slate-100 dark:bg-slate-750 text-slate-400 rounded-full flex items-center justify-center text-[9px] font-bold">3</span>
+                        </div>
+
+                        <!-- Card 4 -->
+                        <div
+                            class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 p-4 rounded-xl text-center shadow-sm relative flex flex-col items-center hover:-translate-y-1 transition-transform">
+                            <div
+                                class="w-10 h-10 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center mb-2">
+                                <i class="fa-solid fa-laptop-code"></i>
+                            </div>
+                            <p class="text-[10px] text-slate-700 dark:text-slate-350 font-semibold leading-relaxed">
+                                Bấm Ship Confirm trên hệ thống để xuất hóa đơn và giảm tồn hệ thống
+                            </p>
+                            <span
+                                class="absolute top-2 right-2 w-4 h-4 bg-slate-100 dark:bg-slate-750 text-slate-400 rounded-full flex items-center justify-center text-[9px] font-bold">4</span>
+                        </div>
+
+                        <!-- Card 5 (7.5) -->
+                        <div
+                            class="bg-white dark:bg-slate-800 border-2 border-emerald-500 dark:border-emerald-400/80 p-4 rounded-xl text-center shadow-md relative flex flex-col items-center hover:-translate-y-1 transition-transform overflow-hidden ring-4 ring-emerald-500/10">
+                            <div
+                                class="absolute top-0 right-0 bg-emerald-500 text-white text-[7px] font-extrabold uppercase px-1.5 py-0.5 rounded-bl-md">
+                                QUAN TRỌNG</div>
+                            <div
+                                class="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-2">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                            <p class="text-[10px] text-slate-700 dark:text-slate-350 font-bold leading-relaxed">
+                                Biên bản giao nhận và Phiếu xuất kho được ký xác nhận hoàn tất
+                            </p>
+                            <span
+                                class="absolute top-2 left-2 w-4 h-4 bg-slate-100 dark:bg-slate-750 text-slate-400 rounded-full flex items-center justify-center text-[9px] font-bold">5</span>
+                            <p class="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold mt-1.5">
+                                <i class="fa-solid fa-star"></i> Biên bản giao nhận (Trip) quan trọng
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 8: Phiếu xuất kho 4 liên -->
+            <div class="glass-panel rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-colors">
+                <div>
+                    <h3
+                        class="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-copy"></i>
+                        8. Phiếu Xuất Kho (DO) - 4 Liên (Ghi chú)
+                    </h3>
+                    <p class="text-[10px] text-slate-400 dark:text-slate-500 mb-4 font-semibold">Sau khi hoàn thành,
+                        Phiếu xuất kho (DO) gồm 4 liên với màu sắc khác nhau:</p>
+
+                    <div class="grid grid-cols-2 gap-3">
+
+                        <!-- Liên 1 -->
+                        <div
+                            class="bg-white dark:bg-slate-800/80 border border-slate-150 dark:border-slate-700 p-3 rounded-xl flex items-start gap-2 shadow-sm relative overflow-hidden">
+                            <!-- Paper representation bar -->
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-slate-300"></div>
+                            <div class="text-slate-450 dark:text-slate-400 mt-1"><i
+                                    class="fa-regular fa-file-lines text-base"></i></div>
+                            <div>
+                                <h4 class="font-extrabold text-[10px] text-slate-700 dark:text-slate-205">LIÊN 1 <span
+                                        class="font-normal text-slate-400">(Trắng)</span></h4>
+                                <p class="text-[9px] text-slate-500 dark:text-slate-450 mt-1">DC giữ lại (Lưu tại DC).
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Liên 2 -->
+                        <div
+                            class="bg-rose-50/20 dark:bg-rose-950/5 border border-rose-150 dark:border-rose-900/40 p-3 rounded-xl flex items-start gap-2 shadow-sm relative overflow-hidden">
+                            <!-- Paper representation bar -->
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-rose-400"></div>
+                            <div class="text-rose-500 mt-1"><i class="fa-regular fa-file-lines text-base"></i></div>
+                            <div>
+                                <h4 class="font-extrabold text-[10px] text-rose-700 dark:text-rose-405">LIÊN 2 <span
+                                        class="font-normal text-rose-400/80">(Hồng)</span></h4>
+                                <p class="text-[9px] text-rose-600/80 dark:text-rose-450 mt-1">Bốc xếp (Giữ lại).</p>
+                            </div>
+                        </div>
+
+                        <!-- Liên 3 -->
+                        <div
+                            class="bg-sky-50/20 dark:bg-sky-950/5 border border-sky-150 dark:border-sky-900/40 p-3 rounded-xl flex items-start gap-2 shadow-sm relative overflow-hidden">
+                            <!-- Paper representation bar -->
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-sky-400"></div>
+                            <div class="text-sky-500 mt-1"><i class="fa-regular fa-file-lines text-base"></i></div>
+                            <div>
+                                <h4 class="font-extrabold text-[10px] text-sky-700 dark:text-sky-405">LIÊN 3 <span
+                                        class="font-normal text-sky-400/80">(Xanh)</span></h4>
+                                <p class="text-[9px] text-sky-600/80 dark:text-sky-450 mt-1">Nhà phân phối / Khách hàng
+                                    giữ lại.</p>
+                            </div>
+                        </div>
+
+                        <!-- Liên 4 -->
+                        <div
+                            class="bg-amber-50/20 dark:bg-amber-950/5 border border-amber-150 dark:border-amber-900/40 p-3 rounded-xl flex items-start gap-2 shadow-sm relative overflow-hidden">
+                            <!-- Paper representation bar -->
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-400"></div>
+                            <div class="text-amber-500 mt-1"><i class="fa-regular fa-file-lines text-base"></i></div>
+                            <div>
+                                <h4 class="font-extrabold text-[10px] text-amber-700 dark:text-amber-405">LIÊN 4 <span
+                                        class="font-normal text-amber-400/80">(Vàng)</span></h4>
+                                <p class="text-[9px] text-amber-600/80 dark:text-amber-450 mt-1">Bảo vệ tại DC giữ lại
+                                    (OK).</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: TÓM TẮT DÒNG THỜI GIAN, GHI CHÚ, LỢI ÍCH -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Tóm tắt dòng thời gian -->
+            <div class="glass-panel rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-colors">
+                <h3
+                    class="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-timeline"></i>
+                    Tóm Tắt Dòng Thời Gian
+                </h3>
+
+                <!-- Timeline Axis Line -->
+                <div class="relative py-4">
+                    <div class="absolute top-8 left-4 right-4 h-1 bg-slate-200 dark:bg-slate-750 z-0"></div>
+                    <!-- Indicator slider -->
+                    <div id="timeline-slider"
+                        class="absolute top-8 left-4 h-1 bg-blue-500 transition-all duration-500 z-10"
+                        style="width: 0%;"></div>
+
+                    <div class="relative flex justify-between z-20">
+                        <!-- Node 17:00 -->
+                        <div class="flex flex-col items-center cursor-pointer group" onclick="highlightTimelineStep(2)">
+                            <div class="w-4 h-4 rounded-full bg-blue-500 border-4 border-white dark:border-slate-800 shadow-md group-hover:scale-125 transition-transform"
+                                id="node-dot-2"></div>
+                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-350 mt-2">17:00</span>
+                            <span class="text-[8px] text-slate-400 dark:text-slate-500 font-medium">SO Release</span>
+                        </div>
+
+                        <!-- Node 17:30 -->
+                        <div class="flex flex-col items-center cursor-pointer group" onclick="highlightTimelineStep(3)">
+                            <div class="w-4 h-4 rounded-full bg-slate-300 dark:bg-slate-600 border-4 border-white dark:border-slate-800 shadow-md group-hover:scale-125 transition-transform"
+                                id="node-dot-3"></div>
+                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-350 mt-2">17:30</span>
+                            <span class="text-[8px] text-slate-400 dark:text-slate-500 font-medium">DC Tổng hợp</span>
+                        </div>
+
+                        <!-- Node 19:00 - 22:00 -->
+                        <div class="flex flex-col items-center cursor-pointer group" onclick="highlightTimelineStep(4)">
+                            <div class="w-4 h-4 rounded-full bg-slate-300 dark:bg-slate-600 border-4 border-white dark:border-slate-800 shadow-md group-hover:scale-125 transition-transform"
+                                id="node-dot-4"></div>
+                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-350 mt-2">19:00 -
+                                22:00</span>
+                            <span class="text-[8px] text-slate-400 dark:text-slate-500 font-medium">Lập kế hoạch</span>
+                        </div>
+
+                        <!-- Node 06:00 -->
+                        <div class="flex flex-col items-center cursor-pointer group" onclick="highlightTimelineStep(5)">
+                            <div class="w-4 h-4 rounded-full bg-slate-300 dark:bg-slate-600 border-4 border-white dark:border-slate-800 shadow-md group-hover:scale-125 transition-transform"
+                                id="node-dot-5"></div>
+                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-350 mt-2">06:00</span>
+                            <span class="text-[8px] text-slate-400 dark:text-slate-500 font-medium">Xe tới DC</span>
+                        </div>
+
+                        <!-- Node 09:00 -->
+                        <div class="flex flex-col items-center cursor-pointer group" onclick="highlightTimelineStep(6)">
+                            <div class="w-4 h-4 rounded-full bg-slate-300 dark:bg-slate-600 border-4 border-white dark:border-slate-800 shadow-md group-hover:scale-125 transition-transform"
+                                id="node-dot-6"></div>
+                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-350 mt-2">09:00</span>
+                            <span class="text-[8px] text-slate-400 dark:text-slate-500 font-medium">Pick xong</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ghi chú giải thích -->
+            <div class="glass-panel rounded-3xl p-6 shadow-sm transition-colors">
+                <h3
+                    class="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question"></i>
+                    Thuật Ngữ Viết Tắt (Ghi Chú)
+                </h3>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <p class="font-bold text-slate-700 dark:text-slate-300 font-mono">SO:</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Sales Order (Đơn bán lẻ)</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-700 dark:text-slate-300 font-mono">DO:</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Delivery Order (Phiếu xuất kho)</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-700 dark:text-slate-300 font-mono">DC:</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Distribution Center (Trung tâm PP)</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-700 dark:text-slate-300 font-mono">STT:</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">System & Tracking Technology</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-700 dark:text-slate-300 font-mono">POD:</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Proof of Delivery (Biên bản giao nhận)
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lợi ích mang lại -->
+            <div
+                class="glass-panel rounded-3xl p-6 shadow-sm border border-emerald-100 dark:border-emerald-950/30 transition-colors">
+                <h3
+                    class="text-xs font-extrabold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check"></i>
+                    Lợi ích & Giá trị mang lại
+                </h3>
+                <ul class="space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-emerald-500 mt-0.5"></i>
+                        <span>Đồng bộ dữ liệu qua Onetech, Rocket, STT.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-emerald-500 mt-0.5"></i>
+                        <span>Tối ưu thời gian tổng hợp, lập kế hoạch - tạo DO/Trip.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-emerald-500 mt-0.5"></i>
+                        <span>Đảm bảo giao hàng đúng tải trọng, đúng thời gian.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-emerald-500 mt-0.5"></i>
+                        <span>Minh bạch chứng từ với 4 liên rõ ràng.</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Set light theme default
+        if (!localStorage.getItem('theme')) {
+            localStorage.setItem('theme', 'light');
+        }
+
+        // Apply theme immediately
+        function applyTheme() {
+            const isDark = localStorage.getItem('theme') === 'dark';
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            // Redraw connections to match theme stroke colors
+            drawPlatformConnections();
+        }
+
+        function toggleTheme() {
+            const current = localStorage.getItem('theme');
+            localStorage.setItem('theme', current === 'dark' ? 'light' : 'dark');
+            applyTheme();
+        }
+
+        // Interactive Timeline Steps
+        function highlightTimelineStep(stepNumber) {
+            // Reset all step card styles
+            for (let i = 2; i <= 6; i++) {
+                const el = document.getElementById('step-card-' + i);
+                const dot = document.getElementById('node-dot-' + i);
+
+                if (el) el.classList.remove('step-active');
+                if (dot) {
+                    dot.classList.remove('bg-blue-500', 'bg-emerald-500', 'bg-violet-500', 'bg-amber-500');
+                    dot.classList.add('bg-slate-300', 'dark:bg-slate-600');
+                }
+            }
+
+            // Highlight the selected step card
+            const activeEl = document.getElementById('step-card-' + stepNumber);
+            if (activeEl) {
+                activeEl.classList.add('step-active');
+                activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            // Update dot colors and timeline slider width
+            const slider = document.getElementById('timeline-slider');
+            const totalSteps = 4; // Step 2 to 6 maps to 0% to 100%
+            const percentage = ((stepNumber - 2) / totalSteps) * 100;
+            slider.style.width = percentage + '%';
+
+            // Set dot active colors
+            const activeDot = document.getElementById('node-dot-' + stepNumber);
+            if (activeDot) {
+                activeDot.classList.remove('bg-slate-300', 'dark:bg-slate-600');
+                if (stepNumber === 2) {
+                    activeDot.classList.add('bg-blue-500');
+                    slider.style.backgroundColor = '#3b82f6';
+                } else if (stepNumber === 3) {
+                    activeDot.classList.add('bg-emerald-500');
+                    slider.style.backgroundColor = '#10b981';
+                } else if (stepNumber === 4) {
+                    activeDot.classList.add('bg-violet-500');
+                    slider.style.backgroundColor = '#8b5cf6';
+                } else if (stepNumber === 5) {
+                    activeDot.classList.add('bg-amber-500');
+                    slider.style.backgroundColor = '#f59e0b';
+                } else if (stepNumber === 6) {
+                    activeDot.classList.add('bg-blue-500');
+                    slider.style.backgroundColor = '#3b82f6';
+                }
+            }
+        }
+
+        // Draw dynamically the platform flow lines
+        function drawPlatformConnections() {
+            const svg = document.getElementById('platform-svg');
+            if (!svg) return;
+            const svgRect = svg.getBoundingClientRect();
+
+            // Clear existing lines
+            const lines = svg.querySelectorAll('.platform-line');
+            lines.forEach(l => l.remove());
+
+            const nodes = ['ebs-node', 'Onetech-node', 'rocket-node', 'stt-node'];
+            const isDark = document.documentElement.classList.contains('dark');
+            const strokeColor = isDark ? '#334155' : '#e2e8f0';
+            const flowColor = '#0284c7';
+
+            for (let i = 0; i < nodes.length - 1; i++) {
+                const fromNode = document.getElementById(nodes[i]);
+                const toNode = document.getElementById(nodes[i + 1]);
+                if (!fromNode || !toNode) continue;
+
+                const fromRect = fromNode.getBoundingClientRect();
+                const toRect = toNode.getBoundingClientRect();
+
+                const x1 = fromRect.right - svgRect.left;
+                const y1 = (fromRect.top + fromRect.height / 2) - svgRect.top;
+                const x2 = toRect.left - svgRect.left;
+                const y2 = (toRect.top + toRect.height / 2) - svgRect.top;
+
+                // Base connection line
+                const baseLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                baseLine.setAttribute('x1', x1);
+                baseLine.setAttribute('y1', y1);
+                baseLine.setAttribute('x2', x2);
+                baseLine.setAttribute('y2', y2);
+                baseLine.setAttribute('stroke', strokeColor);
+                baseLine.setAttribute('stroke-width', '3');
+                baseLine.setAttribute('class', 'platform-line');
+                svg.appendChild(baseLine);
+
+                // Animated flowing dashed line
+                const flowLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                flowLine.setAttribute('x1', x1);
+                flowLine.setAttribute('y1', y1);
+                flowLine.setAttribute('x2', x2);
+                flowLine.setAttribute('y2', y2);
+                flowLine.setAttribute('stroke', flowColor);
+                flowLine.setAttribute('stroke-width', '3');
+                flowLine.setAttribute('class', 'platform-line flowing-dash');
+                flowLine.setAttribute('stroke-linecap', 'round');
+                svg.appendChild(flowLine);
+            }
+        }
+
+        // Auto initialize
+        window.addEventListener('load', () => {
+            applyTheme();
+            highlightTimelineStep(2);
+            // Draw lines with slight timeout to ensure elements layout coordinates are ready
+            setTimeout(drawPlatformConnections, 100);
+        });
+
+        window.addEventListener('resize', drawPlatformConnections);
+    </script>
+</body>
+
+</html>

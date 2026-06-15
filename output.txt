@@ -1,0 +1,8 @@
+--- Sheet: MD06 ---
+Columns: ['Item No', 'Item Name', 'Tấn/ UOM Conversion', 'M3/ UOM Conversion', 'UOM Conversion / Pallet', 'Pallet chồng đôi', 'Item Status']
+     Item No  UOM Conversion / Pallet
+0  97KM01055                     1400
+1  BGTP00028                      800
+2  97NM00035                       68
+3  03NM00530                       27
+4  97KM00894                      225

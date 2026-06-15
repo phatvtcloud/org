@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết Nối Giữa Các Nền Tảng: Hiện Trạng - Vấn Đề - So Sánh - Đề Xuất</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#1e40af',
+                            sky: '#0284c7',
+                            emerald: '#059669',
+                            rose: '#dc2626',
+                            purple: '#7c3aed',
+                            amber: '#d97706',
+                            navy: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .dark body {
+            background-color: #0b0f19;
+            color: #cbd5e1;
+        }
+
+        /* Glassmorphism panels */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .dark .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+
+        /* Card animations */
+        .hover-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .dark .hover-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Dotted borders for non-sync flows */
+        .border-dotted-rose {
+            border-style: dotted;
+            border-width: 2px;
+            border-color: #f43f5e;
+        }
+
+        .border-dashed-blue {
+            border-style: dashed;
+            border-width: 2px;
+            border-color: #3b82f6;
+        }
+
+        /* Theme transition */
+        .theme-transition {
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Animations */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-4px);
+            }
+        }
+
+        .float-animation {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen pb-16 theme-transition">
+
+    <!-- Top Navigation Bar -->
+    <header
+        class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md transition-colors duration-300">
+        <div class="max-w-[1700px] mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-gradient-to-tr from-blue-800 to-sky-500 rounded-xl text-white shadow-md">
+                    <i class="fa-solid fa-circle-nodes text-xl animate-spin" style="animation-duration: 15s;"></i>
+                </div>
+                <div>
+                    <h1
+                        class="text-xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100 uppercase font-sans">
+                        IV> KẾT NỐI GIỮA CÁC NỀN TẢNG: HIỆN TRẠNG – VẤN ĐỀ – SO SÁNH – ĐỀ XUẤT
+                    </h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Hệ thống đồng bộ dữ liệu chuỗi
+                        cung ứng Masan DC FMCG</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" onclick="toggleTheme()"
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-655 dark:text-slate-300 hover:scale-105 transition-all border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-[1700px] mx-auto px-6 mt-8 space-y-8 relative">
+
+        <!-- ==================== TOP BLOCK: SECTION 1, 2, 3 ==================== -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+            <!-- SECTION 1: HIỆN TRẠNG (7 columns) -->
+            <section
+                class="lg:col-span-7 glass-panel rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                <div>
+                    <h2
+                        class="text-sm font-black font-sans tracking-wide text-blue-850 dark:text-blue-400 uppercase mb-6 flex items-center gap-2 border-b pb-3 border-slate-150 dark:border-slate-800">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-800"></span>
+                        1. HIỆN TRẠNG: CÁC NỀN TẢNG HOẠT ĐỘNG RỜI RẠC, KHÔNG LIÊN KẾT
+                    </h2>
+
+                    <!-- Platform Flow Chart -->
+                    <div class="relative flex flex-col xl:flex-row items-stretch justify-between gap-4 py-2">
+
+                        <!-- EBS Card -->
+                        <div
+                            class="flex-1 bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-3 flex flex-col justify-between shadow-sm relative hover-card transition-all">
+                            <div>
+                                <div
+                                    class="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 py-1 px-3 rounded-xl font-bold text-center text-xs uppercase flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-database"></i> EBS
+                                </div>
+                                <div
+                                    class="space-y-1.5 mt-3 text-[10px] font-semibold text-slate-650 dark:text-slate-350">
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        Đơn SO</div>
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        SKU</div>
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        Shipto</div>
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        Org</div>
+                                    <div
+                                        class="bg-rose-50/50 dark:bg-rose-950/20 px-2 py-0.5 rounded text-rose-700 dark:text-rose-400 border border-dotted border-rose-300 dark:border-rose-900/60 font-bold">
+                                        DO (EBS)</div>
+                                    <div
+                                        class="bg-rose-50/50 dark:bg-rose-950/20 px-2 py-0.5 rounded text-rose-700 dark:text-rose-400 border border-dotted border-rose-300 dark:border-rose-900/60 font-bold">
+                                        Trip (EBS)</div>
+                                    <div
+                                        class="bg-rose-50/50 dark:bg-rose-950/20 px-2 py-0.5 rounded text-rose-700 dark:text-rose-400 border border-dotted border-rose-300 dark:border-rose-900/60 font-bold">
+                                        NVT (EBS)</div>
+                                    <div class="px-2 text-slate-400">Lot</div>
+                                    <div class="px-2 text-slate-400">Date</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connector 1 -->
+                        <div
+                            class="flex xl:flex-col items-center justify-center min-w-[20px] text-slate-400 dark:text-slate-600">
+                            <i
+                                class="fa-solid fa-arrow-right-long text-slate-400 dark:text-slate-600 hidden xl:block"></i>
+                            <i
+                                class="fa-solid fa-arrow-down-long text-slate-400 dark:text-slate-600 block xl:hidden"></i>
+                        </div>
+
+                        <!-- OneTech Card -->
+                        <div
+                            class="flex-1 bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-3 flex flex-col justify-between shadow-sm relative hover-card transition-all">
+                            <div>
+                                <div
+                                    class="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 py-1 px-3 rounded-xl font-bold text-center text-xs uppercase flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-desktop"></i> OneTech
+                                </div>
+                                <div
+                                    class="space-y-1.5 mt-3 text-[10px] font-semibold text-slate-650 dark:text-slate-350">
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        Đơn SO</div>
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        SKU</div>
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        Shipto</div>
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        Org</div>
+
+                                    <div
+                                        class="p-1.5 rounded-lg border border-rose-300 dark:border-rose-900 bg-rose-50/30 dark:bg-rose-950/10 text-[9px] mt-2 relative">
+                                        <div class="text-rose-600 dark:text-rose-400 font-extrabold uppercase mb-1">
+                                            KHÔNG ĐỒNG BỘ <span class="text-[8px] text-red-500 font-black">***3</span>
+                                        </div>
+                                        <div class="text-slate-400 line-through">DO (EBS)</div>
+                                        <div class="text-slate-400 line-through">Trip (EBS)</div>
+                                        <div class="text-slate-400 line-through">NVT (EBS)</div>
+                                        <div class="text-slate-400 line-through">Lot</div>
+                                    </div>
+
+                                    <div
+                                        class="p-1.5 rounded-lg border border-blue-200 dark:border-blue-900/80 bg-blue-50/20 dark:bg-blue-950/10 text-[9px] mt-2">
+                                        <div class="text-blue-700 dark:text-blue-400 font-bold">DO (STT)</div>
+                                        <div class="text-blue-700 dark:text-blue-400 font-bold">Trip (STT)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connector 2 -->
+                        <div
+                            class="flex xl:flex-col items-center justify-center min-w-[20px] text-slate-400 dark:text-slate-600">
+                            <i
+                                class="fa-solid fa-arrow-right-long text-slate-400 dark:text-slate-600 hidden xl:block"></i>
+                            <i
+                                class="fa-solid fa-arrow-down-long text-slate-400 dark:text-slate-600 block xl:hidden"></i>
+                        </div>
+
+                        <!-- Rocket Card -->
+                        <div
+                            class="flex-1 bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-3 flex flex-col justify-between shadow-sm relative hover-card transition-all">
+                            <div>
+                                <div
+                                    class="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 py-1 px-3 rounded-xl font-bold text-center text-xs uppercase flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-rocket"></i> Rocket
+                                </div>
+                                <div
+                                    class="space-y-1.5 mt-3 text-[10px] font-semibold text-slate-655 dark:text-slate-350">
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        Đơn SO</div>
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        SKU</div>
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        Shipto</div>
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        Org</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connector 3 -->
+                        <div
+                            class="flex xl:flex-col items-center justify-center min-w-[20px] text-slate-400 dark:text-slate-600">
+                            <i
+                                class="fa-solid fa-arrow-right-long text-slate-400 dark:text-slate-600 hidden xl:block"></i>
+                            <i
+                                class="fa-solid fa-arrow-down-long text-slate-400 dark:text-slate-600 block xl:hidden"></i>
+                        </div>
+
+                        <!-- STT Card -->
+                        <div
+                            class="flex-1 bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-3 flex flex-col justify-between shadow-sm relative hover-card transition-all">
+                            <div>
+                                <div
+                                    class="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 py-1 px-3 rounded-xl font-bold text-center text-xs uppercase flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-truck"></i> STT
+                                </div>
+                                <div
+                                    class="space-y-1.5 mt-3 text-[10px] font-semibold text-slate-655 dark:text-slate-350">
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        Đơn SO</div>
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        SKU</div>
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        Shipto</div>
+                                    <div
+                                        class="bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-dashed border-blue-200 dark:border-blue-900/60">
+                                        Org</div>
+
+                                    <div class="text-center font-bold text-slate-400 text-xs py-0.5">+</div>
+
+                                    <div
+                                        class="p-1.5 rounded-lg border border-blue-300 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-950/20 text-[9px] relative">
+                                        <div class="text-blue-700 dark:text-blue-400 font-extrabold uppercase mb-1">DO
+                                            (STT)</div>
+                                        <div class="text-blue-700 dark:text-blue-400">Trip (STT)</div>
+                                        <div class="text-blue-700 dark:text-blue-400">NVT (STT)</div>
+                                        <div class="absolute right-1 bottom-1 text-[8px] text-red-500 font-black">**2
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connector 4 -->
+                        <div class="flex xl:flex-col items-center justify-center min-w-[20px] text-red-500 relative">
+                            <span class="absolute -top-3 text-[10px] font-black text-rose-600 animate-pulse">*1</span>
+                            <i class="fa-solid fa-arrow-right-long text-rose-500 hidden xl:block"></i>
+                            <i class="fa-solid fa-arrow-down-long text-rose-500 block xl:hidden"></i>
+                        </div>
+
+                        <!-- NPP Card -->
+                        <div
+                            class="flex-1 bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-3 flex flex-col justify-between shadow-sm relative hover-card transition-all">
+                            <div>
+                                <div
+                                    class="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 py-1 px-3 rounded-xl font-bold text-center text-xs uppercase flex items-center justify-center gap-1 w-full">
+                                    <i class="fa-solid fa-store"></i> NPP
+                                </div>
+                                <div class="mt-6 flex flex-col items-center text-center">
+                                    <i
+                                        class="fa-solid fa-house-laptop text-2xl text-slate-400 dark:text-slate-500 float-animation"></i>
+                                    <span class="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 mt-2">Nền
+                                        tảng
+                                        NPP</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Legend section -->
+                <div
+                    class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 pt-4 border-t border-slate-150 dark:border-slate-800">
+                    <div
+                        class="bg-rose-50/20 dark:bg-slate-900/20 p-3 rounded-2xl border border-rose-100 dark:border-slate-800">
+                        <h4
+                            class="text-[10px] font-extrabold text-rose-700 dark:text-rose-400 uppercase tracking-wider mb-2">
+                            CHÚ THÍCH LIÊN KẾT</h4>
+                        <ul class="space-y-1.5 text-[9px] text-slate-600 dark:text-slate-350 font-medium">
+                            <li><strong class="text-rose-600 font-extrabold">*1:</strong> Không có giao thức xác thực
+                                giữa STT và NPP.</li>
+                            <li><strong class="text-rose-600 font-extrabold">**2:</strong> STT và D&T thực hiện tạo
+                                DO/Trip/NVT độc lập trên mỗi hệ thống.</li>
+                            <li><strong class="text-rose-600 font-extrabold">***3:</strong> OneTech không đồng bộ DO,
+                                Trip, NVT từ EBS.</li>
+                        </ul>
+                    </div>
+
+                    <div
+                        class="bg-slate-50 dark:bg-slate-900/20 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+                        <h4
+                            class="text-[10px] font-extrabold text-slate-700 dark:text-slate-350 uppercase tracking-wider mb-2">
+                            GHI CHÚ</h4>
+                        <ul class="space-y-1.5 text-[9px] text-slate-600 dark:text-slate-350 font-medium">
+                            <li class="flex items-center gap-1.5"><span
+                                    class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Mũi tên xanh liền: Đồng bộ hiện
+                                có (SO, SKU, Shipto, Org)</li>
+                            <li class="flex items-center gap-1.5"><span
+                                    class="w-1.5 h-1.5 bg-rose-500 rounded-full"></span> Mũi tên đỏ nét đứt: Không đồng
+                                bộ / không liên kết</li>
+                            <li class="flex items-center gap-1.5"><span
+                                    class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> Dữ liệu thực thi đang rời rạc
+                                giữa các hệ thống</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: VẤN ĐỀ / HỆ LỤY (2 columns) -->
+            <section
+                class="lg:col-span-2 glass-panel rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                <div>
+                    <h2
+                        class="text-sm font-black font-sans tracking-wide text-rose-700 dark:text-rose-455 uppercase mb-6 flex items-center gap-2 border-b pb-3 border-slate-150 dark:border-slate-800">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span>
+                        2. VẤN ĐỀ / HỆ LỤY
+                    </h2>
+
+                    <div class="space-y-3.5">
+                        <!-- Problem 1 -->
+                        <div
+                            class="flex items-start gap-3 p-3 rounded-xl bg-rose-500/5 border border-rose-100 dark:border-rose-950/20 hover:scale-[1.01] transition-all">
+                            <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm mt-0.5 animate-pulse"></i>
+                            <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <strong class="text-rose-700 dark:text-rose-400">Không liên kết dữ liệu thực
+                                    thi</strong> DO / TRIP / NVT trên EBS và STT là 2 bộ dữ liệu khác nhau.
+                            </div>
+                        </div>
+
+                        <!-- Problem 2 -->
+                        <div
+                            class="flex items-start gap-3 p-3 rounded-xl bg-rose-500/5 border border-rose-100 dark:border-rose-950/20 hover:scale-[1.01] transition-all">
+                            <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm mt-0.5"></i>
+                            <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <strong class="text-rose-700 dark:text-rose-400">Không tracking được tiến độ thực
+                                    tế</strong> DO/TRIP trên EBS qua STT.
+                            </div>
+                        </div>
+
+                        <!-- Problem 3 -->
+                        <div
+                            class="flex items-start gap-3 p-3 rounded-xl bg-rose-500/5 border border-rose-100 dark:border-rose-950/20 hover:scale-[1.01] transition-all">
+                            <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm mt-0.5"></i>
+                            <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 leading-relaxed">
+                                Dữ liệu báo cáo, đối soát, KPI <strong class="text-rose-700 dark:text-rose-400">phải
+                                    tổng hợp thủ công</strong> tốn nguồn lực.
+                            </div>
+                        </div>
+
+                        <!-- Problem 4 -->
+                        <div
+                            class="flex items-start gap-3 p-3 rounded-xl bg-rose-500/5 border border-rose-100 dark:border-rose-950/20 hover:scale-[1.01] transition-all">
+                            <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm mt-0.5"></i>
+                            <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 leading-relaxed">
+                                Nhà vận tải/DC phải <strong class="text-rose-700 dark:text-rose-400">thao tác lặp
+                                    lại</strong> (Split SO, Gán tài, Tạo TRIP, cập nhật status).
+                            </div>
+                        </div>
+
+                        <!-- Problem 5 -->
+                        <div
+                            class="flex items-start gap-3 p-3 rounded-xl bg-rose-500/5 border border-rose-100 dark:border-rose-950/20 hover:scale-[1.01] transition-all">
+                            <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm mt-0.5"></i>
+                            <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <strong class="text-rose-700 dark:text-rose-400">Rủi ro sai lệch dữ liệu</strong>, thiếu
+                                nhất quán giữa các bên.
+                            </div>
+                        </div>
+
+
+                        <!-- Problem 7 -->
+                        <div
+                            class="flex items-start gap-3 p-3 rounded-xl bg-rose-500/5 border border-rose-100 dark:border-rose-950/20 hover:scale-[1.01] transition-all">
+                            <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm mt-0.5"></i>
+                            <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 leading-relaxed">
+                                Ảnh hưởng đến khả năng <strong class="text-rose-700 dark:text-rose-400">đối soát
+                                    và quyết toán</strong> tài chính cuối tháng.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: SO SÁNH CHỆCH LỆCH DỮ LIỆU (3 columns) -->
+            <section
+                class="lg:col-span-3 glass-panel rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                <div>
+                    <h2
+                        class="text-sm font-black font-sans tracking-wide text-blue-850 dark:text-blue-400 uppercase mb-6 flex items-center gap-2 border-b pb-3 border-slate-150 dark:border-slate-800">
+                        <span class="w-2.5 h-2.5 rounded-full bg-sky-600"></span>
+                        3. SO SÁNH CHỆCH LỆCH DỮ LIỆU
+                    </h2>
+
+                    <!-- Comparison Table Grid -->
+                    <div class="overflow-hidden rounded-2xl border border-slate-150 dark:border-slate-800 shadow-sm">
+                        <table class="w-full text-left border-collapse text-[10px]">
+                            <thead>
+                                <tr
+                                    class="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-extrabold uppercase">
+                                    <th class="py-3 px-3 text-[9px] w-[25%]">DỮ LIỆU</th>
+                                    <th class="py-3 px-3 text-[9px] w-[30%]">EBS (BỘ SỐ A)</th>
+                                    <th class="py-3 px-3 text-[9px] w-[30%]">STT (BỘ SỐ B)</th>
+                                    <th class="py-3 px-3 text-[9px] w-[15%] text-center">CHỆCH LỆCH</th>
+                                </tr>
+                            </thead>
+                            <tbody
+                                class="divide-y divide-slate-100 dark:divide-slate-800 font-semibold text-slate-700 dark:text-slate-350">
+                                <!-- Row 1 -->
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                    <td class="py-2.5 px-3 font-extrabold">SO</td>
+                                    <td class="py-2.5 px-3">Có số SO A</td>
+                                    <td class="py-2.5 px-3">Có số SO A</td>
+                                    <td class="py-2.5 px-3 text-center text-slate-400 dark:text-slate-550">Không</td>
+                                </tr>
+                                <!-- Row 2 -->
+                                <tr
+                                    class="bg-rose-500/5 dark:bg-rose-950/10 hover:bg-rose-500/10 dark:hover:bg-rose-950/20">
+                                    <td class="py-2.5 px-3 font-extrabold">DO</td>
+                                    <td class="py-2.5 px-3">DO EBS:<br><span
+                                            class="font-mono text-[9px] text-blue-700 dark:text-blue-400">24134505</span>
+                                    </td>
+                                    <td class="py-2.5 px-3">DO STT:<br><span
+                                            class="font-mono text-[9px] text-rose-600 dark:text-rose-455">130000257953</span>
+                                    </td>
+                                    <td class="py-2.5 px-3 text-center"><span
+                                            class="bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 font-black px-1.5 py-0.5 rounded text-[8px]">KHÁC</span>
+                                    </td>
+                                </tr>
+                                <!-- Row 3 -->
+                                <tr
+                                    class="bg-rose-500/5 dark:bg-rose-950/10 hover:bg-rose-500/10 dark:hover:bg-rose-950/20">
+                                    <td class="py-2.5 px-3 font-extrabold">Trip</td>
+                                    <td class="py-2.5 px-3">Trip EBS:<br><span
+                                            class="font-mono text-[9px] text-blue-700 dark:text-blue-400">21663475</span>
+                                    </td>
+                                    <td class="py-2.5 px-3">Trip STT:<br><span
+                                            class="font-mono text-[9px] text-rose-600 dark:text-rose-455">TRIP_VEKRY24419</span>
+                                    </td>
+                                    <td class="py-2.5 px-3 text-center"><span
+                                            class="bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 font-black px-1.5 py-0.5 rounded text-[8px]">KHÁC</span>
+                                    </td>
+                                </tr>
+                                <!-- Row 4 -->
+                                <tr
+                                    class="bg-rose-500/5 dark:bg-rose-950/10 hover:bg-rose-500/10 dark:hover:bg-rose-950/20">
+                                    <td class="py-2.5 px-3 font-extrabold">NVT</td>
+                                    <td class="py-2.5 px-3">NVT EBS:<br><span
+                                            class="font-mono text-[9px] text-blue-700 dark:text-blue-400">78H02140C1</span>
+                                    </td>
+                                    <td class="py-2.5 px-3">NVT STT:<br><span
+                                            class="font-mono text-[9px] text-rose-600 dark:text-rose-455">78H02140</span>
+                                    </td>
+                                    <td class="py-2.5 px-3 text-center"><span
+                                            class="bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 font-black px-1.5 py-0.5 rounded text-[8px]">KHÁC</span>
+                                    </td>
+                                </tr>
+                                <!-- Row 5 -->
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                    <td class="py-2.5 px-3 font-extrabold">Lot / NVT / Date</td>
+                                    <td class="py-2.5 px-3">Theo EBS</td>
+                                    <td class="py-2.5 px-3">Theo STT</td>
+                                    <td class="py-2.5 px-3 text-center text-amber-600 font-bold">Dễ sai lệch</td>
+                                </tr>
+                                <!-- Row 6 -->
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                    <td class="py-2.5 px-3 font-extrabold">Status giao hàng</td>
+                                    <td class="py-2.5 px-3 text-rose-600 dark:text-rose-400">Không update real-time</td>
+                                    <td class="py-2.5 px-3 text-slate-500">Không liên kết EBS</td>
+                                    <td class="py-2.5 px-3 text-center text-slate-500">Không real-time</td>
+                                </tr>
+                                <!-- Row 7 -->
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                    <td class="py-2.5 px-3 font-extrabold">ePOD / POD</td>
+                                    <td class="py-2.5 px-3 text-slate-500">Không đồng bộ</td>
+                                    <td class="py-2.5 px-3 text-slate-500">Không đồng bộ</td>
+                                    <td class="py-2.5 px-3 text-center text-slate-500">Không real-time</td>
+                                </tr>
+                                <!-- Row 8 -->
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                    <td class="py-2.5 px-3 font-extrabold">Tồn kho NPP</td>
+                                    <td class="py-2.5 px-3 text-rose-600 dark:text-rose-400">Không tăng tự động</td>
+                                    <td class="py-2.5 px-3 text-rose-600 dark:text-rose-400">Không tăng tự động</td>
+                                    <td class="py-2.5 px-3 text-center text-amber-600 font-bold">Dễ sai lệch</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== BOTTOM BLOCK: SECTION 4 (PROPOSALS & EVALUATION) ==================== -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+            <!-- PROPOSALS SECTION (8 columns) -->
+            <section
+                class="lg:col-span-8 glass-panel rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+                <h2
+                    class="text-sm font-black font-sans tracking-wide text-blue-850 dark:text-blue-400 uppercase mb-6 flex items-center gap-2 border-b pb-3 border-slate-150 dark:border-slate-800">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                    4. ĐỀ XUẤT: KIẾN TRÚC KẾT NỐI ĐỒNG BỘ DỮ LIỆU
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- OPTION 1: PORTAL/MIDDLEWARE SYNC -->
+                    <div
+                        class="bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
+                        <div>
+                            <span
+                                class="px-2 py-0.5 rounded text-[8px] font-extrabold tracking-widest text-slate-655 dark:text-slate-300 bg-slate-200/80 dark:bg-slate-800 uppercase">Option
+                                1</span>
+                            <h3
+                                class="text-xs font-black text-slate-850 dark:text-slate-100 uppercase tracking-tight mt-1.5">
+                                ĐỒNG BỘ XUYÊN SUỐT QUA CÁC NỀN TẢNG (2 CHIỀU)</h3>
+
+                            <!-- Opt 1 Flow diagram -->
+                            <div
+                                class="flex items-center justify-between gap-1.5 p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-xl shadow-sm mt-4 text-[9px] text-center font-bold">
+                                <div
+                                    class="flex-1 bg-blue-50/50 dark:bg-blue-950/20 p-1 border border-blue-200 dark:border-blue-900 rounded">
+                                    <div class="text-blue-700 dark:text-blue-400 uppercase">EBS</div>
+                                    <div class="text-[7.5px] font-medium text-slate-400 mt-0.5">Source of Truth</div>
+                                </div>
+                                <i class="fa-solid fa-arrow-right text-sky-500"></i>
+                                <div
+                                    class="flex-1 bg-blue-50/50 dark:bg-blue-950/20 p-1 border border-blue-200 dark:border-blue-900 rounded">
+                                    <div class="text-blue-700 dark:text-blue-400 uppercase">OneTech</div>
+                                    <div class="text-[7.5px] font-medium text-slate-400 mt-0.5">Integration Layer</div>
+                                </div>
+                                <i class="fa-solid fa-arrows-left-right text-sky-500"></i>
+                                <div
+                                    class="flex-1 bg-blue-50/50 dark:bg-blue-950/20 p-1 border border-blue-200 dark:border-blue-900 rounded">
+                                    <div class="text-blue-700 dark:text-blue-400 uppercase">Rocket</div>
+                                    <div class="text-[7.5px] font-medium text-slate-400 mt-0.5">Middleware</div>
+                                </div>
+                                <i class="fa-solid fa-arrows-left-right text-sky-500"></i>
+                                <div
+                                    class="flex-1 bg-blue-50/50 dark:bg-blue-950/20 p-1 border border-blue-200 dark:border-blue-900 rounded">
+                                    <div class="text-blue-700 dark:text-blue-400 uppercase">STT</div>
+                                    <div class="text-[7.5px] font-medium text-slate-400 mt-0.5">Execution App</div>
+                                </div>
+                                <i class="fa-solid fa-arrows-left-right text-sky-500"></i>
+                                <div
+                                    class="flex-1 bg-blue-50/50 dark:bg-blue-950/20 p-1 border border-blue-200 dark:border-blue-900 rounded">
+                                    <div class="text-blue-700 dark:text-blue-400 uppercase">NPP</div>
+                                    <div class="text-[7.5px] font-medium text-slate-400 mt-0.5">Real-time Data</div>
+                                </div>
+                            </div>
+
+                            <!-- Sync data icons -->
+                            <div class="mt-4">
+                                <div
+                                    class="text-[9px] font-extrabold text-blue-800 dark:text-blue-400 uppercase tracking-widest text-center mb-2.5">
+                                    CÁC DỮ LIỆU CẦN ĐƯỢC ĐỒNG BỘ XUYÊN SUỐT CÁC NỀN TẢNG</div>
+                                <div
+                                    class="grid grid-cols-5 gap-2 text-center text-[8px] font-bold text-slate-500 dark:text-slate-400">
+                                    <div class="flex flex-col items-center"><i
+                                            class="fa-regular fa-file-lines text-sm text-sky-500 mb-1"></i>SO</div>
+                                    <div class="flex flex-col items-center"><i
+                                            class="fa-solid fa-file-invoice text-sm text-sky-500 mb-1"></i>DO</div>
+                                    <div class="flex flex-col items-center"><i
+                                            class="fa-solid fa-cubes text-sm text-sky-500 mb-1"></i>Lot</div>
+                                    <div class="flex flex-col items-center"><i
+                                            class="fa-regular fa-calendar-days text-sm text-sky-500 mb-1"></i>Date</div>
+                                    <div class="flex flex-col items-center"><i
+                                            class="fa-solid fa-truck text-sm text-sky-500 mb-1"></i>TRIP</div>
+                                    <div class="flex flex-col items-center"><i
+                                            class="fa-solid fa-id-card text-sm text-sky-500 mb-1"></i>NVT</div>
+                                    <div class="flex flex-col items-center"><i
+                                            class="fa-solid fa-car text-sm text-sky-500 mb-1"></i>Vehicle</div>
+                                    <div class="flex flex-col items-center"><i
+                                            class="fa-solid fa-circle-question text-sm text-sky-500 mb-1"></i>Status
+                                    </div>
+                                    <div class="flex flex-col items-center"><i
+                                            class="fa-solid fa-chart-simple text-sm text-sky-500 mb-1"></i>Actual Qty
+                                    </div>
+                                    <div class="flex flex-col items-center"><i
+                                            class="fa-solid fa-signature text-sm text-sky-500 mb-1"></i>POD/ePOD</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Meaning box -->
+                        <div
+                            class="mt-6 p-3 bg-blue-50/50 dark:bg-slate-900/60 rounded-xl border border-blue-100 dark:border-slate-800 text-[10px] text-slate-700 dark:text-slate-300 font-medium space-y-1.5">
+                            <div class="text-blue-800 dark:text-blue-400 font-bold uppercase tracking-wider mb-1"><i
+                                    class="fa-solid fa-circle-info"></i> Ý NGHĨA</div>
+                            <div class="flex items-start gap-1.5"><span class="text-emerald-500">&#10003;</span>
+                                <span>EBS là hệ thống chủ quản dữ liệu và thực thi.</span>
+                            </div>
+                            <div class="flex items-start gap-1.5"><span class="text-emerald-500">&#10003;</span>
+                                <span>Dữ liệu đồng bộ xuyên suốt qua OneTech, Rocket đến STT.</span>
+                            </div>
+                            <div class="flex items-start gap-1.5"><span class="text-emerald-500">&#10003;</span>
+                                <span>STT chỉ cập nhật trạng thái thực tế (GPS, tiến độ, POD...).</span>
+                            </div>
+                            <div class="flex items-start gap-1.5"><span class="text-emerald-500">&#10003;</span>
+                                <span>Tất cả trạng thái được đồng bộ ngược về EBS real-time.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OPTION 2: DIRECT API SYNC (RECOMMENDED) -->
+                    <div
+                        class="bg-gradient-to-tr from-emerald-500/5 via-sky-500/5 to-transparent border-2 border-emerald-500 dark:border-emerald-700/80 rounded-2xl p-4 flex flex-col justify-between shadow-md relative ring-4 ring-emerald-500/5">
+                        <div
+                            class="absolute -top-3.5 right-4 bg-emerald-500 text-white text-[8px] font-black uppercase px-2 py-1 rounded-full tracking-wider shadow">
+                            RECOMMENDED</div>
+
+                        <div>
+                            <span
+                                class="px-2 py-0.5 rounded text-[8px] font-extrabold tracking-widest text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/50 uppercase">Option
+                                2</span>
+                            <h3
+                                class="text-xs font-black text-slate-850 dark:text-slate-100 uppercase tracking-tight mt-1.5">
+                                API TRỰC TIẾP EBS &harr; STT</h3>
+
+                            <!-- Opt 2 direct channel diagram -->
+                            <!-- Opt 2 direct channel diagram -->
+                            <div
+                                class="relative w-full h-[220px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 rounded-xl shadow-sm mt-4 text-[9px]">
+                                <!-- SVG Arrows Layer -->
+                                <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1000 1000"
+                                    preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <!-- Arrow marker (Green) -->
+                                        <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6"
+                                            markerHeight="6" orient="auto">
+                                            <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#10b981" />
+                                        </marker>
+                                        <!-- Arrow marker (Blue) -->
+                                        <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6"
+                                            markerHeight="6" orient="auto">
+                                            <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#0284c7" />
+                                        </marker>
+                                        <!-- Arrow marker (Purple) -->
+                                        <marker id="arrow-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6"
+                                            markerHeight="6" orient="auto">
+                                            <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#8b5cf6" />
+                                        </marker>
+                                    </defs>
+
+                                    <!-- Downstream Line (at the top): EBS (top) -> up -> right -> STT (top) -->
+                                    <path d="M 150 320 L 150 160 L 850 160 L 850 290" stroke="#10b981" stroke-width="8"
+                                        stroke-dasharray="10 10" fill="none" marker-end="url(#arrow-green)" />
+
+                                    <!-- EBS -> OneTech Line (Purple): EBS (right) -> OneTech (left) -->
+                                    <path d="M 260 500 L 375 500" stroke="#8b5cf6" stroke-width="8"
+                                        stroke-dasharray="10 10" fill="none" marker-end="url(#arrow-purple)" />
+
+                                    <!-- Upstream Line (at the bottom): STT (bottom) -> down -> left -> OneTech (bottom) -->
+                                    <path d="M 850 640 L 850 800 L 500 800 L 500 670" stroke="#0284c7" stroke-width="8"
+                                        stroke-dasharray="10 10" fill="none" marker-end="url(#arrow-blue)" />
+                                </svg>
+
+                                <!-- Node EBS (Left) -->
+                                <div
+                                    class="absolute left-[4%] top-[70px] w-[22%] flex flex-col items-center justify-center p-1.5 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/60 text-center shadow-xs">
+                                    <div
+                                        class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-950 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-1">
+                                        <i class="fa-solid fa-database text-xs"></i>
+                                    </div>
+                                    <span
+                                        class="font-extrabold text-blue-800 dark:text-blue-400 text-[9.5px]">EBS</span>
+                                    <span class="text-[6.5px] font-semibold text-slate-400 mt-0.5 leading-none">(Source
+                                        of Truth)</span>
+                                </div>
+
+                                <!-- Node OneTech (Middle) -->
+                                <div
+                                    class="absolute left-[39%] top-[70px] w-[22%] flex flex-col items-center justify-center p-1.5 rounded-lg bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/60 text-center shadow-xs">
+                                    <div
+                                        class="w-7 h-7 rounded-lg bg-purple-100 dark:bg-purple-950 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-1">
+                                        <i class="fa-solid fa-desktop text-xs"></i>
+                                    </div>
+                                    <span
+                                        class="font-extrabold text-purple-800 dark:text-purple-400 text-[9.5px]">ONETECH</span>
+                                    <span
+                                        class="text-[6.5px] font-semibold text-slate-400 mt-0.5 leading-none">(Integration
+                                        Layer)</span>
+                                </div>
+
+                                <!-- Node STT (Right) -->
+                                <div
+                                    class="absolute right-[4%] top-[70px] w-[22%] flex flex-col items-center justify-center p-1.5 rounded-lg bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/60 text-center shadow-xs">
+                                    <div
+                                        class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-1">
+                                        <i class="fa-solid fa-truck text-xs"></i>
+                                    </div>
+                                    <span
+                                        class="font-extrabold text-emerald-800 dark:text-emerald-400 text-[9.5px]">STT</span>
+                                    <span
+                                        class="text-[6.5px] font-semibold text-slate-400 mt-0.5 leading-none">(Tracking
+                                        App)</span>
+                                </div>
+
+                                <!-- Note Downstream (Above the top line) -->
+                                <div class="absolute top-[6px] left-[20%] right-[20%] text-center">
+                                    <div
+                                        class="inline-block bg-emerald-50/95 dark:bg-emerald-950/95 border border-emerald-250 dark:border-emerald-800 px-2 py-0.5 rounded text-[8px] font-semibold text-slate-700 dark:text-slate-350 leading-normal max-w-full shadow-xs">
+                                        <strong
+                                            class="text-emerald-650 dark:text-emerald-400 uppercase text-[7.5px] block font-black">API
+                                            SYNC (DOWNSTREAM)</strong>
+                                        SO / DO / Trip / NVT, Delivery Point, Planned Qty, Customer.
+                                    </div>
+                                </div>
+
+                                <!-- Note Upstream (Below the bottom line) -->
+                                <div class="absolute bottom-[6px] left-[35%] right-[5%] text-center">
+                                    <div
+                                        class="inline-block bg-sky-50/95 dark:bg-sky-950/95 border border-sky-250 dark:border-sky-850 px-2 py-0.5 rounded text-[8px] font-semibold text-slate-700 dark:text-slate-350 leading-normal max-w-full shadow-xs">
+                                        <strong
+                                            class="text-sky-750 dark:text-sky-400 uppercase text-[7.5px] block font-black">API
+                                            SYNC (UPSTREAM)</strong>
+                                        Status (Arrived, Loading, transit), POD/ePOD, Actual Qty, Delay Exception.
+                                    </div>
+                                </div>
+
+                                <!-- Note EBS -> OneTech Sync (Purple) -->
+                                <div class="absolute top-[138px] left-[24%] w-[16%] text-center">
+                                    <div
+                                        class="inline-block bg-purple-50/95 dark:bg-purple-950/95 border border-purple-250 dark:border-purple-800 px-1.5 py-0.5 rounded text-[7.5px] font-semibold text-slate-700 dark:text-slate-350 leading-normal max-w-full shadow-xs">
+                                        <strong
+                                            class="text-purple-750 dark:text-purple-400 uppercase text-[7px] block font-black">EBS &rarr; ONETECH</strong>
+                                        SO / Qty / Shipto
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Meaning box -->
+                        <div
+                            class="mt-6 p-3 bg-emerald-50/50 dark:bg-slate-900/60 rounded-xl border border-emerald-150 dark:border-slate-800 text-[10px] text-slate-700 dark:text-slate-300 font-medium space-y-1.5">
+                            <div class="text-emerald-800 dark:text-emerald-400 font-bold uppercase tracking-wider mb-1">
+                                <i class="fa-solid fa-circle-info"></i> Ý NGHĨA
+                            </div>
+                            <div class="flex items-start gap-1.5"><span class="text-emerald-500">&#10003;</span>
+                                <span>EBS tạo và quản lý toàn bộ dữ liệu thực thi.</span>
+                            </div>
+                            <div class="flex items-start gap-1.5"><span class="text-emerald-500">&#10003;</span>
+                                <span>Đồng bộ bổ sung SO/Qty/Shipto trực tiếp từ EBS sang OneTech.</span>
+                            </div>
+                            <div class="flex items-start gap-1.5"><span class="text-emerald-500">&#10003;</span>
+                                <span>STT chỉ theo dõi trạng thái giao hàng và cập nhật real-time.</span>
+                            </div>
+                            <div class="flex items-start gap-1.5"><span class="text-emerald-500">&#10003;</span>
+                                <span>Loại bỏ thao tác tạo lại (Split SO, Gán tài, Tạo TRIP) trên STT.</span>
+                            </div>
+                            <div class="flex items-start gap-1.5"><span class="text-emerald-500">&#10003;</span>
+                                <span>Dữ liệu đồng bộ trực tiếp, chính xác, giảm sai lệch và đối soát.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- OPTIONS COMPARISON TABLE (4 columns) -->
+            <section
+                class="lg:col-span-4 glass-panel rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                <div>
+                    <h2
+                        class="text-sm font-black font-sans tracking-wide text-blue-850 dark:text-blue-400 uppercase mb-6 flex items-center gap-2 border-b pb-3 border-slate-150 dark:border-slate-800">
+                        <span class="w-2.5 h-2.5 rounded-full bg-purple-650"></span>
+                        SO SÁNH GIỮA CÁC PHƯƠNG ÁN
+                    </h2>
+
+                    <!-- Comparison Table -->
+                    <div class="overflow-hidden rounded-2xl border border-slate-150 dark:border-slate-800 shadow-sm">
+                        <table class="w-full text-left border-collapse text-[10px]">
+                            <thead>
+                                <tr
+                                    class="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-extrabold uppercase">
+                                    <th class="py-2.5 px-2.5 text-[8.5px] w-[31%]">TIÊU CHÍ</th>
+                                    <th
+                                        class="py-2.5 px-2 text-[8.5px] w-[23%] text-rose-600 dark:text-rose-455 font-black">
+                                        HIỆN TRẠNG</th>
+                                    <th
+                                        class="py-2.5 px-2 text-[8.5px] w-[23%] text-blue-700 dark:text-blue-400 font-black">
+                                        OPTION 1</th>
+                                    <th
+                                        class="py-2.5 px-2 text-[8.5px] w-[23%] text-emerald-700 dark:text-emerald-450 font-black">
+                                        OPTION 2</th>
+                                </tr>
+                            </thead>
+                            <tbody
+                                class="divide-y divide-slate-100 dark:divide-slate-800/80 font-semibold text-slate-700 dark:text-slate-350">
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                    <td class="py-2 px-2.5 font-bold">Source of Truth</td>
+                                    <td class="py-2 px-2 text-rose-600 dark:text-rose-455 font-bold">Không rõ</td>
+                                    <td class="py-2 px-2 text-blue-700 dark:text-blue-400 font-bold">EBS</td>
+                                    <td class="py-2 px-2 text-emerald-700 dark:text-emerald-400 font-extrabold">EBS</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                    <td class="py-2 px-2.5 font-bold">Trip Master</td>
+                                    <td class="py-2 px-2 text-rose-600 dark:text-rose-455 font-bold">EBS + STT</td>
+                                    <td class="py-2 px-2 text-blue-700 dark:text-blue-400 font-bold">EBS</td>
+                                    <td class="py-2 px-2 text-emerald-700 dark:text-emerald-400 font-extrabold">EBS</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                    <td class="py-2 px-2.5 font-bold">STT tự tạo DO/Trip</td>
+                                    <td class="py-2 px-2 text-rose-600 dark:text-rose-455 font-bold">Có</td>
+                                    <td class="py-2 px-2 text-blue-700 dark:text-blue-400 font-bold">Không</td>
+                                    <td class="py-2 px-2 text-emerald-700 dark:text-emerald-400 font-extrabold">Không
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                    <td class="py-2 px-2.5 font-bold">Liên kết dữ liệu</td>
+                                    <td class="py-2 px-2 text-rose-600 dark:text-rose-455 font-bold">Không</td>
+                                    <td class="py-2 px-2 text-blue-700 dark:text-blue-400 font-bold">2 chiều</td>
+                                    <td class="py-2 px-2 text-emerald-700 dark:text-emerald-400 font-extrabold">2 chiều
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                    <td class="py-2 px-2.5 font-bold">Tracking real-time</td>
+                                    <td class="py-2 px-2 text-rose-600 dark:text-rose-455 font-bold">Hạn chế</td>
+                                    <td class="py-2 px-2 text-blue-700 dark:text-blue-400 font-bold">Có</td>
+                                    <td class="py-2 px-2 text-emerald-700 dark:text-emerald-400 font-extrabold">Có</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                    <td class="py-2 px-2.5 font-bold">Báo cáo / KPI</td>
+                                    <td class="py-2 px-2 text-rose-600 dark:text-rose-455 font-bold">Thủ công</td>
+                                    <td class="py-2 px-2 text-blue-700 dark:text-blue-400 font-bold">Tự động</td>
+                                    <td class="py-2 px-2 text-emerald-700 dark:text-emerald-400 font-extrabold">Tự động
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                    <td class="py-2 px-2.5 font-bold">Tối ưu vận hành</td>
+                                    <td class="py-2 px-2 text-rose-600 dark:text-rose-455 font-bold">Thấp</td>
+                                    <td class="py-2 px-2 text-blue-700 dark:text-blue-400 font-bold">Cao</td>
+                                    <td class="py-2 px-2 text-emerald-700 dark:text-emerald-400 font-extrabold">Cao</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                    <td class="py-2 px-2.5 font-bold">Độ phức tạp triển khai</td>
+                                    <td class="py-2 px-2 text-slate-450">-</td>
+                                    <td class="py-2 px-2 text-blue-700 dark:text-blue-400 font-bold">Trung bình</td>
+                                    <td class="py-2 px-2 text-emerald-700 dark:text-emerald-400 font-extrabold">Thấp hơn
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                    <td class="py-2 px-2.5 font-bold">Khả năng scale</td>
+                                    <td class="py-2 px-2 text-rose-600 dark:text-rose-455 font-bold">Thấp</td>
+                                    <td class="py-2 px-2 text-blue-700 dark:text-blue-400 font-bold">Cao</td>
+                                    <td class="py-2 px-2 text-emerald-700 dark:text-emerald-400 font-extrabold">Rất cao
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div
+                    class="mt-4 p-3 bg-emerald-500/5 dark:bg-emerald-950/15 border border-emerald-250 dark:border-emerald-900 rounded-2xl">
+                    <p class="text-[9.5px] font-semibold text-emerald-700 dark:text-emerald-400 leading-relaxed">
+                        <i class="fa-solid fa-star text-amber-500 animate-pulse"></i> <strong>Khuyên dùng Option
+                            2:</strong> Đồng bộ API trực tiếp tối ưu hóa thời gian triển khai và giảm thiểu các tầng
+                        trung gian, đảm bảo dữ liệu luôn được cập nhật chính xác và tối đa tính real-time.
+                    </p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Page Footer -->
+    <footer
+        class="max-w-[1700px] mx-auto px-6 mt-12 text-center text-[10px] text-slate-400 dark:text-slate-600 font-medium">
+        Bản quyền thiết kế hệ thống bởi CI FMCG Logistics &copy; 2026 The Supra.
+    </footer>
+
+    <!-- Theme Logic Script -->
+    <script>
+        // Init theme
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+            }
+        }
+    </script>
+</body>
+
+</html>

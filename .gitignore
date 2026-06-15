@@ -1,0 +1,15 @@
+# API Credentials and Environment variables
+WorldCup2026/credentials.json
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Excel temp files
+~$*.xlsx
+~$*.xls
+
+# OS files
+Thumbs.db
+Desktop.ini

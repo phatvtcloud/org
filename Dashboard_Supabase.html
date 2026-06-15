@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Chuyến Xe - Supabase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-8">
+
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <!-- Header & Filters -->
+        <div class="bg-white rounded-lg shadow-md p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <h1 class="text-2xl font-bold text-gray-800">Dashboard Quản Lý Chuyến Xe</h1>
+            <div class="flex flex-wrap gap-4 items-center">
+                <input type="date" id="filter-date" class="border border-gray-300 rounded p-2 text-gray-700 outline-none focus:border-blue-500">
+                <select id="filter-dc" class="border border-gray-300 rounded p-2 text-gray-700 outline-none focus:border-blue-500">
+                    <option value="">Tất cả DC</option>
+                    <option value="DC Supra Bình Dương">DC Supra Bình Dương</option>
+                    <option value="DC Supra Hưng Yên">DC Supra Hưng Yên</option>
+                    <option value="DC Supra Đồng Nai">DC Supra Đồng Nai</option>
+                </select>
+                <button id="btn-filter" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition shadow">Lọc Dữ Liệu</button>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-semibold mb-4 text-gray-700">Tổng Khối Lượng Theo DC (Tấn)</h2>
+            <div class="relative h-64">
+                <canvas id="volumeChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-semibold mb-4 text-gray-700">Chi Tiết Chuyến Xe</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-800 text-white">
+                            <th class="p-3 rounded-tl-lg">ID</th>
+                            <th class="p-3">Ngày Giao</th>
+                            <th class="p-3">Biển Số Xe</th>
+                            <th class="p-3">Khối Lượng (Tấn)</th>
+                            <th class="p-3 rounded-tr-lg">Tên DC</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr>
+                            <td colspan="5" class="text-center p-4 text-gray-500">Đang tải dữ liệu...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://fiafpiqcnlqjwrlqeoei.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_7o5SRYKlden0-dsy9wwkcA_c8Cdu1gt';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let chartInstance = null;
+        let allData = [];
+
+        async function fetchLogs() {
+            const { data, error } = await supabaseClient
+                .from('transport_logs')
+                .select('*')
+                .order('delivery_date', { ascending: false });
+
+            if (error) {
+                console.error("Lỗi khi tải dữ liệu:", error);
+                document.getElementById('table-body').innerHTML = `<tr><td colspan="5" class="text-center p-4 text-red-500">Lỗi: ${error.message}</td></tr>`;
+                return;
+            }
+            
+            allData = data || [];
+            applyFilters(); // Hiển thị dữ liệu lên bảng & biểu đồ lần đầu
+        }
+
+        function applyFilters() {
+            const filterDate = document.getElementById('filter-date').value;
+            const filterDC = document.getElementById('filter-dc').value;
+
+            let filteredData = allData;
+
+            // Lọc theo ngày
+            if (filterDate) {
+                filteredData = filteredData.filter(log => log.delivery_date === filterDate);
+            }
+            // Lọc theo DC
+            if (filterDC) {
+                filteredData = filteredData.filter(log => log.dc_name === filterDC);
+            }
+
+            renderTable(filteredData);
+            renderChart(filteredData);
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-gray-500">Không tìm thấy dữ liệu phù hợp.</td></tr>`;
+                return;
+            }
+
+            data.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b hover:bg-gray-50 transition";
+                tr.innerHTML = `
+                    <td class="p-3">${log.id || '-'}</td>
+                    <td class="p-3">${log.delivery_date || '-'}</td>
+                    <td class="p-3">${log.truck_plate || '-'}</td>
+                    <td class="p-3 font-semibold text-blue-600">${log.volume || '0'}</td>
+                    <td class="p-3">${log.dc_name || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderChart(data) {
+            const ctx = document.getElementById('volumeChart').getContext('2d');
+            
+            // Tính tổng khối lượng theo DC
+            const volumeByDC = {};
+            data.forEach(log => {
+                const dc = log.dc_name || 'Không rõ';
+                const vol = parseFloat(log.volume) || 0;
+                volumeByDC[dc] = (volumeByDC[dc] || 0) + vol;
+            });
+
+            const labels = Object.keys(volumeByDC);
+            const volumes = Object.values(volumeByDC);
+
+            // Xóa biểu đồ cũ nếu có để vẽ lại
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tổng Khối Lượng (Tấn)',
+                        data: volumes,
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.7)', // Blue
+                            'rgba(16, 185, 129, 0.7)', // Green
+                            'rgba(245, 158, 11, 0.7)'  // Yellow
+                        ],
+                        borderColor: [
+                            'rgb(59, 130, 246)',
+                            'rgb(16, 185, 129)',
+                            'rgb(245, 158, 11)'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            title: { display: true, text: 'Tấn' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false } // Ẩn legend vì chỉ có 1 data set
+                    }
+                }
+            });
+        }
+
+        // Gắn sự kiện cho nút Lọc
+        document.getElementById('btn-filter').addEventListener('click', applyFilters);
+        
+        // Tải dữ liệu lần đầu
+        document.addEventListener('DOMContentLoaded', fetchLogs);
+    </script>
+</body>
+
+</html>

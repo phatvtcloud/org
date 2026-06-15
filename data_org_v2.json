@@ -1,0 +1,323 @@
+[
+    {
+        "id": "6",
+        "name": "CFO cum COO",
+        "manager": "Huỳnh Thiên Phú"
+    },
+    {
+        "id": "6.1",
+        "name": "Finance",
+        "manager": "Huỳnh Thiên Phú",
+        "parentId": "6"
+    },
+    {
+        "id": "6.1.1",
+        "name": "Finance Retail",
+        "manager": "Trần Thị Hà Nam",
+        "parentId": "6.1"
+    },
+    {
+        "id": "6.1.2",
+        "name": "Finance FMCG",
+        "manager": "Tăng Hà Ngân",
+        "parentId": "6.1"
+    },
+    {
+        "id": "6.2",
+        "name": "Legal",
+        "manager": "Nguyễn Thị Bích Dung",
+        "parentId": "6"
+    },
+    {
+        "id": "6.3",
+        "name": "MPO",
+        "manager": "Nguyễn Thành Phát",
+        "parentId": "6"
+    },
+    {
+        "id": "6.4",
+        "name": "FMCG",
+        "manager": "Ngô Xuân Hưng",
+        "parentId": "6"
+    },
+    {
+        "id": "6.4.1",
+        "name": "DRP",
+        "manager": "Nguyễn Thị Ngọc Sa",
+        "parentId": "6.4",
+        "note": "m1"
+    },
+    {
+        "id": "6.4.1.1",
+        "name": "DRP - Domestic",
+        "manager": "Nguyễn Thị Ngọc Sa",
+        "parentId": "6.4.1",
+        "note": "m1"
+    },
+    {
+        "id": "6.4.1.1.1",
+        "name": "DRP - Beers",
+        "manager": "Nguyễn Thị Ngọc Sa",
+        "parentId": "6.4.1.1",
+        "note": "m1"
+    },
+    {
+        "id": "6.4.1.1.2",
+        "name": "DRP - Meat/SS",
+        "manager": "Biện Đình Thuần",
+        "parentId": "6.4.1.1",
+        "note": "m1"
+    },
+    {
+        "id": "6.4.1.1.3",
+        "name": "DRP - Convenience Foods",
+        "manager": "Lâm Thế Vinh",
+        "parentId": "6.4.1.1",
+        "note": "m1"
+    },
+    {
+        "id": "6.4.1.1.4",
+        "name": "DRP - HPC",
+        "manager": "Thái Ngọc Hà",
+        "parentId": "6.4.1.1",
+        "note": "m1"
+    },
+    {
+        "id": "6.4.1.1.5",
+        "name": "DRP - Caf/Bev",
+        "manager": "Nguyễn Quốc Hòa",
+        "parentId": "6.4.1.1",
+        "note": "m1"
+    },
+    {
+        "id": "6.4.1.1.6",
+        "name": "DRP - NM/NT",
+        "manager": "Nguyễn Thị Thanh Trúc",
+        "parentId": "6.4.1.1",
+        "note": "m1"
+    },
+    {
+        "id": "6.4.1.2",
+        "name": "DRP - Export",
+        "manager": "Nguyễn Thị Ngọc Sa",
+        "parentId": "6.4.1",
+        "note": "m1"
+    },
+    {
+        "id": "6.4.1.2.1",
+        "name": "DRP - Exp",
+        "manager": "Đặng Bảo Trân",
+        "parentId": "6.4.1.2",
+        "note": "m1"
+    },
+    {
+        "id": "6.4.1.3",
+        "name": "DRP - Console",
+        "manager": "",
+        "parentId": "6.4.1",
+        "note": "m1"
+    },
+    {
+        "id": "6.4.2",
+        "name": "Ops",
+        "manager": "Ngô Xuân Hưng",
+        "parentId": "6.4",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.1",
+        "name": "Ops - Miền Bắc",
+        "manager": "Hoàng Tùng Lâm",
+        "parentId": "6.4.2",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.2",
+        "name": "Ops - Miền Nam",
+        "manager": "",
+        "parentId": "6.4.2",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.3",
+        "name": "Ops - MiềnTây",
+        "manager": "Nguyễn Hoàng Sơn Đạo",
+        "parentId": "6.4.2",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.1.1",
+        "name": "DC Hưng Yên",
+        "manager": "Hoàng Tùng Lâm",
+        "parentId": "6.4.2.1",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.1.2",
+        "name": "DC Hải Dương",
+        "manager": "Nguyễn Phấn Phú",
+        "parentId": "6.4.2.1",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.1.3",
+        "name": "DC Hải Phòng",
+        "manager": "Nguyễn Phấn Phú",
+        "parentId": "6.4.2.1",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.1.4",
+        "name": "DC Nghệ An",
+        "manager": "Vũ Đức Bình",
+        "parentId": "6.4.2.1",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.1.5",
+        "name": "DC Quang Hanh",
+        "manager": "Nguyễn Mạnh Huy",
+        "parentId": "6.4.2.1",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.1.6",
+        "name": "DC Đà Nẵng",
+        "manager": "Võ Phúc",
+        "parentId": "6.4.2.1",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.2.1",
+        "name": "DC Kerry",
+        "manager": "Nguyễn Thanh Dũng",
+        "parentId": "6.4.2.2",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.2.1.1",
+        "name": "DC Vân Trúc",
+        "manager": "Nguyễn Thanh Dũng",
+        "parentId": "6.4.2.2.1",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.2.1.2",
+        "name": "DC BW",
+        "manager": "Nguyễn Thanh Dũng",
+        "parentId": "6.4.2.2.1",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.2.2",
+        "name": "DC TBS",
+        "manager": "Phạm Đình Thắng",
+        "parentId": "6.4.2.2",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.2.3",
+        "name": "DC Tân Bình",
+        "manager": "Thái Minh Hoàng",
+        "parentId": "6.4.2.2",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.2.4",
+        "name": "DC Đồng Nai",
+        "manager": "Ngô Đức Thuận",
+        "parentId": "6.4.2.2",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.2.5",
+        "name": "DC NETCO",
+        "manager": "Ngô Đức Thuận",
+        "parentId": "6.4.2.2",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.3.1",
+        "name": "DC Hậu Giang Foods",
+        "manager": "Nguyễn Hoàng Sơn Đạo",
+        "parentId": "6.4.2.3",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.3.2",
+        "name": "DC Hậu Giang Beers",
+        "manager": "Nguyễn Tài Trung",
+        "parentId": "6.4.2.3",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.2.2.8",
+        "name": "DC Bình Thuận",
+        "manager": "Lâm Văn Chính",
+        "parentId": "6.4.2.2",
+        "note": "m2"
+    },
+    {
+        "id": "6.4.3",
+        "name": "Network Management",
+        "manager": "Ngô Xuân Hưng",
+        "parentId": "6.4",
+        "note": "m3"
+    },
+    {
+        "id": "6.4.3.1",
+        "name": "Reporting",
+        "manager": "",
+        "parentId": "6.4.3",
+        "note": "m3"
+    },
+    {
+        "id": "6.4.3.1.1",
+        "name": "KPI",
+        "manager": "",
+        "parentId": "6.4.3.1",
+        "note": "m3"
+    },
+    {
+        "id": "6.4.3.1.2",
+        "name": "Productivity",
+        "manager": "",
+        "parentId": "6.4.3.1",
+        "note": "m3"
+    },
+    {
+        "id": "6.4.3.1.3",
+        "name": "Cost",
+        "manager": "",
+        "parentId": "6.4.3.1",
+        "note": "m3"
+    },
+    {
+        "id": "6.4.3.2",
+        "name": "Planning",
+        "manager": "",
+        "parentId": "6.4.3",
+        "note": "m3"
+    },
+    {
+        "id": "6.4.3.3",
+        "name": "Project/Optimization",
+        "manager": "",
+        "parentId": "6.4.3",
+        "note": "m3"
+    },
+    {
+        "id": "6.4.3.3.1",
+        "name": "Project transform",
+        "manager": "",
+        "parentId": "6.4.3.3",
+        "note": "m3"
+    },
+    {
+        "id": "6.4.3.3.2",
+        "name": "Project saving",
+        "manager": "",
+        "parentId": "6.4.3.3",
+        "note": "m3"
+    }
+]

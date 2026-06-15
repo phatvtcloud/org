@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ đồ Tổ chức FMCG</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            /* Màu nền web hơi xám nhẹ */
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        #tree {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Tùy chỉnh khung mặc định */
+        #tree [data-n-id] rect {
+            fill: #ffffff;
+            stroke: #000000;
+            stroke-width: 2px;
+            rx: 10;
+            ry: 10;
+        }
+
+        /* Đổi màu tất cả chữ (gồm cả tspan) thành màu đen */
+        #tree [data-n-id] text,
+        #tree [data-n-id] text tspan {
+            fill: #000000 !important;
+        }
+
+        #tree .field_0 {
+            font-size: 16px;
+        }
+
+        #tree .field_1 {
+            font-size: 14px;
+        }
+
+        /* Tùy chỉnh cho Ghi chú là m1, m2, m3 */
+        #tree [data-n-id].note_m1 rect {
+            stroke: #005461;
+            fill: #ffffff;
+        }
+
+        #tree [data-n-id].note_m1 text,
+        #tree [data-n-id].note_m1 text tspan {
+            fill: #005461 !important;
+        }
+
+        #tree [data-n-id].note_m2 rect {
+            stroke: #0056b3;
+            fill: #ffffff;
+        }
+
+        #tree [data-n-id].note_m2 text,
+        #tree [data-n-id].note_m2 text tspan {
+            fill: #0056b3 !important;
+        }
+
+        #tree [data-n-id].note_m3 rect {
+            stroke: #5E0006;
+            fill: #ffffff;
+        }
+
+        #tree [data-n-id].note_m3 text,
+        #tree [data-n-id].note_m3 text tspan {
+            fill: #5E0006 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <button id="saveBtn" style="position: absolute; top: 15px; left: 15px; z-index: 1000; padding: 10px 15px; cursor: pointer; background: #0056b3; color: white; border: none; border-radius: 5px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">💾 Tải xuống data_org.json mới</button>
+
+    <div id="tree"></div>
+
+    <script src="https://balkan.app/js/orgchart.js"></script>
+    <script>
+        fetch('data_org.json')
+            .then(response => response.json())
+            .then(nodes => {
+                // Thêm tag 'note_m1', 'note_m2', 'note_m3' dựa trên giá trị của note
+                nodes.forEach(node => {
+                    if (node.note === "m1") {
+                        if (!node.tags) node.tags = [];
+                        if (node.tags.indexOf("note_m1") === -1) node.tags.push("note_m1");
+                    } else if (node.note === "m2") {
+                        if (!node.tags) node.tags = [];
+                        if (node.tags.indexOf("note_m2") === -1) node.tags.push("note_m2");
+                    } else if (node.note === "m3") {
+                        if (!node.tags) node.tags = [];
+                        if (node.tags.indexOf("note_m3") === -1) node.tags.push("note_m3");
+                    }
+                });
+
+                var chart = new OrgChart(document.getElementById("tree"), {
+                    template: "ana",
+                    enableSearch: true,
+                    mouseWheel: { focus: true, zoom: true },
+                    nodeMenu: {
+                        edit: { text: "Chỉnh sửa" },
+                        add: { text: "Thêm nhân sự mới" },
+                        remove: { text: "Xóa" }
+                    },
+                    nodeBinding: {
+                        field_0: "name",
+                        field_1: "manager"
+                    }
+                });
+
+                // Sử dụng sự kiện node-layout thay cho phân nhóm SubTree
+                // Nhờ cách này, các nhánh vẫn nối mượt với nhau nhưng từ nhánh xodoc sẽ hiển thị dọc
+                chart.on("node-layout", function (sender, args) {
+                    if (args.pnode.tags && args.pnode.tags.indexOf("xodoc") !== -1) {
+                        args.layout = OrgChart.layout.treeRightOffset;
+                    }
+                });
+
+                // Tải dữ liệu vào biểu đồ
+                chart.load(nodes);
+
+                // Sự kiện lưu dữ liệu ra file Json
+                document.getElementById('saveBtn').addEventListener('click', function () {
+                    var dataToSave = [];
+                    // chart.nodes lưu trữ danh sách các điểm trên biểu đồ
+                    for (var key in chart.nodes) {
+                        // chart.get(key) giúp lấy thông tin data gốc của node đó 
+                        var nodeData = chart.get(key);
+                        if(nodeData) {
+                            dataToSave.push(nodeData);
+                        }
+                    }
+                    
+                    // Tạo file và trình duyệt tự động tải xuống
+                    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToSave, null, 4));
+                    var downloadAnchorNode = document.createElement('a');
+                    downloadAnchorNode.setAttribute("href", dataStr);
+                    downloadAnchorNode.setAttribute("download", "data_org.json");
+                    document.body.appendChild(downloadAnchorNode);
+                    downloadAnchorNode.click();
+                    downloadAnchorNode.remove();
+                    
+                    alert("Đã tạo file data_org.json thành công. Vui lòng ghi đè file cũ để giữ lại thay đổi!");
+                });
+            });
+    </script>
+
+</body>
+
+</html>

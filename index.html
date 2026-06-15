@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Trang chủ quản lý và điều hướng các dashboard, sơ đồ tổ chức và mạng lưới Supply Chain của Masan DC FMCG.">
+    <title>Masan DC FMCG - Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --secondary: #ec4899;
+            --bg-color: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.4) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.4) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 4rem 1.5rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #818cf8, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: -0.05em;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 1.5rem;
+            padding: 2.5rem 2rem;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            background: linear-gradient(135deg, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover .card-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            z-index: 1;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            flex-grow: 1;
+            z-index: 1;
+            font-size: 0.95rem;
+        }
+
+        .card-footer {
+            margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            color: #818cf8;
+            transition: color 0.3s ease;
+            z-index: 1;
+            font-size: 1rem;
+        }
+
+        .card:hover .card-footer {
+            color: #f472b6;
+        }
+
+        .card-footer svg {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-left: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .card-footer svg {
+            transform: translateX(8px);
+        }
+
+        footer {
+            margin-top: 4rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            opacity: 0.8;
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 2.5rem; }
+            header p { font-size: 1rem; px: 1rem; }
+            .grid-container { grid-template-columns: 1fr; px: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Masan DC FMCG Portal</h1>
+        <p>Trung tâm quản lý, giám sát và phân tích dữ liệu mạng lưới Supply Chain. Chọn một ứng dụng bên dưới để bắt đầu khám phá.</p>
+    </header>
+
+    <div class="grid-container">
+        <!-- Dashboard Chuyến Xe -->
+        <a href="Dashboard_Supabase.html" class="card">
+            <div class="card-icon">🚛</div>
+            <h2>Dashboard Chuyến Xe</h2>
+            <p>Hệ thống theo dõi và giám sát khối lượng vận chuyển theo các DC thời gian thực, tích hợp trực tiếp với cơ sở dữ liệu Supabase.</p>
+            <div class="card-footer">
+                Truy cập Dashboard
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </div>
+        </a>
+
+        <!-- Supply Chain Baseline -->
+        <a href="Base_Line/Supply_Chain_Network_by_SKU.html" class="card">
+            <div class="card-icon">🕸️</div>
+            <h2>Supply Chain Baseline</h2>
+            <p>Sơ đồ mạng lưới chuỗi cung ứng (Network Design) trực quan. Mô phỏng luồng vận chuyển, các kho bãi và nhà phân phối.</p>
+            <div class="card-footer">
+                Xem Sơ Đồ
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </div>
+        </a>
+
+        <!-- Org Chart -->
+        <a href="html_org_v2.html" class="card">
+            <div class="card-icon">👥</div>
+            <h2>Organization Chart</h2>
+            <p>Sơ đồ tổ chức nhân sự. Hỗ trợ tính năng tương tác, chỉnh sửa trực tiếp cấu trúc và xuất dữ liệu JSON/Excel.</p>
+            <div class="card-footer">
+                Mở Org Chart
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </div>
+        </a>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Masan DC FMCG. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
