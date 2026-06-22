@@ -11,6 +11,7 @@ class WCApp {
         this.currentUser = JSON.parse(localStorage.getItem("wc_user")) || null;
         this.matches = [];
         this.userPredictions = {};
+        this.tempPredictions = {}; // Lưu giữ tạm thời tỉ số đang nhập dở
         this.leaderboard = [];
 
         this.currentSection = "matches"; // matches hoặc leaderboard
@@ -139,11 +140,22 @@ class WCApp {
 
             if (res.success) {
                 this.showToast(res.message, "success");
-                // Reset form và chuyển về Đăng nhập
+                
+                // Tự động đăng nhập sau khi đăng ký thành công
+                this.currentUser = {
+                    username: username,
+                    fullname: fullname,
+                    department: department,
+                    password: password
+                };
+                localStorage.setItem("wc_user", JSON.stringify(this.currentUser));
+                this.updateAuthUI();
+                
+                // Tải dữ liệu ban đầu
+                this.fetchData();
+
+                // Reset form đăng ký
                 document.getElementById("register-form").reset();
-                this.toggleAuthForm(false);
-                // Điền sẵn username vừa tạo vào form đăng nhập
-                document.getElementById("login-username").value = username;
             } else {
                 this.showToast(res.message, "error");
             }
@@ -197,6 +209,7 @@ class WCApp {
 
     logout() {
         this.currentUser = null;
+        this.tempPredictions = {};
         localStorage.removeItem("wc_user");
         this.updateAuthUI();
         this.showToast("Đã đăng xuất tài khoản.", "info");
@@ -322,8 +335,21 @@ class WCApp {
             // Lấy dự đoán cũ của user
             const pred = this.userPredictions[m.match_id];
             const hasPred = pred !== undefined;
-            const predHome = hasPred ? pred.predicted_home : "";
-            const predAway = hasPred ? pred.predicted_away : "";
+            
+            // Lấy dự đoán tạm thời đang gõ dở
+            const tempPred = this.tempPredictions[m.match_id];
+            
+            // Giá trị hiển thị trên ô nhập
+            let predHome = "";
+            let predAway = "";
+            
+            if (tempPred !== undefined) {
+                predHome = tempPred.predicted_home;
+                predAway = tempPred.predicted_away;
+            } else if (hasPred) {
+                predHome = pred.predicted_home;
+                predAway = pred.predicted_away;
+            }
 
             // Kiểm tra trạng thái đóng dự đoán (15 phút trước giờ bóng lăn)
             const minutesLeft = (matchDate - now) / (1000 * 60);
@@ -409,9 +435,9 @@ class WCApp {
                         
                         <!-- Ô nhập tỉ số dự đoán -->
                         <div class="predict-inputs">
-                            <input type="number" id="pred-home-${m.match_id}" class="predict-input" min="0" max="99" value="${predHome}" ${isLocked ? 'disabled' : ''} placeholder="-">
+                            <input type="number" id="pred-home-${m.match_id}" class="predict-input" min="0" max="99" value="${predHome}" ${isLocked ? 'disabled' : ''} placeholder="-" oninput="app.saveTemp('${m.match_id}', 'home', this.value)">
                             <span style="color: var(--text-secondary); font-weight: bold;">:</span>
-                            <input type="number" id="pred-away-${m.match_id}" class="predict-input" min="0" max="99" value="${predAway}" ${isLocked ? 'disabled' : ''} placeholder="-">
+                            <input type="number" id="pred-away-${m.match_id}" class="predict-input" min="0" max="99" value="${predAway}" ${isLocked ? 'disabled' : ''} placeholder="-" oninput="app.saveTemp('${m.match_id}', 'away', this.value)">
                         </div>
                         <div style="font-size: 0.75rem; color: var(--text-secondary); text-align: center; margin-top: 0.2rem;">
                             ${hasPred ? '<span style="color: var(--accent-success); font-weight: 600;"><i class="fa-solid fa-check"></i> Đã dự đoán</span>' : 'Chưa dự đoán'}
@@ -504,13 +530,14 @@ class WCApp {
             if (res.success) {
                 this.showToast(res.message, "success");
 
-                // Đồng bộ cục bộ
+                // Đồng bộ cục bộ và xóa dự đoán tạm thời
                 predictions.forEach(p => {
                     this.userPredictions[p.match_id] = {
                         match_id: p.match_id,
                         predicted_home: p.predicted_home,
                         predicted_away: p.predicted_away
                     };
+                    delete this.tempPredictions[p.match_id];
                 });
 
                 this.renderMatches();
@@ -523,6 +550,17 @@ class WCApp {
         } finally {
             btn.disabled = false;
             btn.innerHTML = originalText;
+        }
+    }
+
+    saveTemp(matchId, side, value) {
+        if (!this.tempPredictions[matchId]) {
+            this.tempPredictions[matchId] = { predicted_home: "", predicted_away: "" };
+        }
+        if (side === "home") {
+            this.tempPredictions[matchId].predicted_home = value;
+        } else {
+            this.tempPredictions[matchId].predicted_away = value;
         }
     }
 
@@ -682,22 +720,6 @@ class WCApp {
     // UTILS & API HELPERS
     // ------------------------------------------------------------------
     async postAPI(data) {
-        // Vì Google Apps Script Web App yêu cầu CORS, chúng ta dùng POST JSON bình thường.
-        // Google Apps Script hỗ trợ redirect tự động nên cần cấu hình fetch theo chuẩn:
-        const response = await fetch(this.apiUrl, {
-            method: "POST",
-            mode: "no-cors", // Thiết lập no-cors để tránh lỗi preflight CORS trên một số trình duyệt
-            headers: {
-                "Content-Type": "text/plain" // Apps Script xử lý chuỗi JSON dễ hơn ở kiểu text/plain
-            },
-            body: JSON.stringify(data)
-        });
-
-        // LƯU Ý: Với mode: "no-cors", response sẽ có status = 0 và body rỗng, ta không đọc được kết quả trả về.
-        // Để tránh việc này và lấy được kết quả JSON chính xác, Apps Script Backend API của chúng ta đã được lập trình
-        // để hỗ trợ xử lý bằng cách trả về đúng kiểu ContentService.MimeType.JSON và cho phép CORS.
-        // Vì vậy ta nên gọi fetch ở mode "cors" bình thường:
-
         try {
             const corsResponse = await fetch(this.apiUrl, {
                 method: "POST",
@@ -708,8 +730,6 @@ class WCApp {
             });
             return await corsResponse.json();
         } catch (e) {
-            // Fallback nếu trình duyệt từ chối CORS ở POST (rất hiếm gặp với thiết lập doGet/doPost Apps Script hiện đại)
-            // Ta thông báo và hướng dẫn user kiểm tra. Ở đây ta coi như lỗi kết nối CORS.
             console.error("POST Error details:", e);
             throw e;
         }

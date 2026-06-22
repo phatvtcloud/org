@@ -2,11 +2,11 @@
   {
     "name": "Bình Thuận",
     "category": "DC",
-    "lat": 11.277083,
-    "lng": 108.7345
+    "lat": 11.2774933428235,
+    "lng": 108.735170681097
   },
   {
-    "name": "Cần Thơ",
+    "name": "Hậu Giang Foods",
     "category": "DC",
     "lat": 9.96475,
     "lng": 105.849417
@@ -18,7 +18,7 @@
     "lng": 108.140417
   },
   {
-    "name": "NM Net",
+    "name": "DC NetCO",
     "category": "DC",
     "lat": 10.786806,
     "lng": 106.991611
@@ -102,18 +102,6 @@
     "lng": 106.61395872263056
   },
   {
-    "name": "Miền Núi - Tân Bình",
-    "category": "DC",
-    "lat": 10.820549167651448,
-    "lng": 106.61395872263056
-  },
-  {
-    "name": "Việt Tiến - Tân Bình",
-    "category": "DC",
-    "lat": 10.820549167651448,
-    "lng": 106.61395872263056
-  },
-  {
     "name": "Vân Trúc",
     "category": "DC",
     "lat": 10.889696291065894,
@@ -124,12 +112,6 @@
     "category": "DC",
     "lat": 10.924485478734782,
     "lng": 106.77731002642268
-  },
-  {
-    "name": "Đồng Nai",
-    "category": "DC",
-    "lat": 10.851160102363,
-    "lng": 106.95547296357
   },
   {
     "name": "Nhà máy Quang Hanh",
@@ -176,14 +158,8 @@
   {
     "name": "Nhà máy Vĩnh Hảo",
     "category": "Factory",
-    "lat": 11.3132444,
-    "lng": 108.7534139
-  },
-  {
-    "name": "Nhà máy Vĩnh Hảo B20L",
-    "category": "Factory",
-    "lat": 11.3132444,
-    "lng": 108.7534139
+    "lat": 11.277083,
+    "lng": 108.7345
   },
   {
     "name": "Nhà máy VCF Biên Hòa",
@@ -242,14 +218,14 @@
   {
     "name": "Nhà máy Hậu Giang Food",
     "category": "Factory",
-    "lat": 9.9610889,
-    "lng": 105.8424
+    "lat": 9.966587120264782,
+    "lng": 105.837811177831
   },
   {
     "name": "Nhà máy Hậu Giang Beer",
     "category": "Factory",
-    "lat": 9.9610889,
-    "lng": 105.8424
+    "lat": 9.964086551571569,
+    "lng": 105.84104034443796
   },
   {
     "name": "Nhà máy Nam Ngư Phú Quốc, Masan Phú Quốc",
@@ -264,12 +240,6 @@
     "lng": 107.7769455
   },
   {
-    "name": "Nhà máy gia công Deneast",
-    "category": "Factory",
-    "lat": 11.1379247,
-    "lng": 106.6978593
-  },
-  {
     "name": "Nhà máy gia công OCM tại Việt Nam",
     "category": "Factory",
     "lat": 10.9153529,
@@ -280,12 +250,6 @@
     "category": "Factory",
     "lat": 20.9376842,
     "lng": 106.6556575
-  },
-  {
-    "name": "Nhà máy gia công Godaco Bến Tre",
-    "category": "Factory",
-    "lat": 10.2797839,
-    "lng": 106.3007738
   },
   {
     "name": "Nhà máy gia công tại Long An",
