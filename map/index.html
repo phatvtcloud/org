@@ -96,69 +96,69 @@
             flex: 1;
             height: 100%;
             position: relative;
-            padding: 16px;
+            padding: 8px;
         }
 
         #map {
             height: 100%;
             width: 100%;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
             border: 1px solid var(--border-color);
             background-color: var(--bg-color);
         }
 
         /* Right Side: Dashboard */
         .sidebar {
-            width: 380px;
+            width: 320px;
             height: 100%;
             border-left: 1px solid var(--border-color);
             background-color: var(--card-bg);
             display: flex;
             flex-direction: column;
-            padding: 24px;
-            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+            padding: 12px;
+            box-shadow: -3px 0 15px rgba(0, 0, 0, 0.1);
             z-index: 1000;
         }
 
         .header {
-            margin-bottom: 18px;
+            margin-bottom: 8px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 700;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             background: linear-gradient(135deg, var(--primary), #8b5cf6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .header p {
             color: var(--text-muted);
-            font-size: 13px;
+            font-size: 11px;
         }
 
         /* Game Mode Tabs */
         .mode-tabs {
             display: flex;
-            background-color: rgba(0, 0, 0, 0.1);
+            background-color: rgba(0, 0, 0, 0.08);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 4px;
-            margin-bottom: 16px;
+            border-radius: 8px;
+            padding: 2px;
+            margin-bottom: 8px;
         }
 
         .mode-tab {
             flex: 1;
-            padding: 10px;
+            padding: 6px;
             text-align: center;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            border-radius: 7px;
+            border-radius: 6px;
             transition: all 0.2s;
             color: var(--text-muted);
         }
@@ -170,18 +170,18 @@
         .mode-tab.active {
             color: white;
             background-color: var(--primary);
-            box-shadow: 0 4px 12px var(--primary-glow);
+            box-shadow: 0 2px 8px var(--primary-glow);
         }
 
         /* Question Box */
         .question-card {
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.05));
             border: 1px solid var(--primary);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 8px;
+            padding: 12px;
             text-align: center;
-            margin-bottom: 16px;
-            box-shadow: 0 0 15px var(--primary-glow);
+            margin-bottom: 8px;
+            box-shadow: 0 0 10px var(--primary-glow);
             position: relative;
             overflow: hidden;
         }
@@ -197,65 +197,65 @@
         }
 
         .q-label {
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 1.2px;
             color: var(--text-muted);
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .q-name {
-            font-size: 26px;
+            font-size: 20px;
             font-weight: 700;
             color: var(--text-color);
-            text-shadow: 0 0 8px var(--primary-glow);
+            text-shadow: 0 0 6px var(--primary-glow);
         }
 
         /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
         .stat-card {
             background-color: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 8px;
             text-align: center;
         }
 
         .stat-val {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 600;
         }
 
         .stat-lbl {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
+            letter-spacing: 0.3px;
+            margin-top: 1px;
         }
 
         /* Progress Bar */
         .progress-container {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .progress-text {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .progress-bar-bg {
-            height: 6px;
+            height: 5px;
             background-color: var(--border-color);
             border-radius: 3px;
             overflow: hidden;
@@ -271,27 +271,28 @@
 
         /* History List (Scrollable) */
         .list-section-title {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         .history-list {
             flex: 1;
             overflow-y: auto;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background-color: rgba(0, 0, 0, 0.05);
-            padding: 4px;
-            margin-bottom: 16px;
+            border-radius: 6px;
+            background-color: rgba(0, 0, 0, 0.03);
+            padding: 3px;
+            margin-bottom: 10px;
+            min-height: 80px;
         }
 
         /* Scrollbar custom style */
         .history-list::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
 
         .history-list::-webkit-scrollbar-track {
@@ -300,18 +301,18 @@
 
         .history-list::-webkit-scrollbar-thumb {
             background-color: var(--border-color);
-            border-radius: 3px;
+            border-radius: 2px;
         }
 
         .history-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 13px;
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-size: 12px;
             cursor: pointer;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             border: 1px solid transparent;
             transition: all 0.15s;
         }
@@ -323,16 +324,16 @@
 
         .history-item.correct {
             color: var(--success);
-            background-color: rgba(16, 185, 129, 0.04);
+            background-color: rgba(16, 185, 129, 0.03);
         }
 
         .history-item.incorrect {
             color: var(--danger);
-            background-color: rgba(239, 68, 68, 0.04);
+            background-color: rgba(239, 68, 68, 0.03);
         }
 
         .history-info {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-muted);
         }
 
@@ -340,34 +341,34 @@
         .controls-card {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;
             border-top: 1px solid var(--border-color);
-            padding-top: 16px;
+            padding-top: 8px;
         }
 
         .btn {
-            padding: 12px 20px;
+            padding: 8px 14px;
             border: none;
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: all 0.2s;
         }
 
         .btn-primary {
             background-color: var(--primary);
             color: white;
-            box-shadow: 0 4px 10px var(--primary-glow);
+            box-shadow: 0 3px 6px var(--primary-glow);
         }
 
         .btn-primary:hover {
             background-color: #2563eb;
-            transform: translateY(-1px);
+            transform: translateY(-0.5px);
         }
 
         .btn-outline {
@@ -384,9 +385,9 @@
         .settings-row {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 8px;
-            font-size: 11px;
+            gap: 6px;
+            margin-top: 4px;
+            font-size: 10px;
             color: var(--text-muted);
         }
 
@@ -394,19 +395,19 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 6px;
+            gap: 4px;
             background-color: rgba(255, 255, 255, 0.01);
             border: 1px solid rgba(255, 255, 255, 0.03);
-            padding: 6px 10px;
-            border-radius: 6px;
+            padding: 4px 6px;
+            border-radius: 4px;
         }
 
         /* Switch */
         .switch {
             position: relative;
             display: inline-block;
-            width: 32px;
-            height: 18px;
+            width: 28px;
+            height: 16px;
             flex-shrink: 0;
         }
 
@@ -425,14 +426,14 @@
             bottom: 0;
             background-color: var(--border-color);
             transition: .4s;
-            border-radius: 18px;
+            border-radius: 16px;
         }
 
         .slider:before {
             position: absolute;
             content: "";
-            height: 12px;
-            width: 12px;
+            height: 10px;
+            width: 10px;
             left: 3px;
             bottom: 3px;
             background-color: white;
@@ -445,7 +446,7 @@
         }
 
         input:checked+.slider:before {
-            transform: translateX(14px);
+            transform: translateX(12px);
         }
 
         /* Leaflet custom styling */
@@ -500,6 +501,206 @@
         .flash-wrong {
             animation: wrong-flash 0.6s ease-out;
         }
+
+        /* User badge banner */
+        .user-badge {
+            display: flex;
+            align-items: center;
+            background-color: var(--hover-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+
+        .user-badge .user-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .user-badge #display-username {
+            font-weight: 600;
+            color: var(--text-color);
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .btn-change-user {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-change-user:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            text-decoration: underline;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(11, 15, 25, 0.7);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.hidden {
+            display: none !important;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .modal-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            width: 420px;
+            max-width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            transform: scale(1);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        [data-theme="light"] .modal-card {
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15);
+        }
+
+        .modal-card h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        .modal-card p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .modal-card input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--text-color);
+            font-size: 15px;
+            font-weight: 500;
+            outline: none;
+            margin-bottom: 20px;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .modal-card input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .close-modal-btn {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            font-weight: 300;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .close-modal-btn:hover {
+            color: var(--text-color);
+        }
+
+        .rankings-table-container {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.02);
+            text-align: left;
+        }
+
+        [data-theme="light"] .rankings-table-container {
+            background-color: #f8fafc;
+        }
+
+        .rankings-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .rankings-table th,
+        .rankings-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .rankings-table th {
+            background-color: var(--hover-bg);
+            color: var(--text-color);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .rankings-table tbody tr {
+            transition: background-color 0.15s;
+        }
+
+        .rankings-table tbody tr:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .rankings-table tbody tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.01);
+        }
+
+        [data-theme="light"] .rankings-table tbody tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .rank-top-1 {
+            color: #f59e0b !important;
+            font-weight: 800 !important;
+        }
+
+        .rank-top-2 {
+            color: #94a3b8 !important;
+            font-weight: 800 !important;
+        }
+
+        .rank-top-3 {
+            color: #b45309 !important;
+            font-weight: 800 !important;
+        }
     </style>
 </head>
 
@@ -516,6 +717,13 @@
             <div class="header">
                 <h1>Bản Đồ Quiz</h1>
                 <p>Masan DC FMCG Geography Quiz</p>
+            </div>
+
+            <!-- User Info Badge -->
+            <div class="user-badge" id="user-badge-container">
+                <span class="user-icon">👤</span>
+                <span id="display-username">Đang tải...</span>
+                <button class="btn-change-user" id="btn-change-user" title="Đổi người chơi">Đổi tên</button>
             </div>
 
             <!-- Mode Switcher -->
@@ -570,8 +778,15 @@
 
             <!-- Controls Panel -->
             <div class="controls-card">
-                <button class="btn btn-primary" id="btn-skip">Bỏ qua / Tiếp tục</button>
+                <button class="btn btn-success" id="btn-finish-round"
+                    style="background-color: var(--success); color: white; border: none;">
+                    <span>💾</span> Hoàn thành lượt chơi
+                </button>
                 <button class="btn btn-outline" id="btn-restart">Đặt lại trò chơi</button>
+                <button class="btn btn-outline" id="btn-rankings"
+                    style="margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <span>🏆</span> Bảng xếp hạng
+                </button>
 
                 <!-- Settings row -->
                 <div class="settings-row">
@@ -599,6 +814,61 @@
                         </label>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay hidden" id="login-modal">
+        <div class="modal-card">
+            <h2>Đăng Nhập Chơi Quiz</h2>
+            <p>Vui lòng nhập tên của bạn để bắt đầu trò chơi và ghi nhận kết quả.</p>
+            <input type="text" id="username-input" placeholder="Tên người chơi..." maxlength="25">
+            <button class="btn btn-primary" id="btn-login-submit" style="width: 100%;">Bắt đầu chơi</button>
+        </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div class="modal-overlay hidden" id="rankings-modal">
+        <div class="modal-card"
+            style="width: 600px; max-width: 95%; max-height: 85vh; display: flex; flex-direction: column; padding: 24px;">
+            <button class="close-modal-btn" id="btn-close-rankings" title="Đóng">&times;</button>
+
+            <h2 style="margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <span>🏆</span> Bảng Xếp Hạng Quiz
+            </h2>
+            <p style="margin-bottom: 16px; font-size: 13px;">Dữ liệu lưu trữ thời gian thực.</p>
+
+            <!-- Modal Tabs -->
+            <div class="mode-tabs" style="margin-bottom: 12px; font-size: 12px;">
+                <div class="mode-tab active" id="rank-tab-provinces">Tỉnh Thành</div>
+                <div class="mode-tab" id="rank-tab-dc-factory">DC / Factory</div>
+            </div>
+
+            <!-- Pivot Selector -->
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 12px; align-items: center;">
+                <div class="toggle-container"
+                    style="margin: 0; padding: 4px 8px; background: var(--hover-bg); border-radius: 6px; border: 1px solid var(--border-color); display: flex; align-items: center;">
+                    <span id="pivot-label" style="font-size: 12px; font-weight: 600;">Xem theo lượt chơi</span>
+                    <label class="switch" style="transform: scale(0.8); margin-left: 8px;">
+                        <input type="checkbox" id="rank-pivot-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Rankings Table Container -->
+            <div class="rankings-table-container">
+                <table class="rankings-table">
+                    <thead>
+                        <tr id="rankings-table-header">
+                            <!-- Populated dynamically -->
+                        </tr>
+                    </thead>
+                    <tbody id="rankings-table-body">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -665,6 +935,10 @@
         });
         lightTiles.addTo(map); // Default theme is light
 
+        // Google Apps Script Web App URL (Cấu hình khi deploy lên GitHub Pages)
+        // Nếu để trống, game sẽ gọi cục bộ qua Flask API (Local)
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxU7wjJ0w0IDuox26erBroCxB-c8hhx2D1B5DT6AbQ0IEdiDg8U95cJ14X__Rf9Mgo/exec";
+
         // State variables
         let geojsonLayer;
         let provincesList = [];
@@ -673,6 +947,13 @@
         let quizState = {
             currentMode: 'provinces', // 'provinces' | 'dc_factory'
             isAnsweringEnabled: true,
+
+            // Database and Player Identity
+            username: localStorage.getItem('quizUsername') || '',
+            sessionId: '',
+            questionNumber: 0,
+            questionStartTime: 0,
+            roundAnswers: [], // Buffer to save all answers of the round
 
             // Mode 1: Provinces
             provincesAnswered: {}, // { provinceName: 'correct' | 'incorrect' }
@@ -722,6 +1003,354 @@
             return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
         }
 
+        // Database and Session Helpers
+        function initUserSession() {
+            // Generate session ID
+            quizState.sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            quizState.questionNumber = 0;
+
+            // Check if username exists
+            if (!quizState.username) {
+                document.getElementById('login-modal').classList.remove('hidden');
+            } else {
+                document.getElementById('display-username').innerText = quizState.username;
+            }
+        }
+
+        function bufferAnswer(isCorrect, clickLatLng, distKm, responseTime) {
+            const targetName = quizState.currentMode === 'provinces' ? quizState.targetProvince : quizState.targetDC.name;
+            const targetType = quizState.currentMode === 'provinces' ? 'Province' : quizState.targetDC.category;
+
+            let targetLat = null;
+            let targetLng = null;
+            if (quizState.currentMode === 'dc_factory' && quizState.targetDC) {
+                targetLat = quizState.targetDC.lat;
+                targetLng = quizState.targetDC.lng;
+            }
+
+            quizState.roundAnswers.push({
+                questionNumber: quizState.questionNumber,
+                targetName: targetName,
+                targetType: targetType,
+                answerLat: clickLatLng ? clickLatLng.lat : null,
+                answerLng: clickLatLng ? clickLatLng.lng : null,
+                targetLat: targetLat,
+                targetLng: targetLng,
+                distanceError: quizState.currentMode === 'dc_factory' ? distKm : null,
+                isCorrect: isCorrect,
+                responseTime: responseTime
+            });
+        }
+
+        function saveRoundToDB() {
+            if (quizState.roundAnswers.length === 0) {
+                alert("Bạn chưa trả lời câu hỏi nào trong lượt này!");
+                return;
+            }
+
+            const payload = {
+                action: "saveRound",
+                sessionId: quizState.sessionId,
+                username: quizState.username || "Anonymous",
+                gameMode: quizState.currentMode,
+                answers: quizState.roundAnswers
+            };
+
+            let url = '/api/save_answer';
+            let options = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            };
+
+            if (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== "") {
+                url = APPS_SCRIPT_URL;
+                options = {
+                    method: 'POST',
+                    mode: 'cors',
+                    body: JSON.stringify(payload)
+                };
+            }
+
+            const btn = document.getElementById('btn-finish-round');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span>⏳</span> Đang lưu...';
+            btn.disabled = true;
+
+            fetch(url, options)
+                .then(res => {
+                    if (!res.ok) throw new Error("HTTP error " + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.status === 'success' || data.success) {
+                        alert("Đã lưu lượt chơi thành công!");
+
+                        // Reset round-level answers and session
+                        quizState.roundAnswers = [];
+                        quizState.sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                        quizState.questionNumber = 0;
+
+                        if (quizState.currentMode === 'provinces') {
+                            quizState.provincesAnswered = {};
+                            quizState.provincesHistory = [];
+                            quizState.streakProvinces = 0;
+                        } else {
+                            quizState.dcAnswered = {};
+                            quizState.dcHistory = [];
+                        }
+
+                        clearTempGraphics();
+                        refreshAnsweredVisuals();
+                        updateStatsDisplay();
+                        updateHistoryUI();
+                        nextQuestion();
+                    } else {
+                        throw new Error(data.message || "Lỗi chưa xác định");
+                    }
+                })
+                .catch(err => {
+                    console.error("Save round failed:", err);
+                    alert("Lỗi khi lưu kết quả: " + err.message);
+                })
+                .finally(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
+        }
+
+        // Leaderboard / Rankings Modal Logic
+        let rankingDataCache = null;
+        let rankingsState = {
+            activeMode: 'provinces',
+            isPivot: false
+        };
+
+        function showRankingsModal() {
+            document.getElementById('rankings-modal').classList.remove('hidden');
+            fetchRankings();
+        }
+
+        function hideRankingsModal() {
+            document.getElementById('rankings-modal').classList.add('hidden');
+        }
+
+        function fetchRankings() {
+            const tbody = document.getElementById('rankings-table-body');
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 30px; color: var(--text-muted);">⏳ Đang tải dữ liệu xếp hạng...</td></tr>`;
+
+            let url = '/api/rankings';
+            if (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== "") {
+                url = APPS_SCRIPT_URL + (APPS_SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') + "action=getRankings";
+            }
+
+            fetch(url)
+                .then(r => {
+                    if (!r.ok) {
+                        return r.json().then(errData => {
+                            throw new Error(errData.message || "Lỗi máy chủ");
+                        });
+                    }
+                    return r.json();
+                })
+                .then(data => {
+                    if (data.status === 'error') {
+                        throw new Error(data.message);
+                    }
+                    rankingDataCache = data;
+                    renderRankings();
+                })
+                .catch(err => {
+                    console.error("Failed to load rankings:", err);
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--danger); padding: 30px; line-height: 1.5;">❌ Lỗi tải dữ liệu bảng xếp hạng:<br><span style="font-size: 12px; color: var(--text-muted); display: block; margin-top: 8px;">${err.message}</span></td></tr>`;
+                });
+        }
+
+        function renderRankings() {
+            if (!rankingDataCache) return;
+
+            const headerRow = document.getElementById('rankings-table-header');
+            const tbody = document.getElementById('rankings-table-body');
+            tbody.innerHTML = '';
+
+            const activeMode = rankingsState.activeMode;
+            const isPivot = rankingsState.isPivot;
+
+            if (!isPivot) {
+                headerRow.innerHTML = `
+                    <th style="width: 50px;">Hạng</th>
+                    <th>Thời gian chơi</th>
+                    <th>Người chơi</th>
+                    <th style="text-align: right;">% Chính xác</th>
+                    <th style="text-align: right;">Thời gian</th>
+                `;
+
+                const rounds = rankingDataCache[activeMode].rounds || [];
+                if (rounds.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 30px; color: var(--text-muted);">Chưa có lượt chơi nào trong hệ thống.</td></tr>`;
+                    return;
+                }
+
+                rounds.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+
+                    const rankCell = document.createElement('td');
+                    rankCell.innerText = index + 1;
+                    if (index === 0) rankCell.className = 'rank-top-1';
+                    else if (index === 1) rankCell.className = 'rank-top-2';
+                    else if (index === 2) rankCell.className = 'rank-top-3';
+
+                    const dateCell = document.createElement('td');
+                    dateCell.innerText = item.date;
+
+                    const userCell = document.createElement('td');
+                    userCell.innerText = item.username;
+                    if (item.username === quizState.username) {
+                        userCell.innerHTML = `<b>${item.username} (Bạn)</b>`;
+                    }
+
+                    const accCell = document.createElement('td');
+                    accCell.style.textAlign = 'right';
+                    accCell.style.fontWeight = '600';
+                    accCell.innerText = `${item.accuracy}% (${item.correct}/${item.total})`;
+
+                    const timeCell = document.createElement('td');
+                    timeCell.style.textAlign = 'right';
+                    timeCell.innerText = item.timeStr;
+
+                    tr.appendChild(rankCell);
+                    tr.appendChild(dateCell);
+                    tr.appendChild(userCell);
+                    tr.appendChild(accCell);
+                    tr.appendChild(timeCell);
+                    tbody.appendChild(tr);
+                });
+            } else {
+                headerRow.innerHTML = `
+                    <th style="width: 50px;">Hạng</th>
+                    <th>Người chơi</th>
+                    <th style="text-align: right;">% Chính xác TB</th>
+                    <th style="text-align: right;">Thời gian TB / Lượt</th>
+                    <th style="text-align: right;">Số lượt</th>
+                `;
+
+                const players = rankingDataCache[activeMode].players || [];
+                if (players.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 30px; color: var(--text-muted);">Chưa có người chơi nào trong hệ thống.</td></tr>`;
+                    return;
+                }
+
+                players.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+
+                    const rankCell = document.createElement('td');
+                    rankCell.innerText = index + 1;
+                    if (index === 0) rankCell.className = 'rank-top-1';
+                    else if (index === 1) rankCell.className = 'rank-top-2';
+                    else if (index === 2) rankCell.className = 'rank-top-3';
+
+                    const userCell = document.createElement('td');
+                    userCell.innerText = item.username;
+                    if (item.username === quizState.username) {
+                        userCell.innerHTML = `<b>${item.username} (Bạn)</b>`;
+                    }
+
+                    const accCell = document.createElement('td');
+                    accCell.style.textAlign = 'right';
+                    accCell.style.fontWeight = '600';
+                    accCell.innerText = `${item.avgAccuracy}%`;
+
+                    const timeCell = document.createElement('td');
+                    timeCell.style.textAlign = 'right';
+                    timeCell.innerText = item.avgTimeStr;
+
+                    const countCell = document.createElement('td');
+                    countCell.style.textAlign = 'right';
+                    countCell.innerText = item.roundsCount;
+
+                    tr.appendChild(rankCell);
+                    tr.appendChild(userCell);
+                    tr.appendChild(accCell);
+                    tr.appendChild(timeCell);
+                    tr.appendChild(countCell);
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        // Login Modal Event Listeners
+        document.getElementById('btn-login-submit').addEventListener('click', function () {
+            const val = document.getElementById('username-input').value.trim();
+            if (val) {
+                playSound('click');
+                quizState.username = val;
+                localStorage.setItem('quizUsername', val);
+                document.getElementById('display-username').innerText = val;
+                document.getElementById('login-modal').classList.add('hidden');
+
+                // Reset session ID and question count on login/change user
+                quizState.sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                quizState.questionNumber = 0;
+            } else {
+                alert("Vui lòng nhập tên của bạn!");
+            }
+        });
+
+        document.getElementById('username-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btn-login-submit').click();
+            }
+        });
+
+        document.getElementById('btn-change-user').addEventListener('click', function () {
+            playSound('click');
+            document.getElementById('username-input').value = quizState.username;
+            document.getElementById('login-modal').classList.remove('hidden');
+        });
+
+        // Leaderboard Event Listeners
+        document.getElementById('btn-finish-round').addEventListener('click', function () {
+            playSound('click');
+            if (confirm("Bạn có muốn hoàn thành và lưu kết quả lượt chơi này không?")) {
+                saveRoundToDB();
+            }
+        });
+
+        document.getElementById('btn-rankings').addEventListener('click', function () {
+            playSound('click');
+            showRankingsModal();
+        });
+
+        document.getElementById('btn-close-rankings').addEventListener('click', function () {
+            playSound('click');
+            hideRankingsModal();
+        });
+
+        document.getElementById('rank-tab-provinces').addEventListener('click', function () {
+            if (rankingsState.activeMode === 'provinces') return;
+            playSound('click');
+            document.getElementById('rank-tab-provinces').classList.add('active');
+            document.getElementById('rank-tab-dc-factory').classList.remove('active');
+            rankingsState.activeMode = 'provinces';
+            renderRankings();
+        });
+
+        document.getElementById('rank-tab-dc-factory').addEventListener('click', function () {
+            if (rankingsState.activeMode === 'dc_factory') return;
+            playSound('click');
+            document.getElementById('rank-tab-dc-factory').classList.add('active');
+            document.getElementById('rank-tab-provinces').classList.remove('active');
+            rankingsState.activeMode = 'dc_factory';
+            renderRankings();
+        });
+
+        document.getElementById('rank-pivot-toggle').addEventListener('change', function (e) {
+            playSound('click');
+            rankingsState.isPivot = e.target.checked;
+            document.getElementById('pivot-label').innerText = rankingsState.isPivot ? "Xem theo người chơi (TB)" : "Xem theo lượt chơi";
+            renderRankings();
+        });
+
         // Switch Game Mode
         function switchGameMode(mode) {
             if (quizState.currentMode === mode) return;
@@ -732,6 +1361,10 @@
             document.getElementById('tab-dc-factory').classList.toggle('active', mode === 'dc_factory');
 
             quizState.currentMode = mode;
+
+            // Reset session on mode switch
+            quizState.sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            quizState.questionNumber = 0;
 
             // Switch tile layers and data layers
             if (mode === 'dc_factory') {
@@ -841,6 +1474,10 @@
             quizState.provincesAnswered[targetName] = isCorrect ? 'correct' : 'incorrect';
             quizState.provincesHistory.push({ name: targetName, correct: isCorrect });
 
+            // Calculate response time and buffer the answer
+            const responseTime = (Date.now() - quizState.questionStartTime) / 1000;
+            bufferAnswer(isCorrect, null, 0, responseTime);
+
             if (isCorrect) {
                 playSound('correct');
                 qCard.classList.add('flash-correct');
@@ -937,6 +1574,10 @@
                 distance: distKm,
                 correct: isCorrect
             });
+
+            // Calculate response time and buffer the answer
+            const responseTime = (Date.now() - quizState.questionStartTime) / 1000;
+            bufferAnswer(isCorrect, clickLatLng, distKm, responseTime);
 
             // Update records
             if (distKm < quizState.bestDCGuess) {
@@ -1085,6 +1726,10 @@
         function nextQuestion() {
             quizState.isAnsweringEnabled = true;
 
+            // Track question info
+            quizState.questionNumber++;
+            quizState.questionStartTime = Date.now();
+
             if (quizState.currentMode === 'provinces') {
                 const remaining = provincesList.filter(p => !quizState.provincesAnswered[p]);
 
@@ -1093,6 +1738,11 @@
                     document.getElementById('q-mode-label').innerText = "Hoàn thành";
                     playSound('correct');
                     quizState.isAnsweringEnabled = false;
+                    setTimeout(() => {
+                        if (confirm("Chúc mừng! Bạn đã hoàn thành tất cả các tỉnh thành. Bạn có muốn lưu kết quả lượt chơi này không?")) {
+                            saveRoundToDB();
+                        }
+                    }, 500);
                     return;
                 }
 
@@ -1111,6 +1761,11 @@
                     document.getElementById('q-mode-label').innerText = "Hoàn thành";
                     playSound('correct');
                     quizState.isAnsweringEnabled = false;
+                    setTimeout(() => {
+                        if (confirm("Chúc mừng! Bạn đã hoàn thành tất cả DC / Nhà máy. Bạn có muốn lưu kết quả lượt chơi này không?")) {
+                            saveRoundToDB();
+                        }
+                    }, 500);
                     return;
                 }
 
@@ -1267,45 +1922,6 @@
                 container.appendChild(li);
             }
         }
-
-        // Skip current item button
-        document.getElementById('btn-skip').addEventListener('click', function () {
-            if (!quizState.isAnsweringEnabled) return;
-            playSound('click');
-
-            const mode = quizState.currentMode;
-            if (mode === 'provinces') {
-                if (quizState.targetProvince) {
-                    quizState.provincesAnswered[quizState.targetProvince] = 'incorrect';
-                    quizState.provincesHistory.push({ name: quizState.targetProvince, correct: false });
-                    quizState.streakProvinces = 0;
-
-                    updateStatsDisplay();
-                    updateHistoryUI();
-                    refreshAnsweredVisuals();
-                    nextQuestion();
-                }
-            } else {
-                if (quizState.targetDC) {
-                    const target = quizState.targetDC;
-                    quizState.dcAnswered[target.name] = 'incorrect';
-                    quizState.dcHistory.push({
-                        name: target.name,
-                        category: target.category,
-                        lat: target.lat,
-                        lng: target.lng,
-                        distance: 250.0, // default large penalty distance
-                        correct: false
-                    });
-
-                    updateStatsDisplay();
-                    updateHistoryUI();
-                    refreshAnsweredVisuals();
-                    nextQuestion();
-                }
-            }
-        });
-
         // Restart Game Button
         document.getElementById('btn-restart').addEventListener('click', function () {
             playSound('click');
@@ -1319,6 +1935,11 @@
                     quizState.dcAnswered = {};
                     quizState.dcHistory = [];
                 }
+
+                // Reset session ID, question count, and roundAnswers buffer
+                quizState.sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                quizState.questionNumber = 0;
+                quizState.roundAnswers = [];
 
                 clearTempGraphics();
                 refreshAnsweredVisuals();
@@ -1349,6 +1970,7 @@
             });
 
             // Start Game
+            initUserSession();
             updateStatsDisplay();
             nextQuestion();
         }).catch(err => {
