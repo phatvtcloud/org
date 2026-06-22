@@ -1,0 +1,296 @@
+[
+  {
+    "name": "Bình Thuận",
+    "category": "DC",
+    "lat": 11.277083,
+    "lng": 108.7345
+  },
+  {
+    "name": "Cần Thơ",
+    "category": "DC",
+    "lat": 9.96475,
+    "lng": 105.849417
+  },
+  {
+    "name": "Đà Nẵng",
+    "category": "DC",
+    "lat": 16.085,
+    "lng": 108.140417
+  },
+  {
+    "name": "NM Net",
+    "category": "DC",
+    "lat": 10.786806,
+    "lng": 106.991611
+  },
+  {
+    "name": "Hải Dương",
+    "category": "DC",
+    "lat": 20.939,
+    "lng": 106.295028
+  },
+  {
+    "name": "Hải Phòng",
+    "category": "DC",
+    "lat": 20.819444,
+    "lng": 106.777611
+  },
+  {
+    "name": "Hậu Giang Beer",
+    "category": "DC",
+    "lat": 9.964778,
+    "lng": 105.842472
+  },
+  {
+    "name": "Hưng Yên",
+    "category": "DC",
+    "lat": 20.896944,
+    "lng": 106.06626
+  },
+  {
+    "name": "Thành Huy - Hưng Yên",
+    "category": "DC",
+    "lat": 20.929167,
+    "lng": 106.067278
+  },
+  {
+    "name": "Đông Dương - Hưng Yên",
+    "category": "DC",
+    "lat": 20.954388,
+    "lng": 106.005706
+  },
+  {
+    "name": "Nghệ An",
+    "category": "DC",
+    "lat": 18.828472,
+    "lng": 105.656861
+  },
+  {
+    "name": "Phú Yên",
+    "category": "DC",
+    "lat": 13.011972,
+    "lng": 109.364639
+  },
+  {
+    "name": "Quang Hanh",
+    "category": "DC",
+    "lat": 21.003306,
+    "lng": 107.223833
+  },
+  {
+    "name": "TBS",
+    "category": "DC",
+    "lat": 10.926,
+    "lng": 106.744583
+  },
+  {
+    "name": "Kerry",
+    "category": "DC",
+    "lat": 10.890194,
+    "lng": 106.734333
+  },
+  {
+    "name": "Suối Mơ",
+    "category": "DC",
+    "lat": 20.960806,
+    "lng": 107.027806
+  },
+  {
+    "name": "Tanimex - Tân Bình",
+    "category": "DC",
+    "lat": 10.820667,
+    "lng": 106.614083
+  },
+  {
+    "name": "Miền Núi - Tân Bình",
+    "category": "DC",
+    "lat": 10.82092,
+    "lng": 106.617099
+  },
+  {
+    "name": "Việt Tiến - Tân Bình",
+    "category": "DC",
+    "lat": 10.82092,
+    "lng": 106.617099
+  },
+  {
+    "name": "Vân Trúc",
+    "category": "DC",
+    "lat": 10.898892,
+    "lng": 106.722755
+  },
+  {
+    "name": "BW",
+    "category": "DC",
+    "lat": 10.898892,
+    "lng": 106.722755
+  },
+  {
+    "name": "Đồng Nai",
+    "category": "DC",
+    "lat": 10.851160102363,
+    "lng": 106.95547296357
+  },
+  {
+    "name": "Nhà máy Quang Hanh",
+    "category": "Factory",
+    "lat": 21.0082107,
+    "lng": 107.2271147
+  },
+  {
+    "name": "Nhà máy Suối Mơ",
+    "category": "Factory",
+    "lat": 20.9578941,
+    "lng": 107.0832118
+  },
+  {
+    "name": "Nhà máy Hải Dương",
+    "category": "Factory",
+    "lat": 20.9297632,
+    "lng": 106.2669247
+  },
+  {
+    "name": "Nhà máy gia công MSJ tại MHN",
+    "category": "Factory",
+    "lat": 20.6378553,
+    "lng": 105.8885067
+  },
+  {
+    "name": "Nhà máy sữa Elovi",
+    "category": "Factory",
+    "lat": 21.3340466,
+    "lng": 105.8686921
+  },
+  {
+    "name": "Nhà máy Masan Miền Bắc",
+    "category": "Factory",
+    "lat": 18.8333799,
+    "lng": 105.6571789
+  },
+  {
+    "name": "Nhà máy Beer Phú Yên",
+    "category": "Factory",
+    "lat": 13.013859,
+    "lng": 109.3619624
+  },
+  {
+    "name": "Nhà máy Vĩnh Hảo",
+    "category": "Factory",
+    "lat": 11.3132444,
+    "lng": 108.7534139
+  },
+  {
+    "name": "Nhà máy Vĩnh Hảo B20L",
+    "category": "Factory",
+    "lat": 11.3132444,
+    "lng": 108.7534139
+  },
+  {
+    "name": "Nhà máy VCF Biên Hòa",
+    "category": "Factory",
+    "lat": 10.921125,
+    "lng": 106.8613515
+  },
+  {
+    "name": "Nhà máy VCF Long Thành",
+    "category": "Factory",
+    "lat": 10.8312488,
+    "lng": 106.935861
+  },
+  {
+    "name": "Nhà máy NET Long Thành",
+    "category": "Factory",
+    "lat": 10.7948211,
+    "lng": 106.9900006
+  },
+  {
+    "name": "Nhà máy MSI",
+    "category": "Factory",
+    "lat": 10.92273,
+    "lng": 106.7878992
+  },
+  {
+    "name": "Nhà máy gia công MSJ tại SNF",
+    "category": "Factory",
+    "lat": 10.92273,
+    "lng": 106.7878992
+  },
+  {
+    "name": "Nhà máy Vihawa Sóng Thần",
+    "category": "Factory",
+    "lat": 10.8798866,
+    "lng": 106.7507199
+  },
+  {
+    "name": "Nhà máy gia công VTF - Vihawa",
+    "category": "Factory",
+    "lat": 10.8162555,
+    "lng": 106.6251124
+  },
+  {
+    "name": "Nhà máy gia công Cao Nguyên Xanh",
+    "category": "Factory",
+    "lat": 10.953763,
+    "lng": 106.5476008
+  },
+  {
+    "name": "Nhà máy Gia công Nihon",
+    "category": "Factory",
+    "lat": 11.1320152,
+    "lng": 106.6306686
+  },
+  {
+    "name": "Nhà máy Hậu Giang Food",
+    "category": "Factory",
+    "lat": 9.9610889,
+    "lng": 105.8424
+  },
+  {
+    "name": "Nhà máy Hậu Giang Beer",
+    "category": "Factory",
+    "lat": 9.9610889,
+    "lng": 105.8424
+  },
+  {
+    "name": "Nhà máy Nam Ngư Phú Quốc, Masan Phú Quốc",
+    "category": "Factory",
+    "lat": 10.1253417,
+    "lng": 103.9956269
+  },
+  {
+    "name": "Nhà máy Hương Giang Lagi",
+    "category": "Factory",
+    "lat": 10.6940278,
+    "lng": 107.7769455
+  },
+  {
+    "name": "Nhà máy gia công Deneast",
+    "category": "Factory",
+    "lat": 11.1379247,
+    "lng": 106.6978593
+  },
+  {
+    "name": "Nhà máy gia công OCM tại Việt Nam",
+    "category": "Factory",
+    "lat": 10.9153529,
+    "lng": 106.4409484
+  },
+  {
+    "name": "Nhà máy gia công Aroma",
+    "category": "Factory",
+    "lat": 20.9376842,
+    "lng": 106.6556575
+  },
+  {
+    "name": "Nhà máy gia công Godaco Bến Tre",
+    "category": "Factory",
+    "lat": 10.2797839,
+    "lng": 106.3007738
+  },
+  {
+    "name": "Nhà máy gia công tại Long An",
+    "category": "Factory",
+    "lat": 10.8104615,
+    "lng": 106.4751146
+  }
+]

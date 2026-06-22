@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bản Đồ Quiz - Việt Nam</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #151c2c;
+            --border-color: #232d42;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.4);
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.3);
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.3);
+            --hover-bg: #1e293b;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #94a3b8;
+            --text-color: #0f172a;
+            --text-muted: #334155;
+            --primary: #1d4ed8;
+            --primary-glow: rgba(29, 78, 216, 0.15);
+            --success: #047857;
+            --success-glow: rgba(4, 120, 87, 0.15);
+            --danger: #b91c1c;
+            --danger-glow: rgba(185, 28, 28, 0.15);
+            --hover-bg: #cbd5e1;
+        }
+
+        [data-theme="light"] .question-card {
+            background: linear-gradient(135deg, rgba(29, 78, 216, 0.08), rgba(139, 92, 246, 0.05));
+            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.08);
+        }
+
+        [data-theme="light"] .q-name {
+            text-shadow: none;
+        }
+
+        [data-theme="light"] .mode-tabs {
+            background-color: #f1f5f9;
+        }
+
+        [data-theme="light"] .history-list {
+            background-color: #f8fafc;
+        }
+
+        [data-theme="light"] .stat-card {
+            background-color: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Layout Grid */
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Left Side: Map */
+        .map-section {
+            flex: 1;
+            height: 100%;
+            position: relative;
+            padding: 16px;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+        }
+
+        /* Right Side: Dashboard */
+        .sidebar {
+            width: 380px;
+            height: 100%;
+            border-left: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+        }
+
+        .header {
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* Game Mode Tabs */
+        .mode-tabs {
+            display: flex;
+            background-color: rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 7px;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+
+        .mode-tab:hover {
+            color: var(--text-color);
+        }
+
+        .mode-tab.active {
+            color: white;
+            background-color: var(--primary);
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        /* Question Box */
+        .question-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.05));
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 16px;
+            box-shadow: 0 0 15px var(--primary-glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), #8b5cf6);
+        }
+
+        .q-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .q-name {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-color);
+            text-shadow: 0 0 8px var(--primary-glow);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .stat-lbl {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background-color: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), #8b5cf6);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* History List (Scrollable) */
+        .list-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+
+        /* Scrollbar custom style */
+        .history-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            border: 1px solid transparent;
+            transition: all 0.15s;
+        }
+
+        .history-item:hover {
+            background-color: var(--hover-bg);
+            border-color: var(--border-color);
+        }
+
+        .history-item.correct {
+            color: var(--success);
+            background-color: rgba(16, 185, 129, 0.04);
+        }
+
+        .history-item.incorrect {
+            color: var(--danger);
+            background-color: rgba(239, 68, 68, 0.04);
+        }
+
+        .history-info {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Controls / Footer */
+        .controls-card {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--hover-bg);
+        }
+
+        /* Settings row */
+        .settings-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            background-color: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+
+        /* Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 32px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: .4s;
+            border-radius: 18px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 12px;
+            width: 12px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--primary);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(14px);
+        }
+
+        /* Leaflet custom styling */
+        .leaflet-container {
+            font-family: 'Outfit', sans-serif !important;
+        }
+
+        .custom-tooltip {
+            background-color: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-color) !important;
+            font-family: 'Outfit', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 12px !important;
+            border-radius: 4px !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        /* Animations */
+        @keyframes correct-flash {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        @keyframes wrong-flash {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+
+        .flash-correct {
+            animation: correct-flash 0.6s ease-out;
+        }
+
+        .flash-wrong {
+            animation: wrong-flash 0.6s ease-out;
+        }
+    </style>
+</head>
+
+<body data-theme="light">
+
+    <div class="app-container">
+        <!-- Map View -->
+        <div class="map-section">
+            <div id="map"></div>
+        </div>
+
+        <!-- Sidebar Dashboard -->
+        <div class="sidebar">
+            <div class="header">
+                <h1>Bản Đồ Quiz</h1>
+                <p>Masan DC FMCG Geography Quiz</p>
+            </div>
+
+            <!-- Mode Switcher -->
+            <div class="mode-tabs">
+                <div class="mode-tab active" id="tab-provinces" onclick="switchGameMode('provinces')">Tỉnh Thành</div>
+                <div class="mode-tab" id="tab-dc-factory" onclick="switchGameMode('dc_factory')">DC / Factory</div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="question-card" id="q-card">
+                <div class="q-label" id="q-mode-label">Đang tải...</div>
+                <div class="q-name" id="target-province">Đang tải...</div>
+            </div>
+
+            <!-- Statistics Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-val" id="score-val">0 / 0</div>
+                    <div class="stat-lbl">Đúng / Câu</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="stat-2-val">0</div>
+                    <div class="stat-lbl" id="stat-2-lbl">Chuỗi Đúng</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="accuracy-val">0%</div>
+                    <div class="stat-lbl">Chính xác</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="stat-4-val">0</div>
+                    <div class="stat-lbl" id="stat-4-lbl">Kỷ Lục</div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-text">
+                    <span id="progress-lbl">Tiến trình hoàn thành</span>
+                    <span id="progress-percent">0/0 (0%)</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progress-bar"></div>
+                </div>
+            </div>
+
+            <!-- History list -->
+            <div class="list-section-title">Lịch sử nhấp chuột</div>
+            <div class="history-list" id="history-ul">
+                <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 13px;">Chưa có lượt
+                    chơi nào.</div>
+            </div>
+
+            <!-- Controls Panel -->
+            <div class="controls-card">
+                <button class="btn btn-primary" id="btn-skip">Bỏ qua / Tiếp tục</button>
+                <button class="btn btn-outline" id="btn-restart">Đặt lại trò chơi</button>
+
+                <!-- Settings row -->
+                <div class="settings-row">
+                    <div class="toggle-container">
+                        <span>Âm thanh</span>
+                        <label class="switch">
+                            <input type="checkbox" id="sound-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-container">
+                        <span>Sáng / Tối</span>
+                        <label class="switch">
+                            <input type="checkbox" id="theme-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="settings-row" style="grid-template-columns: 1fr; margin-top: 0;">
+                    <div class="toggle-container">
+                        <span>Bật vùng & tên đã trả lời</span>
+                        <label class="switch">
+                            <input type="checkbox" id="show-answered-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        // Web Audio Context for sound effects
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!document.getElementById('sound-toggle').checked) return;
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(783.99, now + 0.08); // G5
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.25);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                gain.gain.setValueAtTime(0.02, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+                osc.start(now);
+                osc.stop(now + 0.04);
+            }
+        }
+
+        // Initialize Map
+        const map = L.map('map', {
+            zoomControl: true,
+            attributionControl: false
+        }).setView([16.0, 106.0], 6);
+
+        // Map Tile Layers
+        const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', { maxZoom: 18 });
+        const lightTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', { maxZoom: 18 });
+        const osmTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+        lightTiles.addTo(map); // Default theme is light
+
+        // State variables
+        let geojsonLayer;
+        let provincesList = [];
+        let dcFactoriesList = [];
+
+        let quizState = {
+            currentMode: 'provinces', // 'provinces' | 'dc_factory'
+            isAnsweringEnabled: true,
+
+            // Mode 1: Provinces
+            provincesAnswered: {}, // { provinceName: 'correct' | 'incorrect' }
+            provincesHistory: [], // array of { name, correct }
+            streakProvinces: 0,
+            highScoreProvinces: parseInt(localStorage.getItem('highScoreProvinces') || '0'),
+            targetProvince: null,
+
+            // Mode 2: DC / Factory
+            dcAnswered: {}, // { dcName: 'correct' | 'incorrect' }
+            dcHistory: [], // array of { name, category, lat, lng, distance, correct }
+            bestDCGuess: parseFloat(localStorage.getItem('bestDCGuess') || '999999'), // best distance in km
+            targetDC: null
+        };
+
+        // Temporary graphics (lines, markers) during checking
+        let tempGraphics = [];
+        // Permanent graphics for showing answered DCs/Factories on map
+        let answeredDCGroup = L.layerGroup().addTo(map);
+
+        // Theme Toggle
+        document.getElementById('theme-toggle').addEventListener('change', function (e) {
+            playSound('click');
+            if (e.target.checked) {
+                document.body.setAttribute('data-theme', 'light');
+                if (quizState.currentMode === 'provinces') {
+                    map.removeLayer(darkTiles);
+                    lightTiles.addTo(map);
+                }
+            } else {
+                document.body.removeAttribute('data-theme');
+                if (quizState.currentMode === 'provinces') {
+                    map.removeLayer(lightTiles);
+                    darkTiles.addTo(map);
+                }
+            }
+        });
+
+        // Toggle "Bật vùng & tên đã trả lời"
+        document.getElementById('show-answered-toggle').addEventListener('change', function () {
+            playSound('click');
+            refreshAnsweredVisuals();
+        });
+
+        // Helper to read CSS values dynamically
+        function varCSS(varName) {
+            return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+        }
+
+        // Switch Game Mode
+        function switchGameMode(mode) {
+            if (quizState.currentMode === mode) return;
+            playSound('click');
+
+            // UI tab updates
+            document.getElementById('tab-provinces').classList.toggle('active', mode === 'provinces');
+            document.getElementById('tab-dc-factory').classList.toggle('active', mode === 'dc_factory');
+
+            quizState.currentMode = mode;
+
+            // Switch tile layers and data layers
+            if (mode === 'dc_factory') {
+                map.removeLayer(darkTiles);
+                map.removeLayer(lightTiles);
+                osmTiles.addTo(map);
+                if (geojsonLayer && map.hasLayer(geojsonLayer)) {
+                    map.removeLayer(geojsonLayer);
+                }
+            } else {
+                map.removeLayer(osmTiles);
+                const isLight = document.getElementById('theme-toggle').checked;
+                if (isLight) {
+                    lightTiles.addTo(map);
+                } else {
+                    darkTiles.addTo(map);
+                }
+                if (geojsonLayer && !map.hasLayer(geojsonLayer)) {
+                    geojsonLayer.addTo(map);
+                }
+            }
+
+            // Reset temp display elements
+            clearTempGraphics();
+
+            // Re-render answered visuals based on mode
+            refreshAnsweredVisuals();
+
+            // Load stats and trigger new question
+            updateStatsDisplay();
+            updateHistoryUI();
+            nextQuestion();
+        }
+
+        // Styling for provinces in GeoJSON
+        function getProvinceStyle(feature) {
+            return {
+                fillColor: '#3b82f6',
+                weight: 1,
+                opacity: 1,
+                color: '#334155',
+                fillOpacity: 0.12
+            };
+        }
+
+        function highlightFeature(e) {
+            if (quizState.currentMode !== 'provinces' || !quizState.isAnsweringEnabled) return;
+            const layer = e.target;
+            layer.setStyle({
+                weight: 2,
+                color: '#60a5fa',
+                fillOpacity: 0.35
+            });
+        }
+
+        function resetHighlight(e) {
+            if (quizState.currentMode !== 'provinces') return;
+            const layer = e.target;
+            const name = layer.feature.properties.Name;
+
+            // Only keep status coloring if toggle "Show answered" is checked
+            const showAnswered = document.getElementById('show-answered-toggle').checked;
+            const status = quizState.provincesAnswered[name];
+
+            if (showAnswered && status) {
+                const color = status === 'correct' ? varCSS('--success') : varCSS('--danger');
+                layer.setStyle({
+                    fillColor: color,
+                    fillOpacity: 0.5,
+                    color: color,
+                    weight: 1
+                });
+            } else {
+                geojsonLayer.resetStyle(layer);
+            }
+        }
+
+        // Polygon clicked
+        function onProvinceClick(e) {
+            if (!quizState.isAnsweringEnabled) return;
+
+            if (quizState.currentMode === 'provinces') {
+                handleProvinceAnswer(e.target);
+            } else {
+                // In Mode 2, clicking a polygon acts as coordinates click
+                handleDCAnswer(e.latlng);
+            }
+        }
+
+        function onEachFeature(feature, layer) {
+            layer.on({
+                mouseover: highlightFeature,
+                mouseout: resetHighlight,
+                click: onProvinceClick
+            });
+        }
+
+        // Mode 1: Province Answer Verification
+        function handleProvinceAnswer(layer) {
+            quizState.isAnsweringEnabled = false;
+            const clickedName = layer.feature.properties.Name;
+            const targetName = quizState.targetProvince;
+
+            const qCard = document.getElementById('q-card');
+            const isCorrect = clickedName === targetName;
+
+            quizState.provincesAnswered[targetName] = isCorrect ? 'correct' : 'incorrect';
+            quizState.provincesHistory.push({ name: targetName, correct: isCorrect });
+
+            if (isCorrect) {
+                playSound('correct');
+                qCard.classList.add('flash-correct');
+                quizState.streakProvinces++;
+                if (quizState.streakProvinces > quizState.highScoreProvinces) {
+                    quizState.highScoreProvinces = quizState.streakProvinces;
+                    localStorage.setItem('highScoreProvinces', quizState.highScoreProvinces);
+                }
+
+                layer.setStyle({
+                    fillColor: varCSS('--success'),
+                    fillOpacity: 0.65,
+                    color: varCSS('--success'),
+                    weight: 2
+                });
+
+                setTimeout(() => {
+                    qCard.classList.remove('flash-correct');
+                    refreshAnsweredVisuals();
+                    nextQuestion();
+                }, 1200);
+            } else {
+                playSound('wrong');
+                qCard.classList.add('flash-wrong');
+                quizState.streakProvinces = 0;
+
+                // Red for clicked
+                layer.setStyle({
+                    fillColor: varCSS('--danger'),
+                    fillOpacity: 0.65,
+                    color: varCSS('--danger'),
+                    weight: 2
+                });
+
+                // Highlight correct province in green and open name label
+                let correctLayer;
+                geojsonLayer.eachLayer(function (l) {
+                    if (l.feature.properties.Name === targetName) {
+                        correctLayer = l;
+                        l.setStyle({
+                            fillColor: varCSS('--success'),
+                            fillOpacity: 0.5,
+                            color: varCSS('--success'),
+                            weight: 3
+                        });
+                        l.bindTooltip(targetName, {
+                            permanent: true,
+                            direction: 'center',
+                            className: 'custom-tooltip'
+                        }).openTooltip();
+                    }
+                });
+
+                setTimeout(() => {
+                    qCard.classList.remove('flash-wrong');
+                    if (correctLayer) {
+                        correctLayer.closeTooltip();
+                        correctLayer.unbindTooltip();
+                    }
+                    refreshAnsweredVisuals();
+                    nextQuestion();
+                }, 2200);
+            }
+
+            updateStatsDisplay();
+            updateHistoryUI();
+        }
+
+        // Map Click (for DC/Factory mode)
+        map.on('click', function (e) {
+            if (quizState.currentMode === 'dc_factory' && quizState.isAnsweringEnabled) {
+                handleDCAnswer(e.latlng);
+            }
+        });
+
+        // Mode 2: DC/Factory Click and Distance Calculations
+        function handleDCAnswer(clickLatLng) {
+            quizState.isAnsweringEnabled = false;
+
+            const target = quizState.targetDC;
+            const targetLatLng = L.latLng(target.lat, target.lng);
+
+            // Calculate distance in meters
+            const distMeters = clickLatLng.distanceTo(targetLatLng);
+            const distKm = distMeters / 1000;
+            const isCorrect = distKm <= 30.0; // Correct if distance is < 30km
+
+            quizState.dcAnswered[target.name] = isCorrect ? 'correct' : 'incorrect';
+            quizState.dcHistory.push({
+                name: target.name,
+                category: target.category,
+                lat: target.lat,
+                lng: target.lng,
+                distance: distKm,
+                correct: isCorrect
+            });
+
+            // Update records
+            if (distKm < quizState.bestDCGuess) {
+                quizState.bestDCGuess = distKm;
+                localStorage.setItem('bestDCGuess', distKm);
+            }
+
+            // Draw temporary graphics
+            clearTempGraphics();
+
+            // 1. Line connector
+            const line = L.polyline([clickLatLng, targetLatLng], {
+                color: isCorrect ? varCSS('--success') : '#f59e0b',
+                weight: 3,
+                dashArray: '6, 8',
+                opacity: 0.8
+            }).addTo(map);
+            tempGraphics.push(line);
+
+            // 2. Clicked marker
+            const clickMarker = L.circleMarker(clickLatLng, {
+                radius: 6,
+                color: isCorrect ? varCSS('--success') : varCSS('--danger'),
+                fillColor: isCorrect ? varCSS('--success') : varCSS('--danger'),
+                fillOpacity: 0.8
+            }).addTo(map);
+            tempGraphics.push(clickMarker);
+
+            // 3. Target actual location marker (glowing gold circle)
+            const targetMarker = L.circleMarker(targetLatLng, {
+                radius: 10,
+                color: '#ffffff',
+                fillColor: '#fbbf24',
+                fillOpacity: 0.9,
+                weight: 2
+            }).addTo(map);
+            tempGraphics.push(targetMarker);
+
+            // 4. Popup text at click location showing exact error distance
+            const popupText = `
+                <div style="font-family:'Outfit'; text-align:center;">
+                    <b style="font-size:14px; color:${isCorrect ? varCSS('--success') : varCSS('--danger')};">
+                        ${isCorrect ? '✓ ĐÚNG (<30km)' : '✗ SAI (>30km)'}
+                    </b>
+                    <div style="margin-top:4px; font-size:12px; color:var(--text-color);">
+                        Sai lệch: <b>${distKm.toFixed(2)} km</b>
+                    </div>
+                </div>
+            `;
+            const popup = L.popup({ closeButton: false, className: 'leaflet-popup-custom' })
+                .setLatLng(clickLatLng)
+                .setContent(popupText)
+                .openOn(map);
+
+            const qCard = document.getElementById('q-card');
+            if (isCorrect) {
+                playSound('correct');
+                qCard.classList.add('flash-correct');
+                setTimeout(() => {
+                    qCard.classList.remove('flash-correct');
+                    map.closePopup();
+                    clearTempGraphics();
+                    refreshAnsweredVisuals();
+                    nextQuestion();
+                }, 1500);
+            } else {
+                playSound('wrong');
+                qCard.classList.add('flash-wrong');
+                setTimeout(() => {
+                    qCard.classList.remove('flash-wrong');
+                    map.closePopup();
+                    clearTempGraphics();
+                    refreshAnsweredVisuals();
+                    nextQuestion();
+                }, 3000);
+            }
+
+            updateStatsDisplay();
+            updateHistoryUI();
+        }
+
+        // Clean Visual Helper Elements
+        function clearTempGraphics() {
+            tempGraphics.forEach(layer => map.removeLayer(layer));
+            tempGraphics = [];
+        }
+
+        // Refresh all Answered states visual styling (Provinces coloring and markers)
+        function refreshAnsweredVisuals() {
+            const showAnswered = document.getElementById('show-answered-toggle').checked;
+
+            // 1. Reset/color Province Layers
+            if (geojsonLayer) {
+                geojsonLayer.eachLayer(function (layer) {
+                    const name = layer.feature.properties.Name;
+                    const status = quizState.provincesAnswered[name];
+
+                    // Unbind tooltips
+                    layer.closeTooltip();
+                    layer.unbindTooltip();
+
+                    if (quizState.currentMode === 'provinces' && showAnswered && status) {
+                        const color = status === 'correct' ? varCSS('--success') : varCSS('--danger');
+                        layer.setStyle({
+                            fillColor: color,
+                            fillOpacity: 0.45,
+                            color: color,
+                            weight: 1
+                        });
+                        layer.bindTooltip(name, {
+                            permanent: true,
+                            direction: 'center',
+                            className: 'custom-tooltip'
+                        });
+                    } else {
+                        geojsonLayer.resetStyle(layer);
+                    }
+                });
+            }
+
+            // 2. Refresh DC markers
+            answeredDCGroup.clearLayers();
+            if (quizState.currentMode === 'dc_factory' && showAnswered) {
+                quizState.dcHistory.forEach(item => {
+                    const color = item.correct ? varCSS('--success') : varCSS('--danger');
+                    const marker = L.circleMarker([item.lat, item.lng], {
+                        radius: 7,
+                        color: '#ffffff',
+                        fillColor: color,
+                        fillOpacity: 0.9,
+                        weight: 1.5
+                    });
+
+                    // Popup showing name and distance on click/hover
+                    marker.bindTooltip(`<b>${item.name}</b> (${item.category})<br>Sai lệch: ${item.distance.toFixed(1)} km`, {
+                        direction: 'top',
+                        className: 'custom-tooltip'
+                    });
+
+                    answeredDCGroup.addLayer(marker);
+                });
+            }
+        }
+
+        // Pick Next Question
+        function nextQuestion() {
+            quizState.isAnsweringEnabled = true;
+
+            if (quizState.currentMode === 'provinces') {
+                const remaining = provincesList.filter(p => !quizState.provincesAnswered[p]);
+
+                if (remaining.length === 0) {
+                    document.getElementById('target-province').innerText = "Đã tìm hết các tỉnh!";
+                    document.getElementById('q-mode-label').innerText = "Hoàn thành";
+                    playSound('correct');
+                    quizState.isAnsweringEnabled = false;
+                    return;
+                }
+
+                const randomIndex = Math.floor(Math.random() * remaining.length);
+                quizState.targetProvince = remaining[randomIndex];
+
+                document.getElementById('q-mode-label').innerText = "Tìm tỉnh thành";
+                document.getElementById('target-province').innerText = quizState.targetProvince;
+
+            } else {
+                // DC & Factory mode
+                const remaining = dcFactoriesList.filter(dc => !quizState.dcAnswered[dc.name]);
+
+                if (remaining.length === 0) {
+                    document.getElementById('target-province').innerText = "Đã tìm hết DC / Nhà máy!";
+                    document.getElementById('q-mode-label').innerText = "Hoàn thành";
+                    playSound('correct');
+                    quizState.isAnsweringEnabled = false;
+                    return;
+                }
+
+                const randomIndex = Math.floor(Math.random() * remaining.length);
+                quizState.targetDC = remaining[randomIndex];
+
+                document.getElementById('q-mode-label').innerText = `Tìm vị trí (${quizState.targetDC.category})`;
+                document.getElementById('target-province').innerText = quizState.targetDC.name;
+            }
+        }
+
+        // Update Dashboard Statistics Cards
+        function updateStatsDisplay() {
+            const mode = quizState.currentMode;
+
+            if (mode === 'provinces') {
+                // Provinces Stats
+                const correct = quizState.provincesHistory.filter(h => h.correct).length;
+                const total = quizState.provincesHistory.length;
+                const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+                document.getElementById('score-val').innerText = `${correct} / ${total}`;
+                document.getElementById('accuracy-val').innerText = `${accuracy}%`;
+
+                // Stat 2: Streak
+                document.getElementById('stat-2-lbl').innerText = "Chuỗi Đúng";
+                document.getElementById('stat-2-val').innerText = quizState.streakProvinces;
+
+                // Stat 4: High score
+                document.getElementById('stat-4-lbl').innerText = "Kỷ lục";
+                document.getElementById('stat-4-val').innerText = quizState.highScoreProvinces;
+
+                // Progress
+                const totalTarget = provincesList.length || 63;
+                document.getElementById('progress-lbl').innerText = "Tiến trình tỉnh thành";
+                document.getElementById('progress-percent').innerText = `${total}/${totalTarget} (${Math.round((total / totalTarget) * 100)}%)`;
+                document.getElementById('progress-bar').style.width = `${(total / totalTarget) * 100}%`;
+
+            } else {
+                // DC / Factory Stats
+                const correct = quizState.dcHistory.filter(h => h.correct).length;
+                const total = quizState.dcHistory.length;
+                const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+                document.getElementById('score-val').innerText = `${correct} / ${total}`;
+                document.getElementById('accuracy-val').innerText = `${accuracy}%`;
+
+                // Stat 2: Avg Error
+                document.getElementById('stat-2-lbl').innerText = "Sai số TB";
+                if (total > 0) {
+                    const avgError = quizState.dcHistory.reduce((sum, h) => sum + h.distance, 0) / total;
+                    document.getElementById('stat-2-val').innerText = `${avgError.toFixed(1)} km`;
+                } else {
+                    document.getElementById('stat-2-val').innerText = "0 km";
+                }
+
+                // Stat 4: Best guess
+                document.getElementById('stat-4-lbl').innerText = "Lệch ít nhất";
+                if (quizState.bestDCGuess < 9999) {
+                    document.getElementById('stat-4-val').innerText = `${quizState.bestDCGuess.toFixed(1)} km`;
+                } else {
+                    document.getElementById('stat-4-val').innerText = "-";
+                }
+
+                // Progress
+                const totalTarget = dcFactoriesList.length || 49;
+                document.getElementById('progress-lbl').innerText = "Tiến trình DC/Factory";
+                document.getElementById('progress-percent').innerText = `${total}/${totalTarget} (${Math.round((total / totalTarget) * 100)}%)`;
+                document.getElementById('progress-bar').style.width = `${(total / totalTarget) * 100}%`;
+            }
+        }
+
+        // Render Click Guessing History list
+        function updateHistoryUI() {
+            const container = document.getElementById('history-ul');
+            container.innerHTML = '';
+
+            const historyData = quizState.currentMode === 'provinces'
+                ? quizState.provincesHistory
+                : quizState.dcHistory;
+
+            if (historyData.length === 0) {
+                container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 13px;">Chưa có lượt chơi nào.</div>`;
+                return;
+            }
+
+            // Render in reverse order (most recent first)
+            for (let i = historyData.length - 1; i >= 0; i--) {
+                const item = historyData[i];
+                const li = document.createElement('div');
+                li.className = `history-item ${item.correct ? 'correct' : 'incorrect'}`;
+
+                const left = document.createElement('div');
+                left.style.display = 'flex';
+                left.style.flexDirection = 'column';
+
+                const nameSpan = document.createElement('span');
+                nameSpan.style.fontWeight = '600';
+                nameSpan.innerText = item.name;
+
+                const catSpan = document.createElement('span');
+                catSpan.className = 'history-info';
+                catSpan.innerText = quizState.currentMode === 'provinces' ? 'Tỉnh thành' : item.category;
+
+                left.appendChild(nameSpan);
+                left.appendChild(catSpan);
+
+                const right = document.createElement('div');
+                right.style.textAlign = 'right';
+                right.style.display = 'flex';
+                right.style.flexDirection = 'column';
+                right.style.alignItems = 'flex-end';
+
+                const statusSpan = document.createElement('span');
+                statusSpan.style.fontWeight = '700';
+                statusSpan.innerText = item.correct ? '✓ ĐÚNG' : '✗ SAI';
+
+                const detailSpan = document.createElement('span');
+                detailSpan.className = 'history-info';
+                if (quizState.currentMode === 'provinces') {
+                    detailSpan.innerText = item.correct ? 'Trong địa phận' : 'Ngoài địa phận';
+                } else {
+                    detailSpan.innerText = `Lệch: ${item.distance.toFixed(1)} km`;
+                }
+
+                right.appendChild(statusSpan);
+                right.appendChild(detailSpan);
+
+                li.appendChild(left);
+                li.appendChild(right);
+
+                // Allow clicking history items to zoom in and check location
+                li.addEventListener('click', function () {
+                    playSound('click');
+                    if (quizState.currentMode === 'provinces') {
+                        geojsonLayer.eachLayer(function (l) {
+                            if (l.feature.properties.Name === item.name) {
+                                map.fitBounds(l.getBounds(), { maxZoom: 8 });
+                            }
+                        });
+                    } else {
+                        map.setView([item.lat, item.lng], 10);
+                        // Briefly pulse a circle marker at the location
+                        const pulse = L.circle([item.lat, item.lng], {
+                            radius: 12000,
+                            color: item.correct ? varCSS('--success') : varCSS('--danger'),
+                            weight: 2,
+                            fillOpacity: 0.1
+                        }).addTo(map);
+                        setTimeout(() => map.removeLayer(pulse), 1500);
+                    }
+                });
+
+                container.appendChild(li);
+            }
+        }
+
+        // Skip current item button
+        document.getElementById('btn-skip').addEventListener('click', function () {
+            if (!quizState.isAnsweringEnabled) return;
+            playSound('click');
+
+            const mode = quizState.currentMode;
+            if (mode === 'provinces') {
+                if (quizState.targetProvince) {
+                    quizState.provincesAnswered[quizState.targetProvince] = 'incorrect';
+                    quizState.provincesHistory.push({ name: quizState.targetProvince, correct: false });
+                    quizState.streakProvinces = 0;
+
+                    updateStatsDisplay();
+                    updateHistoryUI();
+                    refreshAnsweredVisuals();
+                    nextQuestion();
+                }
+            } else {
+                if (quizState.targetDC) {
+                    const target = quizState.targetDC;
+                    quizState.dcAnswered[target.name] = 'incorrect';
+                    quizState.dcHistory.push({
+                        name: target.name,
+                        category: target.category,
+                        lat: target.lat,
+                        lng: target.lng,
+                        distance: 250.0, // default large penalty distance
+                        correct: false
+                    });
+
+                    updateStatsDisplay();
+                    updateHistoryUI();
+                    refreshAnsweredVisuals();
+                    nextQuestion();
+                }
+            }
+        });
+
+        // Restart Game Button
+        document.getElementById('btn-restart').addEventListener('click', function () {
+            playSound('click');
+            if (confirm("Bạn có chắc chắn muốn đặt lại trò chơi? Tất cả số liệu của chế độ chơi hiện tại sẽ bị xóa.")) {
+                const mode = quizState.currentMode;
+                if (mode === 'provinces') {
+                    quizState.provincesAnswered = {};
+                    quizState.provincesHistory = [];
+                    quizState.streakProvinces = 0;
+                } else {
+                    quizState.dcAnswered = {};
+                    quizState.dcHistory = [];
+                }
+
+                clearTempGraphics();
+                refreshAnsweredVisuals();
+                updateStatsDisplay();
+                updateHistoryUI();
+                nextQuestion();
+            }
+        });
+
+        // Load Game Data
+        Promise.all([
+            fetch('provinces.json').then(r => r.json()),
+            fetch('diaphantinh.geojson').then(r => r.json()),
+            fetch('dc_factories.json').then(r => r.json())
+        ]).then(([names, geojson, dcList]) => {
+            provincesList = names;
+            dcFactoriesList = dcList;
+
+            // Render GeoJSON
+            geojsonLayer = L.geoJSON(geojson, {
+                style: getProvinceStyle,
+                onEachFeature: onEachFeature
+            }).addTo(map);
+
+            // Fit map bounds to Vietnam
+            map.fitBounds(geojsonLayer.getBounds(), {
+                padding: [20, 20]
+            });
+
+            // Start Game
+            updateStatsDisplay();
+            nextQuestion();
+        }).catch(err => {
+            console.error("Error loading map assets:", err);
+            document.getElementById('target-province').innerText = "Lỗi tải bản đồ";
+        });
+    </script>
+</body>
+
+</html>
