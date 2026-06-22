@@ -366,18 +366,30 @@ class WCApp {
                     let pointsLabel = "";
                     let pointsClass = "";
 
-                    if (points === 3) {
-                        pointsLabel = "+3 Điểm (Chính xác)";
+                    if (points > 0) {
+                        pointsLabel = `+${points} Điểm (Chính xác)`;
                         pointsClass = "points-exact";
-                    } else if (points === 1) {
-                        pointsLabel = "+1 Điểm (Đúng kết quả)";
-                        pointsClass = "points-correct";
                     } else if (hasPred) {
-                        pointsLabel = "0 Điểm (Sai tỉ số)";
-                        pointsClass = "points-none";
+                        const realHome = parseInt(m.home_score);
+                        const realAway = parseInt(m.away_score);
+                        const predHome = parseInt(pred.predicted_home);
+                        const predAway = parseInt(pred.predicted_away);
+                        const realDiff = realHome - realAway;
+                        const predDiff = predHome - predAway;
+                        
+                        if ((realDiff > 0 && predDiff > 0) || 
+                            (realDiff < 0 && predDiff < 0) || 
+                            (realDiff === 0 && predDiff === 0)) {
+                            pointsLabel = "Đúng 1X2 (0đ)";
+                            pointsClass = "points-correct";
+                        } else {
+                            pointsLabel = "0 Điểm (Sai tỷ số)";
+                            pointsClass = "points-wrong";
+                        }
                     } else {
-                        pointsLabel = "Không tham gia dự đoán";
-                        pointsClass = "points-none";
+                        // points sẽ mang giá trị âm (ví dụ: -10)
+                        pointsLabel = `${points} Điểm (Không dự đoán)`;
+                        pointsClass = "points-wrong";
                     }
 
                     footerHTML = `
@@ -610,8 +622,35 @@ class WCApp {
     // ------------------------------------------------------------------
     // TÍNH ĐIỂM DỰ ĐOÁN PHỤC VỤ HIỂN THỊ OFFLINE TRÊN GIAO DIỆN
     // ------------------------------------------------------------------
+    getStagePoints(roundName) {
+        if (!roundName) return 10;
+        const r = roundName.toUpperCase();
+        if (r.includes("FINAL") && !r.includes("SEMI") && !r.includes("QUARTER") && !r.includes("THIRD")) {
+            return 500;
+        }
+        if (r.includes("THIRD") || r.includes("3RD") || r.includes("BRONZE")) {
+            return 200;
+        }
+        if (r.includes("SEMI")) {
+            return 100;
+        }
+        if (r.includes("QUARTER")) {
+            return 50;
+        }
+        if (r.includes("16") || r.includes("LAST 16") || r.includes("ROUND OF 16")) {
+            return 30;
+        }
+        if (r.includes("32") || r.includes("LAST 32") || r.includes("ROUND OF 32")) {
+            return 15;
+        }
+        return 10; // Mặc định Vòng bảng (Group Stage)
+    }
+
     calculateMatchPoints(match, prediction) {
-        if (!prediction) return 0;
+        if (!prediction) {
+            // Không tham gia dự đoán -> Bị trừ số điểm của vòng đấu đó
+            return -this.getStagePoints(match.round);
+        }
 
         const realHome = parseInt(match.home_score);
         const realAway = parseInt(match.away_score);
@@ -619,22 +658,13 @@ class WCApp {
         const predAway = parseInt(prediction.predicted_away);
 
         if (isNaN(realHome) || isNaN(realAway) || isNaN(predHome) || isNaN(predAway)) {
-            return 0;
+            // Có ô nhập bị lỗi -> Trừ điểm như không tham gia
+            return -this.getStagePoints(match.round);
         }
 
-        // Đoán chính xác tỷ số
+        // Chỉ ghi điểm khi đoán chính xác tỉ số
         if (realHome === predHome && realAway === predAway) {
-            return 3;
-        }
-
-        // Đoán chính xác kết quả thắng/hòa/thua
-        const realDiff = realHome - realAway;
-        const predDiff = predHome - predAway;
-
-        if ((realDiff > 0 && predDiff > 0) ||
-            (realDiff < 0 && predDiff < 0) ||
-            (realDiff === 0 && predDiff === 0)) {
-            return 1;
+            return this.getStagePoints(match.round);
         }
 
         return 0;

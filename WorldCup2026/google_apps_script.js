@@ -147,6 +147,31 @@ function getInitData(username) {
   };
 }
 
+// Helper: Xác định điểm số theo từng giai đoạn trận đấu
+function getStagePoints(roundName) {
+  if (!roundName) return 10;
+  const r = roundName.toUpperCase();
+  if (r.includes("FINAL") && !r.includes("SEMI") && !r.includes("QUARTER") && !r.includes("THIRD")) {
+    return 500;
+  }
+  if (r.includes("THIRD") || r.includes("3RD") || r.includes("BRONZE")) {
+    return 200;
+  }
+  if (r.includes("SEMI")) {
+    return 100;
+  }
+  if (r.includes("QUARTER")) {
+    return 50;
+  }
+  if (r.includes("16") || r.includes("LAST 16") || r.includes("ROUND OF 16")) {
+    return 30;
+  }
+  if (r.includes("32") || r.includes("LAST 32") || r.includes("ROUND OF 32")) {
+    return 15;
+  }
+  return 10; // Mặc định Vòng bảng (Group Stage)
+}
+
 // ------------------------------------------------------------------
 // THUẬT TOÁN TÍNH ĐIỂM & BẢNG XẾP HẠNG
 // ------------------------------------------------------------------
@@ -183,12 +208,12 @@ function calculateLeaderboard(matches, predictions, users) {
       const userStat = userPoints[p.username];
       if (!userStat) return;
       
-      // 1. Đoán trúng tỷ số chính xác (+3đ)
+      // 1. Đoán trúng tỷ số chính xác (Điểm theo Stage)
       if (realHome === predHome && realAway === predAway) {
         userStat.exactMatches += 1;
-        userStat.totalPoints += 3;
+        userStat.totalPoints += getStagePoints(match.round);
       } 
-      // 2. Đoán trúng thắng/thua/hòa (+1đ)
+      // 2. Đoán trúng thắng/thua/hòa (0đ nhưng vẫn lưu thống kê)
       else {
         const realDiff = realHome - realAway;
         const predDiff = predHome - predAway;
@@ -197,7 +222,7 @@ function calculateLeaderboard(matches, predictions, users) {
             (realDiff < 0 && predDiff < 0) || 
             (realDiff === 0 && predDiff === 0)) {
           userStat.correctResults += 1;
-          userStat.totalPoints += 1;
+          // Không cộng điểm (0đ)
         }
       }
     }
