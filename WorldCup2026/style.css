@@ -374,9 +374,14 @@ main {
     font-size: 1.8rem;
     font-weight: 800;
     letter-spacing: 0.1em;
-    background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+    background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+    background-color: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 8px;
+    padding: 0.2rem 0.8rem;
 }
 
 .live-badge {
@@ -491,6 +496,30 @@ main {
     background: rgba(245, 158, 11, 0.1);
     color: var(--accent-warning);
     border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.points-wrong {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--accent-danger);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Custom prediction styles for disabled inputs */
+.predict-input.pred-correct {
+    background: rgba(16, 185, 129, 0.18) !important;
+    border-color: rgba(16, 185, 129, 0.5) !important;
+    color: #10b981 !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #10b981 !important;
+    text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
+}
+
+.predict-input.pred-wrong {
+    background: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+    color: #ef4444 !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #ef4444 !important;
 }
 
 /* Leaderboard Table */

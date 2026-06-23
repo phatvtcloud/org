@@ -4,6 +4,7 @@
 
 // CẤU HÌNH URL GOOGLE APPS SCRIPT Ở ĐÂY ĐỂ NHÂN VIÊN KHÔNG PHẢI NHẬP LẠI
 const DEFAULT_API_URL = "https://script.google.com/macros/s/AKfycbwfVY2LtzMaWSYS53PROoOv46ZoWdPijbC4pamSBiDcK0WnCkdkdwSuIpaR1lJj5WixKQ/exec";
+const START_DATE_LIMIT = "2026-06-22T17:00:00.000Z"; // Giờ Việt Nam: 23/06/2026 00:00:00
 
 class WCApp {
     constructor() {
@@ -300,12 +301,15 @@ class WCApp {
 
         // Lọc trận đấu
         const filtered = this.matches.filter(m => {
+            const matchDate = new Date(m.date);
+            const limitDate = new Date(START_DATE_LIMIT);
+            if (matchDate < limitDate) return false; // Ẩn trận trước 23/06/2026 VN
+
             const isFinished = m.status === "FT" || m.status === "Finished";
             if (this.matchFilter === "completed") {
                 return isFinished;
             } else {
                 // Chỉ hiển thị các trận sắp diễn ra trong vòng 2 ngày (48 giờ) sắp tới
-                const matchDate = new Date(m.date);
                 return !isFinished && matchDate <= twoDaysLater;
             }
         });
@@ -366,28 +370,21 @@ class WCApp {
                     let pointsLabel = "";
                     let pointsClass = "";
 
-                    if (points > 0) {
-                        pointsLabel = `+${points} Điểm (Chính xác)`;
-                        pointsClass = "points-exact";
-                    } else if (hasPred) {
+                    if (hasPred) {
                         const realHome = parseInt(m.home_score);
                         const realAway = parseInt(m.away_score);
                         const predHome = parseInt(pred.predicted_home);
                         const predAway = parseInt(pred.predicted_away);
-                        const realDiff = realHome - realAway;
-                        const predDiff = predHome - predAway;
                         
-                        if ((realDiff > 0 && predDiff > 0) || 
-                            (realDiff < 0 && predDiff < 0) || 
-                            (realDiff === 0 && predDiff === 0)) {
-                            pointsLabel = "Đúng 1X2 (0đ)";
-                            pointsClass = "points-correct";
+                        if (realHome === predHome && realAway === predAway) {
+                            pointsLabel = "Chính xác (0đ)";
+                            pointsClass = "points-exact";
                         } else {
-                            pointsLabel = "0 Điểm (Sai tỷ số)";
+                            pointsLabel = `${points} Điểm (Đoán sai)`;
                             pointsClass = "points-wrong";
                         }
                     } else {
-                        // points sẽ mang giá trị âm (ví dụ: -10)
+                        // points mang giá trị âm nhân đôi (-2 * stagePoints)
                         pointsLabel = `${points} Điểm (Không dự đoán)`;
                         pointsClass = "points-wrong";
                     }
@@ -424,6 +421,29 @@ class WCApp {
                 `;
             }
 
+            // Xác định màu sắc của ô nhập tỉ số dự đoán khi đã kết thúc
+            let inputHomeClass = "";
+            let inputAwayClass = "";
+            const isFinished = m.status === "FT" || m.status === "Finished";
+            if (isFinished) {
+                if (hasPred) {
+                    const realHome = parseInt(m.home_score);
+                    const realAway = parseInt(m.away_score);
+                    const prHome = parseInt(pred.predicted_home);
+                    const prAway = parseInt(pred.predicted_away);
+                    if (realHome === prHome && realAway === prAway) {
+                        inputHomeClass = "pred-correct";
+                        inputAwayClass = "pred-correct";
+                    } else {
+                        inputHomeClass = "pred-wrong";
+                        inputAwayClass = "pred-wrong";
+                    }
+                } else {
+                    inputHomeClass = "pred-wrong";
+                    inputAwayClass = "pred-wrong";
+                }
+            }
+
             const card = document.createElement("div");
             card.className = cardClasses;
             card.innerHTML = `
@@ -447,9 +467,9 @@ class WCApp {
                         
                         <!-- Ô nhập tỉ số dự đoán -->
                         <div class="predict-inputs">
-                            <input type="number" id="pred-home-${m.match_id}" class="predict-input" min="0" max="99" value="${predHome}" ${isLocked ? 'disabled' : ''} placeholder="-" oninput="app.saveTemp('${m.match_id}', 'home', this.value)">
+                            <input type="number" id="pred-home-${m.match_id}" class="predict-input ${inputHomeClass}" min="0" max="99" value="${predHome}" ${isLocked ? 'disabled' : ''} placeholder="-" oninput="app.saveTemp('${m.match_id}', 'home', this.value)">
                             <span style="color: var(--text-secondary); font-weight: bold;">:</span>
-                            <input type="number" id="pred-away-${m.match_id}" class="predict-input" min="0" max="99" value="${predAway}" ${isLocked ? 'disabled' : ''} placeholder="-" oninput="app.saveTemp('${m.match_id}', 'away', this.value)">
+                            <input type="number" id="pred-away-${m.match_id}" class="predict-input ${inputAwayClass}" min="0" max="99" value="${predAway}" ${isLocked ? 'disabled' : ''} placeholder="-" oninput="app.saveTemp('${m.match_id}', 'away', this.value)">
                         </div>
                         <div style="font-size: 0.75rem; color: var(--text-secondary); text-align: center; margin-top: 0.2rem;">
                             ${hasPred ? '<span style="color: var(--accent-success); font-weight: 600;"><i class="fa-solid fa-check"></i> Đã dự đoán</span>' : 'Chưa dự đoán'}
@@ -611,9 +631,10 @@ class WCApp {
                     <div class="username-display">@${row.username}</div>
                 </td>
                 <td>${row.department || "N/A"}</td>
+                <td style="text-align: center; font-weight: 600; color: var(--text-secondary);">${row.totalNeeded || 0}</td>
                 <td style="text-align: center; font-weight: 600; color: var(--accent-success);">${row.exactMatches || 0}</td>
-                <td style="text-align: center; font-weight: 600; color: var(--text-secondary);">${row.correctResults || 0}</td>
-                <td style="text-align: right;" class="points-display">${row.totalPoints || 0} đ</td>
+                <td style="text-align: center; font-weight: 600; color: var(--accent-danger);">${row.wrongMatches || 0}</td>
+                <td style="text-align: right; color: #ef4444; font-weight: bold;" class="points-display">${row.totalPoints || 0} đ</td>
             `;
             tbody.appendChild(tr);
         });
@@ -647,9 +668,14 @@ class WCApp {
     }
 
     calculateMatchPoints(match, prediction) {
+        // Nếu trận đấu diễn ra trước ngày giới hạn -> Không tính điểm
+        const matchDate = new Date(match.date);
+        const limitDate = new Date(START_DATE_LIMIT);
+        if (matchDate < limitDate) return 0;
+
         if (!prediction) {
-            // Không tham gia dự đoán -> Bị trừ số điểm của vòng đấu đó
-            return -this.getStagePoints(match.round);
+            // Không tham gia dự đoán -> Trừ gấp đôi điểm của vòng đấu đó
+            return -2 * this.getStagePoints(match.round);
         }
 
         const realHome = parseInt(match.home_score);
@@ -658,16 +684,17 @@ class WCApp {
         const predAway = parseInt(prediction.predicted_away);
 
         if (isNaN(realHome) || isNaN(realAway) || isNaN(predHome) || isNaN(predAway)) {
-            // Có ô nhập bị lỗi -> Trừ điểm như không tham gia
-            return -this.getStagePoints(match.round);
+            // Dự đoán lỗi -> Trừ gấp đôi điểm
+            return -2 * this.getStagePoints(match.round);
         }
 
-        // Chỉ ghi điểm khi đoán chính xác tỉ số
+        // Nếu dự đoán đúng: Không bị trừ điểm (0đ)
         if (realHome === predHome && realAway === predAway) {
-            return this.getStagePoints(match.round);
+            return 0;
         }
 
-        return 0;
+        // Nếu dự đoán sai: Trừ số điểm của vòng đấu đó
+        return -this.getStagePoints(match.round);
     }
 
     // Tính thời gian đếm ngược đến lúc khóa sổ

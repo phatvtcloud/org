@@ -176,64 +176,80 @@ function getStagePoints(roundName) {
 // THUẬT TOÁN TÍNH ĐIỂM & BẢNG XẾP HẠNG
 // ------------------------------------------------------------------
 function calculateLeaderboard(matches, predictions, users) {
-  const matchMap = {};
-  matches.forEach(m => {
-    matchMap[m.match_id] = m;
+  const limitDate = new Date("2026-06-22T17:00:00.000Z"); // Chỉ tính trận từ 23/06/2026 00:00:00 giờ Việt Nam
+  
+  const finishedMatches = matches.filter(m => {
+    return (m.status === "FT" || m.status === "Finished") && new Date(m.date) >= limitDate;
+  });
+  
+  const totalNeeded = finishedMatches.length;
+  
+  // Bản đồ dự đoán: username -> match_id -> prediction
+  const predMap = {};
+  predictions.forEach(p => {
+    const uname = p.username.toLowerCase();
+    if (!predMap[uname]) {
+      predMap[uname] = {};
+    }
+    predMap[uname][p.match_id] = p;
   });
   
   const userPoints = {};
   Object.keys(users).forEach(uname => {
-    userPoints[uname] = {
+    const lowerUname = uname.toLowerCase();
+    userPoints[lowerUname] = {
       username: uname,
       fullname: users[uname].fullname || uname,
       department: users[uname].department || "",
+      totalNeeded: totalNeeded,
       exactMatches: 0,
-      correctResults: 0,
+      wrongMatches: 0,
       totalPoints: 0
     };
   });
   
-  predictions.forEach(p => {
-    const match = matchMap[p.match_id];
-    if (!match) return;
+  finishedMatches.forEach(match => {
+    const stagePoints = getStagePoints(match.round);
+    const realHome = parseInt(match.home_score);
+    const realAway = parseInt(match.away_score);
+    if (isNaN(realHome) || isNaN(realAway)) return;
     
-    if (match.status === "FT" || match.status === "Finished") {
-      const realHome = parseInt(match.home_score);
-      const realAway = parseInt(match.away_score);
-      const predHome = parseInt(p.predicted_home);
-      const predAway = parseInt(p.predicted_away);
+    Object.keys(userPoints).forEach(lowerUname => {
+      const userStat = userPoints[lowerUname];
+      const userPreds = predMap[lowerUname] || {};
+      const p = userPreds[match.match_id];
       
-      if (isNaN(realHome) || isNaN(realAway) || isNaN(predHome) || isNaN(predAway)) return;
-      
-      const userStat = userPoints[p.username];
-      if (!userStat) return;
-      
-      // 1. Đoán trúng tỷ số chính xác (Điểm theo Stage)
-      if (realHome === predHome && realAway === predAway) {
-        userStat.exactMatches += 1;
-        userStat.totalPoints += getStagePoints(match.round);
-      } 
-      // 2. Đoán trúng thắng/thua/hòa (0đ nhưng vẫn lưu thống kê)
-      else {
-        const realDiff = realHome - realAway;
-        const predDiff = predHome - predAway;
-        
-        if ((realDiff > 0 && predDiff > 0) || 
-            (realDiff < 0 && predDiff < 0) || 
-            (realDiff === 0 && predDiff === 0)) {
-          userStat.correctResults += 1;
-          // Không cộng điểm (0đ)
+      if (p) {
+        const predHome = parseInt(p.predicted_home);
+        const predAway = parseInt(p.predicted_away);
+        if (isNaN(predHome) || isNaN(predAway)) {
+          // Lỗi dữ liệu coi như không dự đoán -> Trừ gấp đôi
+          userStat.totalPoints -= (2 * stagePoints);
+          userStat.wrongMatches += 1;
+          return;
         }
+        
+        if (realHome === predHome && realAway === predAway) {
+          // Đoán trúng -> Không bị trừ điểm (0đ)
+          userStat.exactMatches += 1;
+        } else {
+          // Đoán sai -> Trừ số điểm của vòng đấu
+          userStat.wrongMatches += 1;
+          userStat.totalPoints -= stagePoints;
+        }
+      } else {
+        // Không tham gia dự đoán -> Trừ gấp đôi
+        userStat.totalPoints -= (2 * stagePoints);
       }
-    }
+    });
   });
   
   const rankList = Object.keys(userPoints).map(k => userPoints[k]);
   rankList.sort((a, b) => {
     if (b.totalPoints !== a.totalPoints) {
-      return b.totalPoints - a.totalPoints;
+      return b.totalPoints - a.totalPoints; // Điểm cao hơn (âm ít hơn) xếp trước
     }
-    return b.exactMatches - a.exactMatches;
+    return b.exactMatches - a.exactMatches; // Trúng nhiều hơn xếp trước
   });
   
   return rankList;
