@@ -17,7 +17,7 @@ class WCApp {
 
         this.currentSection = "matches"; // matches hoặc leaderboard
         this.matchFilter = "upcoming";   // upcoming hoặc completed
-        this.leaderboardSortOrder = "desc"; // desc = Bộ óc vĩ đại (lớn->bé), asc = Tài trợ kim cương (bé->lớn)
+        this.leaderboardSortOrder = "desc"; // desc = Bộ óc vĩ đại (lớn->bé), asc = Trái tim nhân ái (bé->lớn)
 
         // Cập nhật giao diện ban đầu
         this.init();
@@ -626,12 +626,11 @@ class WCApp {
         }
         msg.classList.add("hidden");
 
-        // Tính Quỹ = tổng điểm tất cả thành viên × 1000
+        // Tính Tổng điểm = tổng điểm tất cả thành viên
         const fundTotal = this.leaderboard.reduce((sum, row) => sum + (row.totalPoints || 0), 0);
-        const fundDisplay = fundTotal * 1000;
         const fundEl = document.getElementById("fund-value");
         if (fundEl) {
-            fundEl.textContent = `${fundDisplay.toLocaleString('en-US')} đ`;
+            fundEl.textContent = `${fundTotal.toLocaleString('en-US')} đ`;
             // Đổi màu dựa trên giá trị quỹ
             fundEl.className = "fund-value";
             if (fundTotal > 0) {
