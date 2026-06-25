@@ -522,6 +522,108 @@ main {
     -webkit-text-fill-color: #ef4444 !important;
 }
 
+/* Leaderboard Controls */
+.leaderboard-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+.fund-display {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.fund-display i {
+    font-size: 1.2rem;
+    color: var(--accent-warning);
+}
+
+.fund-label {
+    color: var(--text-secondary);
+}
+
+.fund-value {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+.fund-value.fund-positive {
+    color: var(--accent-success);
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.fund-value.fund-negative {
+    color: var(--accent-danger);
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.sort-buttons {
+    display: flex;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.3rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.sort-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: transparent;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.sort-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sort-btn-diamond.active {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+    border-color: rgba(6, 182, 212, 0.4);
+    color: #67e8f9;
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+}
+
+.sort-btn-diamond.active i {
+    color: #67e8f9;
+    text-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+}
+
+.sort-btn-brain.active {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(52, 211, 153, 0.2) 100%);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #6ee7b7;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+
+.sort-btn-brain.active i {
+    color: #6ee7b7;
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
 /* Leaderboard Table */
 .table-container {
     overflow-x: auto;

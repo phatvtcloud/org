@@ -164,7 +164,7 @@
         <!-- LEADERBOARD SECTION -->
         <div id="leaderboard-section" class="panel hidden">
             <div
-                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
                 <h2 style="font-weight: 800; font-size: 1.8rem; display: flex; align-items: center; gap: 0.5rem;">
                     <i class="fa-solid fa-trophy" style="color: var(--accent-warning);"></i> Bảng Xếp Hạng Thực Tế
                 </h2>
@@ -172,6 +172,23 @@
                 <button class="btn btn-secondary" onclick="app.fetchData()" style="width: auto; padding: 0.5rem 1rem;">
                     <i class="fa-solid fa-rotate"></i> Làm mới điểm
                 </button>
+            </div>
+
+            <!-- Quỹ & Sorting Controls -->
+            <div class="leaderboard-controls">
+                <div class="sort-buttons">
+                    <button class="sort-btn sort-btn-diamond" id="sort-diamond" onclick="app.sortLeaderboard('asc')">
+                        <i class="fa-solid fa-gem"></i> Tài trợ kim cương
+                    </button>
+                    <button class="sort-btn sort-btn-brain active" id="sort-brain" onclick="app.sortLeaderboard('desc')">
+                        <i class="fa-solid fa-brain"></i> Bộ óc vĩ đại
+                    </button>
+                </div>
+                <div class="fund-display" id="fund-display">
+                    <i class="fa-solid fa-vault"></i>
+                    <span class="fund-label">Quỹ Nhóm:</span>
+                    <span class="fund-value" id="fund-value">0 đ</span>
+                </div>
             </div>
 
             <div class="table-container">

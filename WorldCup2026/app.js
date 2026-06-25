@@ -17,6 +17,7 @@ class WCApp {
 
         this.currentSection = "matches"; // matches hoặc leaderboard
         this.matchFilter = "upcoming";   // upcoming hoặc completed
+        this.leaderboardSortOrder = "desc"; // desc = Bộ óc vĩ đại (lớn->bé), asc = Tài trợ kim cương (bé->lớn)
 
         // Cập nhật giao diện ban đầu
         this.init();
@@ -243,6 +244,7 @@ class WCApp {
                 data.userPredictions.forEach(p => {
                     this.userPredictions[p.match_id] = p;
                 });
+                console.log('Fetched user predictions from API:', this.userPredictions);
             }
 
             this.renderMatches();
@@ -596,6 +598,20 @@ class WCApp {
         }
     }
 
+    sortLeaderboard(order) {
+        this.leaderboardSortOrder = order;
+
+        // Cập nhật active state cho buttons
+        const diamondBtn = document.getElementById("sort-diamond");
+        const brainBtn = document.getElementById("sort-brain");
+        if (diamondBtn && brainBtn) {
+            diamondBtn.classList.toggle("active", order === "asc");
+            brainBtn.classList.toggle("active", order === "desc");
+        }
+
+        this.renderLeaderboard();
+    }
+
     renderLeaderboard() {
         const tbody = document.getElementById("leaderboard-rows");
         const msg = document.getElementById("no-leaderboard-msg");
@@ -603,11 +619,40 @@ class WCApp {
 
         if (this.leaderboard.length === 0) {
             msg.classList.remove("hidden");
+            // Reset fund display
+            const fundEl = document.getElementById("fund-value");
+            if (fundEl) fundEl.textContent = "0 đ";
             return;
         }
         msg.classList.add("hidden");
 
-        this.leaderboard.forEach((row, index) => {
+        // Tính Quỹ = tổng điểm tất cả thành viên × 1000
+        const fundTotal = this.leaderboard.reduce((sum, row) => sum + (row.totalPoints || 0), 0);
+        const fundDisplay = fundTotal * 1000;
+        const fundEl = document.getElementById("fund-value");
+        if (fundEl) {
+            fundEl.textContent = `${fundDisplay.toLocaleString('en-US')} đ`;
+            // Đổi màu dựa trên giá trị quỹ
+            fundEl.className = "fund-value";
+            if (fundTotal > 0) {
+                fundEl.classList.add("fund-positive");
+            } else if (fundTotal < 0) {
+                fundEl.classList.add("fund-negative");
+            }
+        }
+
+        // Sắp xếp leaderboard theo thứ tự đã chọn
+        const sorted = [...this.leaderboard].sort((a, b) => {
+            const pointsA = a.totalPoints || 0;
+            const pointsB = b.totalPoints || 0;
+            if (this.leaderboardSortOrder === "asc") {
+                return pointsA - pointsB; // Bé -> Lớn (ai âm nhiều nhất lên top)
+            } else {
+                return pointsB - pointsA; // Lớn -> Bé (ai điểm cao nhất lên top)
+            }
+        });
+
+        sorted.forEach((row, index) => {
             const tr = document.createElement("tr");
 
             // Đánh dấu dòng của User hiện tại để dễ tìm
