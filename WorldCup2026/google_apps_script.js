@@ -201,6 +201,7 @@ function calculateLeaderboard(matches, predictions, users) {
       username: uname,
       fullname: users[uname].fullname || uname,
       department: users[uname].department || "",
+      img_url: users[uname].img_url || "",
       totalNeeded: totalNeeded,
       exactMatches: 0,
       wrongMatches: 0,

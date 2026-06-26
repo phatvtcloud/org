@@ -615,10 +615,13 @@ class WCApp {
     renderLeaderboard() {
         const tbody = document.getElementById("leaderboard-rows");
         const msg = document.getElementById("no-leaderboard-msg");
+        const heroContainer = document.getElementById("hero-top3");
         tbody.innerHTML = "";
+        if (heroContainer) heroContainer.innerHTML = "";
 
         if (this.leaderboard.length === 0) {
             msg.classList.remove("hidden");
+            if (heroContainer) heroContainer.classList.add("hidden");
             // Reset fund display
             const fundEl = document.getElementById("fund-value");
             if (fundEl) fundEl.textContent = "0 đ";
@@ -650,6 +653,56 @@ class WCApp {
                 return pointsB - pointsA; // Lớn -> Bé (ai điểm cao nhất lên top)
             }
         });
+
+        // ---- HERO TOP-3 CARDS (chỉ hiện ở chế độ Trái tim nhân ái) ----
+        if (this.leaderboardSortOrder === "asc" && heroContainer) {
+            heroContainer.classList.remove("hidden");
+            const top3 = sorted.slice(0, 3);
+
+            // Podium order: [2nd, 1st, 3rd] để tạo hiệu ứng podium
+            const podiumOrder = [
+                { row: top3[1], rank: 2, podiumClass: "podium-2nd" },
+                { row: top3[0], rank: 1, podiumClass: "podium-1st" },
+                { row: top3[2], rank: 3, podiumClass: "podium-3rd" },
+            ].filter(p => p.row); // lọc nếu có ít hơn 3 người
+
+            const rankMedals = ["🥇", "🥈", "🥉"];
+            const rankLabels = {
+                1: { label: "Trái tim #1", color: "#f87171", glow: "rgba(248,113,113,0.35)", border: "rgba(248,113,113,0.5)" },
+                2: { label: "Nhân ái #2", color: "#fb923c", glow: "rgba(251,146,60,0.25)", border: "rgba(251,146,60,0.4)" },
+                3: { label: "Nhân ái #3", color: "#facc15", glow: "rgba(250,204,21,0.2)", border: "rgba(250,204,21,0.35)" },
+            };
+
+            heroContainer.innerHTML = `
+                <div class="hero-top3-title">
+                    <i class="fa-solid fa-heart" style="color:#f87171;"></i>
+                    Trái Tim Nhân Ái — Top 3
+                </div>
+                <div class="hero-podium">
+                    ${podiumOrder.map(({ row, rank, podiumClass }) => {
+                        const imgUrl = row.img_url || "";
+                        const meta = rankLabels[rank];
+                        const avatarHTML = imgUrl
+                            ? `<img src="${imgUrl}" alt="${row.fullname}" class="hero-avatar" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                               <div class="hero-avatar-fallback" style="display:none;">${row.fullname.charAt(0).toUpperCase()}</div>`
+                            : `<div class="hero-avatar-fallback">${row.fullname.charAt(0).toUpperCase()}</div>`;
+                        return `
+                            <div class="hero-card ${podiumClass}" style="--hero-color:${meta.color};--hero-glow:${meta.glow};--hero-border:${meta.border};">
+                                <div class="hero-medal">${rankMedals[rank - 1]}</div>
+                                <div class="hero-avatar-wrap">
+                                    ${avatarHTML}
+                                </div>
+                                <div class="hero-name">${row.fullname}</div>
+                                <div class="hero-dept">${row.department || ""}</div>
+                                <div class="hero-rank-label">${meta.label}</div>
+                                <div class="hero-points">${row.totalPoints || 0} đ</div>
+                            </div>`;
+                    }).join("")}
+                </div>
+            `;
+        } else if (heroContainer) {
+            heroContainer.classList.add("hidden");
+        }
 
         sorted.forEach((row, index) => {
             const tr = document.createElement("tr");
