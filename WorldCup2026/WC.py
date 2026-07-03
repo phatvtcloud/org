@@ -127,21 +127,27 @@ def get_live_fixtures(api_key, provider, league_id, season):
                 else:
                     status = "NS"
                 
-                # Lấy tỉ số đúng:
-                # - Nếu trận đá hiệp phụ (120p) -> lấy extraTime
-                # - Nếu trận kết thúc sau 90p -> lấy fullTime
-                # - KHÔNG lấy penalties
+                # Lấy tỉ số đúng - cấu trúc API football-data.org:
+                # - fullTime   = tổng tích lũy (có cả penalty) -> KHÔNG dùng!
+                # - regularTime = tỉ số sau 90p -> luôn lấy cái này
+                # - extraTime   = bàn thắng TRONG hiệp phụ (cộng vào regularTime)
+                # - penalties   = số bàn luân lưu thuần
                 score_obj = item.get("score", {})
                 duration = score_obj.get("duration", "REGULAR")
-                score_extra = score_obj.get("extraTime", {}) or {}
-                score_ft = score_obj.get("fullTime", {}) or {}
+                score_regular = score_obj.get("regularTime") or {}
+                score_extra = score_obj.get("extraTime") or {}
 
-                if duration in ("EXTRA_TIME", "PENALTY_SHOOTOUT") and score_extra.get("home") is not None:
-                    # Trận có hiệp phụ: lấy tỉ số sau 120p
-                    home_score = str(score_extra.get("home"))
-                    away_score = str(score_extra.get("away"))
-                else:
+                if duration in ("EXTRA_TIME", "PENALTY_SHOOTOUT") and score_regular.get("home") is not None and score_extra.get("home") is not None:
+                    # Trận có hiệp phụ: cộng regularTime + extraTime
+                    home_score = str(score_regular.get("home", 0) + score_extra.get("home", 0))
+                    away_score = str(score_regular.get("away", 0) + score_extra.get("away", 0))
+                elif score_regular.get("home") is not None:
                     # Trận kết thúc sau 90p bình thường
+                    home_score = str(score_regular.get("home"))
+                    away_score = str(score_regular.get("away"))
+                else:
+                    # Fallback nếu API không có regularTime (trận chưa đá)
+                    score_ft = score_obj.get("fullTime") or {}
                     home_score = str(score_ft.get("home")) if score_ft.get("home") is not None else ""
                     away_score = str(score_ft.get("away")) if score_ft.get("away") is not None else ""
                 

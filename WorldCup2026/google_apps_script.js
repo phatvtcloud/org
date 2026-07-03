@@ -581,22 +581,30 @@ function syncMatchesFromAPI() {
       if (item.status === "FINISHED") status = "FT";
       else if (item.status === "IN_PLAY" || item.status === "PAUSED") status = "Live";
       
-      // Lấy tỉ số đúng:
-      // - Nếu trận đá hiệp phụ (120p) -> lấy extraTime
-      // - Nếu trận kết thúc sau 90p -> lấy fullTime
-      // - KHÔNG lấy penalties
+      // Lấy tỉ số đúng - cấu trúc API football-data.org:
+      // - fullTime    = tổng tích lũy (có cả penalty) -> KHÔNG dùng!
+      // - regularTime = tỉ số sau 90p -> luôn lấy cái này
+      // - extraTime   = bàn thắng TRONG hiệp phụ (cộng vào regularTime)
+      // - penalties   = số bàn luân lưu thuần
       const scoreObj = item.score || {};
       const duration = scoreObj.duration || "REGULAR";
+      const scoreRegular = scoreObj.regularTime || {};
       const scoreExtra = scoreObj.extraTime || {};
-      const scoreFt = scoreObj.fullTime || {};
 
       let homeScore, awayScore;
-      if ((duration === "EXTRA_TIME" || duration === "PENALTY_SHOOTOUT") && scoreExtra.home !== null && scoreExtra.home !== undefined) {
-        // Trận có hiệp phụ: lấy tỉ số sau 120p
-        homeScore = scoreExtra.home.toString();
-        awayScore = scoreExtra.away.toString();
-      } else {
+      if ((duration === "EXTRA_TIME" || duration === "PENALTY_SHOOTOUT")
+          && scoreRegular.home !== null && scoreRegular.home !== undefined
+          && scoreExtra.home !== null && scoreExtra.home !== undefined) {
+        // Trận có hiệp phụ: cộng regularTime + extraTime
+        homeScore = (scoreRegular.home + scoreExtra.home).toString();
+        awayScore = (scoreRegular.away + scoreExtra.away).toString();
+      } else if (scoreRegular.home !== null && scoreRegular.home !== undefined) {
         // Trận kết thúc sau 90p bình thường
+        homeScore = scoreRegular.home.toString();
+        awayScore = scoreRegular.away.toString();
+      } else {
+        // Fallback nếu API không có regularTime (trận chưa đá)
+        const scoreFt = scoreObj.fullTime || {};
         homeScore = (scoreFt.home !== null && scoreFt.home !== undefined) ? scoreFt.home.toString() : "";
         awayScore = (scoreFt.away !== null && scoreFt.away !== undefined) ? scoreFt.away.toString() : "";
       }
