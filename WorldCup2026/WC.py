@@ -127,9 +127,23 @@ def get_live_fixtures(api_key, provider, league_id, season):
                 else:
                     status = "NS"
                 
-                score_ft = item.get("score", {}).get("fullTime", {})
-                home_score = str(score_ft.get("home")) if score_ft.get("home") is not None else ""
-                away_score = str(score_ft.get("away")) if score_ft.get("away") is not None else ""
+                # Lấy tỉ số đúng:
+                # - Nếu trận đá hiệp phụ (120p) -> lấy extraTime
+                # - Nếu trận kết thúc sau 90p -> lấy fullTime
+                # - KHÔNG lấy penalties
+                score_obj = item.get("score", {})
+                duration = score_obj.get("duration", "REGULAR")
+                score_extra = score_obj.get("extraTime", {}) or {}
+                score_ft = score_obj.get("fullTime", {}) or {}
+
+                if duration in ("EXTRA_TIME", "PENALTY_SHOOTOUT") and score_extra.get("home") is not None:
+                    # Trận có hiệp phụ: lấy tỉ số sau 120p
+                    home_score = str(score_extra.get("home"))
+                    away_score = str(score_extra.get("away"))
+                else:
+                    # Trận kết thúc sau 90p bình thường
+                    home_score = str(score_ft.get("home")) if score_ft.get("home") is not None else ""
+                    away_score = str(score_ft.get("away")) if score_ft.get("away") is not None else ""
                 
                 stage_raw = item.get("stage", "World Cup")
                 round_name = stage_raw.replace("_", " ").title()

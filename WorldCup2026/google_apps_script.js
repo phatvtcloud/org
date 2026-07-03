@@ -581,9 +581,25 @@ function syncMatchesFromAPI() {
       if (item.status === "FINISHED") status = "FT";
       else if (item.status === "IN_PLAY" || item.status === "PAUSED") status = "Live";
       
-      const scoreFt = item.score?.fullTime || {};
-      const homeScore = scoreFt.home !== null && scoreFt.home !== undefined ? scoreFt.home.toString() : "";
-      const awayScore = scoreFt.away !== null && scoreFt.away !== undefined ? scoreFt.away.toString() : "";
+      // Lấy tỉ số đúng:
+      // - Nếu trận đá hiệp phụ (120p) -> lấy extraTime
+      // - Nếu trận kết thúc sau 90p -> lấy fullTime
+      // - KHÔNG lấy penalties
+      const scoreObj = item.score || {};
+      const duration = scoreObj.duration || "REGULAR";
+      const scoreExtra = scoreObj.extraTime || {};
+      const scoreFt = scoreObj.fullTime || {};
+
+      let homeScore, awayScore;
+      if ((duration === "EXTRA_TIME" || duration === "PENALTY_SHOOTOUT") && scoreExtra.home !== null && scoreExtra.home !== undefined) {
+        // Trận có hiệp phụ: lấy tỉ số sau 120p
+        homeScore = scoreExtra.home.toString();
+        awayScore = scoreExtra.away.toString();
+      } else {
+        // Trận kết thúc sau 90p bình thường
+        homeScore = (scoreFt.home !== null && scoreFt.home !== undefined) ? scoreFt.home.toString() : "";
+        awayScore = (scoreFt.away !== null && scoreFt.away !== undefined) ? scoreFt.away.toString() : "";
+      }
       
       let roundName = (item.stage || "World Cup").replace(/_/g, " ");
       roundName = roundName.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
