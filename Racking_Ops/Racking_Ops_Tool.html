@@ -1070,10 +1070,35 @@
     function detectHeaderIdx(raw, keywords) {
       for (let i = 0; i <= 2; i++) {
         if (!raw[i]) continue;
-        const vals = raw[i].map(h => String(h).trim().toLowerCase());
-        if (keywords.some(kw => vals.includes(kw))) return i;
+        const vals = raw[i].map(h => String(h).trim().toLowerCase()
+          // normalize: remove diacritics for comparison
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
+        const normKws = keywords.map(k => k.normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
+        if (normKws.some(kw => vals.includes(kw))) return i;
       }
-      return 1; // fallback: row index 1 (dòng 2)
+      return 1; // fallback: row index 1 (đòng 2)
+    }
+
+    // ──────────────────────────────────────────────
+    // getCol: tìm giá trị cột trong object theo tên gần đúng (normalize dấu)
+    // ──────────────────────────────────────────────
+    function norm(s) {
+      return String(s || '').trim().toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+    function getCol(obj, colName) {
+      const nTarget = norm(colName);
+      // Exact match first
+      if (obj[colName] !== undefined) return String(obj[colName]);
+      // Normalized match
+      const key = Object.keys(obj).find(k => norm(k) === nTarget);
+      return key !== undefined ? String(obj[key]) : '';
+    }
+
+    // getSkuSO: tìm mã SKU trong SO04 row (thử nhiều tên cột khác nhau)
+    function getSkuSO(r) {
+      return getCol(r, 'Item No') || getCol(r, 'Ma') || getCol(r, 'Item_No') ||
+        getCol(r, 'Sku') || getCol(r, 'Mã') || '';
     }
 
     // ──────────────────────────────────────────────
@@ -1145,59 +1170,65 @@
 
         // ── SO04 Filter: Warehouse=MTD, SO Status=BOOKED, Unc=Y ──
         const so04Filtered = so04Rows.filter(r =>
-          String(r['Warehouse']).trim().toUpperCase() === 'MTD' &&
-          String(r['SO Status']).trim().toUpperCase() === 'BOOKED' &&
-          String(r['Unc']).trim().toUpperCase() === 'Y'
+          getCol(r, 'Warehouse').toUpperCase() === 'MTD' &&
+          getCol(r, 'SO Status').toUpperCase() === 'BOOKED' &&
+          getCol(r, 'Unc').toUpperCase() === 'Y'
         );
 
         // ── SO04 Group by Item No → sum Pallet (raw float) ──
-        const soPalletMap = {}; // itemNo → total pallet
+        const soPalletMap = {};
         const soNameMap = {};
         so04Filtered.forEach(r => {
-          const sku = String(r['Item No']).trim();
-          const pallet = parseFloat(r['Pallet']) || 0;
+          const sku = getSkuSO(r);
+          if (!sku) return;
+          const pallet = parseFloat(getCol(r, 'Pallet')) || 0;
           soPalletMap[sku] = (soPalletMap[sku] || 0) + pallet;
-          if (!soNameMap[sku]) soNameMap[sku] = String(r['Item Name'] || '').trim();
+          if (!soNameMap[sku]) soNameMap[sku] = getCol(r, 'Item Name');
         });
 
         // ── INV14 Filter: Ware house=MTD, Sub=SS0 ──
         const inv14Filtered = inv14Rows.filter(r =>
-          String(r['Ware house']).trim().toUpperCase() === 'MTD' &&
-          String(r['Sub']).trim().toUpperCase() === 'SS0'
+          getCol(r, 'Ware house').toUpperCase() === 'MTD' &&
+          getCol(r, 'Sub').toUpperCase() === 'SS0'
         );
 
         // ── INV14: group summary + collect raw rack lots per SKU ──
-        const inv14Map = {}; // sku → { rack, san, name }
-        const rackLotMap = {}; // sku → [ { locator, lotNo, mfgDate, expiryStr, pallets } ]
+        const inv14Map = {};
+        const rackLotMap = {};
         inv14Filtered.forEach(r => {
-          const sku = String(r['Mã Item']).trim();
-          const locator = String(r['Locator']).trim();
-          const pallet = parseFloat(r['Số lượng Pallet']) || 0;
+          // INV14 cột SKU có thể là 'Mã Item' hoặc 'Ma Item'
+          const sku = getCol(r, 'Ma Item');
+          const locator = getCol(r, 'Locator');
+          // 'Số lượng Pallet' → normalize match 'So luong Pallet'
+          const pallet = parseFloat(getCol(r, 'So luong Pallet')) || 0;
           const rackType = isRack(locator) ? 'rack' : 'san';
-          if (!inv14Map[sku]) inv14Map[sku] = { rack: 0, san: 0, name: String(r['Tên Item'] || '').trim() };
+          const tenItem = getCol(r, 'Ten Item');
+          if (!sku) return;
+          if (!inv14Map[sku]) inv14Map[sku] = { rack: 0, san: 0, name: tenItem };
           inv14Map[sku][rackType] += pallet;
-
-          // Collect rack lots for moving plan
           if (rackType === 'rack') {
             if (!rackLotMap[sku]) rackLotMap[sku] = [];
             rackLotMap[sku].push({
               locator,
-              lotNo: String(r['Lot number'] || '').trim(),
-              expiryStr: String(r['Ngày hết hạn'] || '').trim(),
+              lotNo: getCol(r, 'Lot number'),
+              expiryStr: getCol(r, 'Ngay het han'),
               pallets: pallet
             });
           }
         });
 
-        // ── SO04: determine channel per SKU (GT0 = GT; else MT) ──
-        const skuChannel = {}; // sku → 'GT' | 'MT'
+        // ── SO04: determine channel per SKU ──
+        const skuChannel = {};
         so04Filtered.forEach(r => {
-          const sku = String(r['Item No']).trim();
-          const ch = String(r['Sale channel'] || '').trim().toUpperCase();
-          // If any line is non-GT → upgrade to MT (more restrictive)
+          const sku = getSkuSO(r);
+          if (!sku) return;
+          const ch = getCol(r, 'Sale channel').toUpperCase();
           if (!skuChannel[sku]) skuChannel[sku] = ch === 'GT0' ? 'GT' : 'MT';
           else if (skuChannel[sku] === 'GT' && ch !== 'GT0') skuChannel[sku] = 'MT';
         });
+
+        // Diagnostic
+        setStatus(`<span class="spinner"></span>INV14: ${inv14Rows.length} dòng tổng / ${inv14Filtered.length} sau filter · SO04: ${so04Rows.length} dòng / ${so04Filtered.length} BOOKED MTD...`);
 
         // ── Build result: SKUs present in SO ──
         const skus = Object.keys(soPalletMap).sort();
