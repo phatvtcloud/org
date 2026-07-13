@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Racking Ops – MTD Inventory vs SO Analysis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --card2: #22263a;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --danger: #ff4d6d;
+      --warn: #ffb830;
+      --text: #e8eaf6;
+      --muted: #8892b0;
+      --border: #2d3155;
+      --rack-color: #6c63ff;
+      --san-color: #00d4aa;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #1a1d27 0%, #12162b 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Upload Section */
+    .upload-section {
+      padding: 24px 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .upload-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      transition: border-color .2s;
+    }
+
+    .upload-card:hover {
+      border-color: var(--accent);
+    }
+
+    .upload-card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 6px;
+    }
+
+    .upload-card p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      position: relative;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.drag {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, .05);
+    }
+
+    .drop-zone input[type=file] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .drop-zone .icon {
+      font-size: 28px;
+    }
+
+    .drop-zone .label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .file-list {
+      margin-top: 10px;
+    }
+
+    .file-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(108, 99, 255, .15);
+      border: 1px solid rgba(108, 99, 255, .3);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11px;
+      margin: 3px 2px;
+    }
+
+    .file-tag button {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      line-height: 1;
+    }
+
+    .file-tag button:hover {
+      color: var(--danger);
+    }
+
+    /* Run button */
+    .run-bar {
+      padding: 0 32px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-run {
+      background: linear-gradient(135deg, var(--accent), #9c6bff);
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 32px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .btn-run:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(108, 99, 255, .4);
+    }
+
+    .btn-run:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .status-msg {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* Summary cards – now 5 */
+    .summary-cards {
+      padding: 0 32px 20px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+
+    .s-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .s-card .val {
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .s-card .lbl {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .s-card.accent .val {
+      color: var(--accent);
+    }
+
+    .s-card.green .val {
+      color: var(--accent2);
+    }
+
+    .s-card.warn .val {
+      color: var(--warn);
+    }
+
+    .s-card.danger .val {
+      color: var(--danger);
+    }
+
+    .s-card.move .val {
+      color: #f97316;
+    }
+
+    /* Table section */
+    .table-section {
+      padding: 0 32px 40px;
+    }
+
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .table-header h2 {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .search-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 12px;
+      color: var(--text);
+      font-size: 13px;
+      width: 220px;
+      outline: none;
+    }
+
+    .search-box:focus {
+      border-color: var(--accent);
+    }
+
+    .table-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      background: var(--card2);
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+    }
+
+    tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(45, 49, 85, .5);
+      white-space: nowrap;
+    }
+
+    tbody tr:hover td {
+      background: rgba(108, 99, 255, .05);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-rack {
+      background: rgba(108, 99, 255, .2);
+      color: var(--rack-color);
+    }
+
+    .badge-san {
+      background: rgba(0, 212, 170, .15);
+      color: var(--san-color);
+    }
+
+    .badge-ok {
+      background: rgba(0, 212, 170, .15);
+      color: var(--accent2);
+    }
+
+    .badge-warn {
+      background: rgba(255, 184, 48, .15);
+      color: var(--warn);
+    }
+
+    .badge-danger {
+      background: rgba(255, 77, 109, .15);
+      color: var(--danger);
+    }
+
+    .num {
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+    }
+
+    .sku-code {
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    /* Progress bar inside cell */
+    .mini-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mini-bar {
+      height: 6px;
+      border-radius: 3px;
+      min-width: 4px;
+      transition: width .3s;
+    }
+
+    .mini-bar-rack {
+      background: var(--rack-color);
+    }
+
+    .mini-bar-san {
+      background: var(--san-color);
+    }
+
+    /* Tab system */
+    .tab-bar {
+      padding: 0 32px 0;
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 12px 22px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color .2s, border-color .2s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      color: var(--text);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-btn .tab-count {
+      font-size: 10px;
+      background: var(--border);
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .tab-btn.active .tab-count {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* Group filter buttons */
+    .group-filter {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .gf-btn {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+
+    .gf-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .gf-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .gf-btn.gf-san.active {
+      background: var(--san-color);
+      border-color: var(--san-color);
+      color: #000;
+    }
+
+    /* Table section */
+    .table-section {
+      padding: 16px 32px 40px;
+    }
+
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .table-header h2 {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .search-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 12px;
+      color: var(--text);
+      font-size: 13px;
+      width: 200px;
+      outline: none;
+    }
+
+    .search-box:focus {
+      border-color: var(--accent);
+    }
+
+    .table-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      background: var(--card2);
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+    }
+
+    tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(45, 49, 85, .5);
+      white-space: nowrap;
+    }
+
+    tbody tr:hover td {
+      background: rgba(108, 99, 255, .05);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-rack {
+      background: rgba(108, 99, 255, .2);
+      color: var(--rack-color);
+    }
+
+    .badge-san {
+      background: rgba(0, 212, 170, .15);
+      color: var(--san-color);
+    }
+
+    .badge-ok {
+      background: rgba(0, 212, 170, .15);
+      color: var(--accent2);
+    }
+
+    .badge-warn {
+      background: rgba(255, 184, 48, .15);
+      color: var(--warn);
+    }
+
+    .badge-danger {
+      background: rgba(255, 77, 109, .15);
+      color: var(--danger);
+    }
+
+    .num {
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+    }
+
+    .sku-code {
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    /* Progress bar inside cell */
+    .mini-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mini-bar {
+      height: 6px;
+      border-radius: 3px;
+      min-width: 4px;
+      transition: width .3s;
+    }
+
+    .mini-bar-rack {
+      background: var(--rack-color);
+    }
+
+    .mini-bar-san {
+      background: var(--san-color);
+    }
+
+    /* Empty/loading states */
+    .empty-state {
+      text-align: center;
+      padding: 60px 0;
+      color: var(--muted);
+    }
+
+    .empty-state .icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Moving Plan section */
+    .move-section {
+      padding: 16px 32px 48px;
+    }
+
+    .move-section-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .move-section-title .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--warn);
+      display: inline-block;
+    }
+
+    .move-sku-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .move-sku-header {
+      background: var(--card2);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .move-sku-header .sku {
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .move-sku-header .sku-name {
+      font-size: 12px;
+      color: var(--muted);
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .move-meta {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .move-chip {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+    }
+
+    .chip-need {
+      background: rgba(255, 184, 48, .18);
+      color: var(--warn);
+    }
+
+    .chip-gt {
+      background: rgba(0, 212, 170, .15);
+      color: var(--accent2);
+    }
+
+    .chip-mt {
+      background: rgba(108, 99, 255, .2);
+      color: var(--accent);
+    }
+
+    .chip-ok {
+      background: rgba(0, 212, 170, .15);
+      color: var(--accent2);
+    }
+
+    .chip-fail {
+      background: rgba(255, 77, 109, .15);
+      color: var(--danger);
+    }
+
+    .move-table-wrap {
+      overflow-x: auto;
+    }
+
+    .move-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .move-table th {
+      padding: 9px 14px;
+      text-align: center;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, .02);
+      white-space: nowrap;
+    }
+
+    .move-table td {
+      padding: 9px 14px;
+      text-align: center;
+      border-bottom: 1px solid rgba(45, 49, 85, .4);
+      white-space: nowrap;
+    }
+
+    .move-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .move-table tr:hover td {
+      background: rgba(255, 184, 48, .04);
+    }
+
+    .sl-bar-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .sl-bar {
+      height: 5px;
+      border-radius: 3px;
+      background: var(--border);
+      width: 60px;
+      overflow: hidden;
+    }
+
+    .sl-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width .3s;
+    }
+
+    .sl-ok {
+      background: var(--accent2);
+    }
+
+    .sl-warn {
+      background: var(--warn);
+    }
+
+    .sl-fail {
+      background: var(--danger);
+    }
+
+    .move-qty {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--warn);
+    }
+
+    .ineligible {
+      opacity: .45;
+    }
+
+    .move-summary-row td {
+      background: rgba(255, 184, 48, .06) !important;
+      font-weight: 700;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Export button */
+    .btn-export {
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      border: none;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform .15s, box-shadow .15s;
+      white-space: nowrap;
+    }
+
+    .btn-export:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(22, 163, 74, .4);
+    }
+
+    .btn-export:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="header-icon">📦</div>
+    <div>
+      <h1>Racking Ops – MTD Inventory vs SO</h1>
+      <p>Merge INV14 + SO04 · Rack / Sàn analysis · Real-value pallet</p>
+    </div>
+  </div>
+
+  <!-- Upload -->
+  <div class="upload-section">
+    <!-- INV14 -->
+    <div class="upload-card">
+      <h3>📋 INV14 – Tồn kho</h3>
+      <p>Header dòng 2 · Filter Warehouse = MTD · Sub = SS0</p>
+      <div class="drop-zone" id="dropINV14" ondragover="onDragOver(event,'dropINV14')"
+        ondragleave="onDragLeave('dropINV14')" ondrop="onDrop(event,'inv14')">
+        <input type="file" id="fileINV14" accept=".xls,.xlsx" multiple onchange="onFileChange(event,'inv14')">
+        <div class="icon">📂</div>
+        <div class="label">Kéo thả hoặc click để chọn file .xls / .xlsx</div>
+      </div>
+      <div class="file-list" id="listINV14"></div>
+    </div>
+
+    <!-- SO04 -->
+    <div class="upload-card">
+      <h3>🛒 SO04 – Sales Order</h3>
+      <p>Header dòng 2 · Filter Warehouse = MTD · SO Status = BOOKED · Unc = Y</p>
+      <div class="drop-zone" id="dropSO04" ondragover="onDragOver(event,'dropSO04')"
+        ondragleave="onDragLeave('dropSO04')" ondrop="onDrop(event,'so04')">
+        <input type="file" id="fileSO04" accept=".xls,.xlsx" multiple onchange="onFileChange(event,'so04')">
+        <div class="icon">📂</div>
+        <div class="label">Kéo thả hoặc click để chọn file .xls / .xlsx</div>
+      </div>
+      <div class="file-list" id="listSO04"></div>
+    </div>
+  </div>
+
+  <!-- Run -->
+  <div class="run-bar">
+    <button class="btn-run" id="btnRun" onclick="runAnalysis()">▶ Phân tích</button>
+    <span class="status-msg" id="statusMsg"></span>
+  </div>
+
+  <!-- Summary cards (5) -->
+  <div class="summary-cards hidden" id="summaryCards">
+    <div class="s-card accent">
+      <div class="val" id="scSKU">0</div>
+      <div class="lbl">SKU có trong SO</div>
+    </div>
+    <div class="s-card warn">
+      <div class="val" id="scPalletSO">0</div>
+      <div class="lbl">Tổng Pallet cần xuất</div>
+    </div>
+    <div class="s-card">
+      <div class="val" id="scRack">0</div>
+      <div class="lbl">Tổng Pallet Rack</div>
+    </div>
+    <div class="s-card green">
+      <div class="val" id="scSan">0</div>
+      <div class="lbl">Tổng Pallet Sàn</div>
+    </div>
+    <div class="s-card move">
+      <div class="val" id="scMove">0</div>
+      <div class="lbl">Tổng Pallet cần Move</div>
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tab-bar hidden" id="tabBar">
+    <button class="tab-btn active" id="tabBtnResult" onclick="switchTab('result')">
+      📊 Kết quả <span class="tab-count" id="tabCountResult">0</span>
+    </button>
+    <button class="tab-btn" id="tabBtnMove" onclick="switchTab('move')">
+      🚛 Moving Plan <span class="tab-count" id="tabCountMove">0</span>
+    </button>
+  </div>
+
+  <!-- TAB: Kết quả -->
+  <div class="tab-pane active" id="paneResult">
+    <div class="table-section">
+      <div class="table-header">
+        <h2 id="tableTitle">Kết quả phân tích</h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <!-- Group filter -->
+          <div class="group-filter">
+            <button class="gf-btn active" id="gfAll" onclick="setGroupFilter('all')">Tất cả</button>
+            <button class="gf-btn" id="gfRack" onclick="setGroupFilter('rack')">📦 Nhóm Rack</button>
+            <button class="gf-btn gf-san" id="gfSan" onclick="setGroupFilter('san')">🟢 Chỉ Sàn</button>
+          </div>
+          <input class="search-box" id="searchBox" type="text" placeholder="🔍 Tìm SKU..." oninput="applyFilters()"
+            style="display:none">
+          <button class="btn-export" id="btnExportResult" onclick="exportResults()" disabled>📅 Xuất Excel</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="empty-state" id="emptyState">
+          <div class="icon">📊</div>
+          <div>Chọn file INV14 và SO04 rồi nhấn <b>Phân tích</b></div>
+        </div>
+        <table id="resultTable" class="hidden">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>SKU (Item No)</th>
+              <th>Tên sản phẩm</th>
+              <th class="num">Pallet cần xuất (SO)</th>
+              <th class="num">Pallet Rack</th>
+              <th class="num">Pallet Sàn</th>
+              <th class="num">Tổng tồn</th>
+              <th class="num" style="color:#f97316">⬇ Cần Move Rack→Sàn</th>
+              <th>Nhóm</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody id="resultBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: Moving Plan -->
+  <div class="tab-pane" id="paneMove">
+    <div class="move-section" id="movePlanSection">
+      <div class="move-section-title">
+        <span class="dot"></span>🚛 Moving Plan – Rack → Sàn (FEFO)
+        <button class="btn-export" id="btnExportMove" onclick="exportMovingPlan()" disabled style="margin-left:auto">📅
+          Xuất Excel</button>
+      </div>
+      <div id="movePlanBody"></div>
+    </div>
+  </div>
+
+  <!-- SheetJS -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    // ──────────────────────────────────────────────
+    // State
+    // ──────────────────────────────────────────────
+    const files = { inv14: [], so04: [] };
+    let tableData = [];
+    let movingData = []; // per-SKU moving plan
+
+    // ──────────────────────────────────────────────
+    // Drag & Drop helpers
+    // ──────────────────────────────────────────────
+    function onDragOver(e, id) { e.preventDefault(); document.getElementById(id).classList.add('drag'); }
+    function onDragLeave(id) { document.getElementById(id).classList.remove('drag'); }
+    function onDrop(e, key) {
+      e.preventDefault();
+      const id = key === 'inv14' ? 'dropINV14' : 'dropSO04';
+      document.getElementById(id).classList.remove('drag');
+      addFiles(key, Array.from(e.dataTransfer.files));
+    }
+    function onFileChange(e, key) { addFiles(key, Array.from(e.target.files)); }
+
+    function addFiles(key, newFiles) {
+      newFiles.forEach(f => { if (!files[key].find(x => x.name === f.name && x.size === f.size)) files[key].push(f); });
+      renderFileList(key);
+    }
+
+    function removeFile(key, idx) {
+      files[key].splice(idx, 1);
+      renderFileList(key);
+    }
+
+    function renderFileList(key) {
+      const el = document.getElementById(key === 'inv14' ? 'listINV14' : 'listSO04');
+      el.innerHTML = files[key].map((f, i) =>
+        `<span class="file-tag">📄 ${f.name} <button onclick="removeFile('${key}',${i})">×</button></span>`
+      ).join('');
+    }
+
+    // ──────────────────────────────────────────────
+    // Read XLS/XLSX → array of arrays (header row 2, index 1)
+    // ──────────────────────────────────────────────
+    function readFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          try {
+            const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array', raw: false, cellDates: false });
+            const ws = wb.Sheets[wb.SheetNames[0]];
+            // Get actual numeric values (not formatted display)
+            const data = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '' });
+            resolve(data);
+          } catch (err) { reject(err); }
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    // ──────────────────────────────────────────────
+    // Rack locator logic
+    // B046–B106, C046–C106, D046–D106
+    // ──────────────────────────────────────────────
+    function isRack(locator) {
+      if (!locator) return false;
+      const s = String(locator).trim().toUpperCase();
+      const prefix = s.substring(0, 4); // e.g. "B046"
+      if (prefix.length < 4) return false;
+      const letter = prefix[0];
+      const numStr = prefix.substring(1, 4);
+      const num = parseInt(numStr, 10);
+      if (isNaN(num)) return false;
+      if ((letter === 'B' || letter === 'C' || letter === 'D') && num >= 46 && num <= 106) return true;
+      return false;
+    }
+
+    // ──────────────────────────────────────────────
+    // Main analysis
+    // ──────────────────────────────────────────────
+    async function runAnalysis() {
+      if (!files.inv14.length || !files.so04.length) {
+        setStatus('⚠️ Vui lòng chọn ít nhất 1 file INV14 và 1 file SO04.');
+        return;
+      }
+      const btn = document.getElementById('btnRun');
+      btn.disabled = true;
+      setStatus('<span class="spinner"></span>Đang đọc file...');
+
+      try {
+        // ── Read & merge INV14 ──
+        let inv14Rows = [];
+        for (const f of files.inv14) {
+          const raw = await readFile(f);
+          if (raw.length < 2) continue;
+          const headers = raw[1].map(h => String(h).trim()); // row index 1 = header
+          for (let r = 2; r < raw.length; r++) {
+            const row = raw[r];
+            const obj = {};
+            headers.forEach((h, i) => obj[h] = row[i] !== undefined ? row[i] : '');
+            inv14Rows.push(obj);
+          }
+        }
+
+        // ── Read & merge SO04 ──
+        // Auto-detect header: dòng 2 (index 1) hoặc dòng 3 (index 2)
+        let so04Rows = [];
+        for (const f of files.so04) {
+          const raw = await readFile(f);
+          if (raw.length < 2) continue;
+          // Kiểm tra row index 1 có phải header không (chứa "Warehouse")
+          let headerIdx = 1;
+          const row1Vals = raw[1].map(h => String(h).trim().toLowerCase());
+          if (!row1Vals.includes('warehouse') && raw.length > 2) {
+            const row2Vals = raw[2].map(h => String(h).trim().toLowerCase());
+            if (row2Vals.includes('warehouse')) headerIdx = 2;
+          }
+          const headers = raw[headerIdx].map(h => String(h).trim());
+          for (let r = headerIdx + 1; r < raw.length; r++) {
+            const row = raw[r];
+            const obj = {};
+            headers.forEach((h, i) => obj[h] = row[i] !== undefined ? row[i] : '');
+            so04Rows.push(obj);
+          }
+        }
+
+        setStatus('<span class="spinner"></span>Đang xử lý...');
+
+        // ── SO04 Filter: Warehouse=MTD, SO Status=BOOKED, Unc=Y ──
+        const so04Filtered = so04Rows.filter(r =>
+          String(r['Warehouse']).trim().toUpperCase() === 'MTD' &&
+          String(r['SO Status']).trim().toUpperCase() === 'BOOKED' &&
+          String(r['Unc']).trim().toUpperCase() === 'Y'
+        );
+
+        // ── SO04 Group by Item No → sum Pallet (raw float) ──
+        const soPalletMap = {}; // itemNo → total pallet
+        const soNameMap = {};
+        so04Filtered.forEach(r => {
+          const sku = String(r['Item No']).trim();
+          const pallet = parseFloat(r['Pallet']) || 0;
+          soPalletMap[sku] = (soPalletMap[sku] || 0) + pallet;
+          if (!soNameMap[sku]) soNameMap[sku] = String(r['Item Name'] || '').trim();
+        });
+
+        // ── INV14 Filter: Ware house=MTD, Sub=SS0 ──
+        const inv14Filtered = inv14Rows.filter(r =>
+          String(r['Ware house']).trim().toUpperCase() === 'MTD' &&
+          String(r['Sub']).trim().toUpperCase() === 'SS0'
+        );
+
+        // ── INV14: group summary + collect raw rack lots per SKU ──
+        const inv14Map = {}; // sku → { rack, san, name }
+        const rackLotMap = {}; // sku → [ { locator, lotNo, mfgDate, expiryStr, pallets } ]
+        inv14Filtered.forEach(r => {
+          const sku = String(r['Mã Item']).trim();
+          const locator = String(r['Locator']).trim();
+          const pallet = parseFloat(r['Số lượng Pallet']) || 0;
+          const rackType = isRack(locator) ? 'rack' : 'san';
+          if (!inv14Map[sku]) inv14Map[sku] = { rack: 0, san: 0, name: String(r['Tên Item'] || '').trim() };
+          inv14Map[sku][rackType] += pallet;
+
+          // Collect rack lots for moving plan
+          if (rackType === 'rack') {
+            if (!rackLotMap[sku]) rackLotMap[sku] = [];
+            rackLotMap[sku].push({
+              locator,
+              lotNo: String(r['Lot number'] || '').trim(),
+              expiryStr: String(r['Ngày hết hạn'] || '').trim(),
+              pallets: pallet
+            });
+          }
+        });
+
+        // ── SO04: determine channel per SKU (GT0 = GT; else MT) ──
+        const skuChannel = {}; // sku → 'GT' | 'MT'
+        so04Filtered.forEach(r => {
+          const sku = String(r['Item No']).trim();
+          const ch = String(r['Sale channel'] || '').trim().toUpperCase();
+          // If any line is non-GT → upgrade to MT (more restrictive)
+          if (!skuChannel[sku]) skuChannel[sku] = ch === 'GT0' ? 'GT' : 'MT';
+          else if (skuChannel[sku] === 'GT' && ch !== 'GT0') skuChannel[sku] = 'MT';
+        });
+
+        // ── Build result: SKUs present in SO ──
+        const skus = Object.keys(soPalletMap).sort();
+        tableData = skus.map(sku => {
+          const soQty = soPalletMap[sku] || 0;
+          const inv = inv14Map[sku] || { rack: 0, san: 0, name: '' };
+          const name = inv.name || soNameMap[sku] || '';
+          const totalInv = inv.rack + inv.san;
+          return { sku, name, soQty, rack: inv.rack, san: inv.san, totalInv };
+        });
+
+        // ── Build moving plan ──
+        movingData = buildMovingPlan(tableData, rackLotMap, skuChannel);
+
+        // ── Gắn toMove vào tableData để hiển thị trong bảng chính ──
+        const moveBySkU = {};
+        movingData.forEach(m => { moveBySkU[m.sku] = m.lots.reduce((s, l) => s + l.toMove, 0); });
+        tableData.forEach(r => { r.toMove = moveBySkU[r.sku] != null ? moveBySkU[r.sku] : null; });
+
+        // ── Update summary cards ──
+        const totSO = tableData.reduce((s, r) => s + r.soQty, 0);
+        const totRack = tableData.reduce((s, r) => s + r.rack, 0);
+        const totSan = tableData.reduce((s, r) => s + r.san, 0);
+        const totMove = movingData.reduce((s, m) => s + m.lots.reduce((a, l) => a + l.toMove, 0), 0);
+        document.getElementById('scSKU').textContent = tableData.length;
+        document.getElementById('scPalletSO').textContent = fmt(totSO);
+        document.getElementById('scRack').textContent = fmt(totRack);
+        document.getElementById('scSan').textContent = fmt(totSan);
+        document.getElementById('scMove').textContent = totMove;
+        document.getElementById('summaryCards').classList.remove('hidden');
+
+        // Tab counts
+        document.getElementById('tabCountResult').textContent = tableData.length;
+        document.getElementById('tabCountMove').textContent = movingData.length;
+        document.getElementById('tabBar').classList.remove('hidden');
+
+        renderTable(tableData);
+        renderMovingPlan(movingData);
+        // Enable export buttons
+        document.getElementById('btnExportResult').disabled = false;
+        if (movingData.length) document.getElementById('btnExportMove').disabled = false;
+        document.getElementById('tableTitle').textContent = `Kết quả · ${tableData.length} SKU · INV14: ${inv14Filtered.length} dòng · SO04: ${so04Filtered.length} dòng`;
+        setStatus(`✅ Hoàn thành — ${inv14Rows.length.toLocaleString()} dòng INV14, ${so04Rows.length.toLocaleString()} dòng SO04.`);
+      } catch (err) {
+        setStatus('❌ Lỗi: ' + err.message);
+        console.error(err);
+      }
+      btn.disabled = false;
+    }
+
+    // ──────────────────────────────────────────────
+    // Render table
+    // ──────────────────────────────────────────────
+    function renderTable(data) {
+      const body = document.getElementById('resultBody');
+      if (!data.length) {
+        document.getElementById('emptyState').classList.remove('hidden');
+        document.getElementById('resultTable').classList.add('hidden');
+        document.getElementById('searchBox').style.display = 'none';
+        body.innerHTML = '';
+        return;
+      }
+      document.getElementById('emptyState').classList.add('hidden');
+      document.getElementById('resultTable').classList.remove('hidden');
+      document.getElementById('searchBox').style.display = '';
+
+      const maxInv = Math.max(...data.map(r => r.rack + r.san), 1);
+
+      body.innerHTML = data.map((r, i) => {
+        const total = r.rack + r.san;
+        const rackPct = Math.round((r.rack / maxInv) * 80);
+        const sanPct = Math.round((r.san / maxInv) * 80);
+        let badge = '';
+        if (total >= r.soQty) badge = `<span class="badge badge-ok">✓ Đủ hàng</span>`;
+        else if (total > 0) badge = `<span class="badge badge-warn">⚠ Thiếu ${fmt(r.soQty - total)}</span>`;
+        else badge = `<span class="badge badge-danger">✗ Hết hàng</span>`;
+
+        // Cột Cần Move
+        const needMove = r.soQty - r.san;
+        let moveCell = '';
+        if (needMove <= 0) {
+          moveCell = `<span style="color:var(--accent2);font-size:12px">✓ Không cần</span>`;
+        } else {
+          const moveQty = r.toMove != null ? r.toMove : Math.ceil(needMove);
+          moveCell = `<span style="color:#f97316;font-weight:700;font-size:14px">▼ ${moveQty}</span>`;
+        }
+
+        // Nhóm: Rack (có rack > 0) vs Chỉ Sàn
+        const grp = r.rack > 0
+          ? `<span class="badge badge-rack">📦 Rack</span>`
+          : `<span class="badge badge-san">🟢 Sàn</span>`;
+
+        return `<tr>
+      <td style="color:var(--muted);font-size:11px">${i + 1}</td>
+      <td class="sku-code">${r.sku}</td>
+      <td style="max-width:240px;overflow:hidden;text-overflow:ellipsis" title="${r.name}">${r.name}</td>
+      <td class="num" style="color:var(--warn);font-weight:600">${fmt(r.soQty)}</td>
+      <td class="num">
+        <div class="mini-bar-wrap">
+          <div class="mini-bar mini-bar-rack" style="width:${rackPct}px"></div>
+          <span style="color:var(--rack-color)">${fmt(r.rack)}</span>
+        </div>
+      </td>
+      <td class="num">
+        <div class="mini-bar-wrap">
+          <div class="mini-bar mini-bar-san" style="width:${sanPct}px"></div>
+          <span style="color:var(--san-color)">${fmt(r.san)}</span>
+        </div>
+      </td>
+      <td class="num">${fmt(total)}</td>
+      <td class="num">${moveCell}</td>
+      <td>${grp}</td>
+      <td>${badge}</td>
+    </tr>`;
+      }).join('');
+    }
+
+    // ──────────────────────────────────────────────
+    // Tab switcher
+    // ──────────────────────────────────────────────
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('pane' + (tab === 'result' ? 'Result' : 'Move')).classList.add('active');
+      document.getElementById('tabBtn' + (tab === 'result' ? 'Result' : 'Move')).classList.add('active');
+    }
+
+    // ──────────────────────────────────────────────
+    // Group filter + search filter
+    // ──────────────────────────────────────────────
+    let activeGroup = 'all';
+
+    function setGroupFilter(grp) {
+      activeGroup = grp;
+      ['All', 'Rack', 'San'].forEach(g => {
+        const el = document.getElementById('gf' + g);
+        if (el) el.classList.toggle('active', g.toLowerCase() === grp);
+      });
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const q = document.getElementById('searchBox').value.toLowerCase();
+      let filtered = tableData;
+      // Group filter:
+      // 'rack'  → SKU có rack > 0 (only rack + rack+sàn)
+      // 'san'   → SKU chỉ có sàn (rack = 0)
+      // 'all'   → tất cả
+      if (activeGroup === 'rack') filtered = filtered.filter(r => r.rack > 0);
+      else if (activeGroup === 'san') filtered = filtered.filter(r => r.rack === 0);
+      // Search
+      if (q) filtered = filtered.filter(r => r.sku.toLowerCase().includes(q) || r.name.toLowerCase().includes(q));
+      renderTable(filtered);
+    }
+
+    // ──────────────────────────────────────────────
+    // Parse date helpers
+    // ──────────────────────────────────────────────
+    // lotNo first 6 chars: DDMMYY → Date
+    function parseMfgDate(lotNo) {
+      if (!lotNo || lotNo.length < 6) return null;
+      const s = lotNo.substring(0, 6);
+      const dd = parseInt(s.substring(0, 2), 10);
+      const mm = parseInt(s.substring(2, 4), 10) - 1;
+      const yy = parseInt(s.substring(4, 6), 10);
+      const yyyy = yy + (yy >= 0 && yy <= 99 ? 2000 : 0);
+      const d = new Date(yyyy, mm, dd);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    // Parse expiry: 'DD-Mon-YYYY' (e.g., '05-JAN-2029') or 'DD/MM/YYYY'
+    function parseExpiryDate(str) {
+      if (!str) return null;
+      const MONTHS = { JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5, JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11 };
+      // DD-Mon-YYYY
+      const m1 = str.match(/^(\d{1,2})-([A-Z]{3})-(\d{4})$/i);
+      if (m1) { const d = new Date(parseInt(m1[3]), MONTHS[m1[2].toUpperCase()], parseInt(m1[1])); return isNaN(d.getTime()) ? null : d; }
+      // DD/MM/YYYY
+      const m2 = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+      if (m2) { const d = new Date(parseInt(m2[3]), parseInt(m2[2]) - 1, parseInt(m2[1])); return isNaN(d.getTime()) ? null : d; }
+      return null;
+    }
+
+    // Shelf life remaining % = (expiry - today) / (expiry - mfg) * 100
+    function shelfLifePct(mfgDate, expiryDate) {
+      if (!mfgDate || !expiryDate) return null;
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const total = expiryDate - mfgDate;
+      const remaining = expiryDate - today;
+      if (total <= 0) return 0;
+      return (remaining / total) * 100;
+    }
+
+    // ──────────────────────────────────────────────
+    // Build Moving Plan
+    // ──────────────────────────────────────────────
+    function buildMovingPlan(tableData, rackLotMap, skuChannel) {
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const result = [];
+
+      tableData.forEach(row => {
+        const { sku, name, soQty, san } = row;
+        const needToMove = soQty - san;
+        if (needToMove <= 0) return; // Sàn đã đủ
+
+        const channel = skuChannel[sku] || 'MT';
+        const threshold = channel === 'GT' ? 50 : 72; // shelf life % required
+        const lots = rackLotMap[sku] || [];
+
+        // Enrich lots: parse dates, calc shelf life %, filter & sort FEFO (earliest mfg first)
+        const enriched = lots.map(l => {
+          const mfg = parseMfgDate(l.lotNo);
+          const exp = parseExpiryDate(l.expiryStr);
+          const slPct = shelfLifePct(mfg, exp);
+          const eligible = slPct !== null && slPct > threshold;
+          const wholePallets = Math.floor(l.pallets); // can only move whole pallets
+          return { ...l, mfg, exp, slPct, eligible, wholePallets };
+        });
+
+        // Sort FEFO: earliest mfg date first (null mfg → last)
+        enriched.sort((a, b) => {
+          if (!a.mfg && !b.mfg) return 0;
+          if (!a.mfg) return 1;
+          if (!b.mfg) return -1;
+          return a.mfg - b.mfg;
+        });
+
+        // Allocate from eligible lots
+        let stillNeeded = Math.ceil(needToMove); // round up to whole pallets
+        const allocations = enriched.map(l => ({ ...l, toMove: 0 }));
+        for (const alloc of allocations) {
+          if (stillNeeded <= 0) break;
+          if (!alloc.eligible || alloc.wholePallets <= 0) continue;
+          const take = Math.min(alloc.wholePallets, stillNeeded);
+          alloc.toMove = take;
+          stillNeeded -= take;
+        }
+
+        result.push({ sku, name, channel, threshold, needToMove: Math.ceil(needToMove), san, soQty, lots: allocations, fulfilled: stillNeeded <= 0 });
+      });
+
+      return result;
+    }
+
+    // ──────────────────────────────────────────────
+    // Render Moving Plan
+    // ──────────────────────────────────────────────
+    function renderMovingPlan(data) {
+      const section = document.getElementById('movePlanSection');
+      const body = document.getElementById('movePlanBody');
+      if (!data.length) { section.classList.add('hidden'); return; }
+      section.classList.remove('hidden');
+
+      const fmtDate = d => d ? d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+
+      body.innerHTML = data.map(d => {
+        const totalToMove = d.lots.reduce((s, l) => s + l.toMove, 0);
+        const chBadge = d.channel === 'GT'
+          ? `<span class="move-chip chip-gt">GT – SL ≥ 50%</span>`
+          : `<span class="move-chip chip-mt">MT – SL ≥ 72%</span>`;
+        const fulfillBadge = d.fulfilled
+          ? `<span class="move-chip chip-ok">✓ Đủ plan</span>`
+          : `<span class="move-chip chip-fail">⚠ Thiếu ${fmt(d.needToMove - totalToMove)} plt</span>`;
+
+        const rows = d.lots.map(l => {
+          const sl = l.slPct !== null ? l.slPct.toFixed(1) + '%' : '—';
+          const slNum = l.slPct || 0;
+          const barClass = slNum >= d.threshold ? 'sl-ok' : 'sl-fail';
+          const barW = Math.min(100, slNum).toFixed(0);
+          const rowClass = !l.eligible ? 'ineligible' : '';
+          const moveCell = l.toMove > 0
+            ? `<span class="move-qty">▼ ${l.toMove}</span>`
+            : (l.eligible ? `<span style="color:var(--muted)">—</span>` : `<span style="color:var(--danger);font-size:11px">SL fail</span>`);
+          return `<tr class="${rowClass}">
+        <td style="text-align:left;font-family:monospace;color:var(--accent);font-size:12px">${l.locator}</td>
+        <td style="text-align:left;font-size:11px;color:var(--muted)">${l.lotNo}</td>
+        <td>${fmtDate(l.mfg)}</td>
+        <td>${fmtDate(l.exp)}</td>
+        <td>
+          <div class="sl-bar-wrap">
+            <div class="sl-bar"><div class="sl-bar-fill ${barClass}" style="width:${barW}%"></div></div>
+            <span style="color:${slNum >= d.threshold ? 'var(--accent2)' : 'var(--danger)'}">${sl}</span>
+          </div>
+        </td>
+        <td style="color:var(--muted)">${fmt(l.pallets)}</td>
+        <td style="color:var(--muted)">${l.wholePallets}</td>
+        <td>${moveCell}</td>
+      </tr>`;
+        }).join('');
+
+        return `<div class="move-sku-block">
+      <div class="move-sku-header">
+        <span class="sku">${d.sku}</span>
+        <span class="sku-name" title="${d.name}">${d.name.length > 50 ? d.name.substring(0, 50) + '…' : d.name}</span>
+        <div class="move-meta">
+          ${chBadge}
+          <span class="move-chip chip-need">Cần move: ${d.needToMove} plt</span>
+          ${fulfillBadge}
+        </div>
+      </div>
+      <div class="move-table-wrap">
+        <table class="move-table">
+          <thead><tr>
+            <th style="text-align:left">Locator</th>
+            <th style="text-align:left">Lot Number</th>
+            <th>NSX</th><th>HSD</th>
+            <th>Shelf Life %</th>
+            <th>Pallet (thực)</th>
+            <th>Pallet nguyên</th>
+            <th>To Move ↓</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+          <tfoot><tr class="move-summary-row">
+            <td colspan="6" style="text-align:right;color:var(--muted)">Tổng cần move:</td>
+            <td></td>
+            <td><span class="move-qty">${totalToMove} plt</span></td>
+          </tr></tfoot>
+        </table>
+      </div>
+    </div>`;
+      }).join('');
+    }
+    // ──────────────────────────────────────────────
+    // Export Excel – Kết quả
+    // ──────────────────────────────────────────────
+    function exportResults() {
+      // Lấy data hiện tại (theo filter nhóm + search)
+      const q = document.getElementById('searchBox').value.toLowerCase();
+      let data = tableData;
+      if (activeGroup === 'rack') data = data.filter(r => r.rack > 0);
+      else if (activeGroup === 'san') data = data.filter(r => r.rack === 0);
+      if (q) data = data.filter(r => r.sku.toLowerCase().includes(q) || r.name.toLowerCase().includes(q));
+
+      const fmtN = v => (v === null || v === undefined || isNaN(Number(v))) ? '' : Number(v);
+
+      const headers = ['#', 'SKU (Item No)', 'Tên sản phẩm', 'Pallet cần xuất (SO)',
+        'Pallet Rack', 'Pallet Sàn', 'Tổng tồn', 'Cần Move Rack→Sàn', 'Nhóm', 'Trạng thái'];
+
+      const rows = data.map((r, i) => {
+        const total = r.rack + r.san;
+        const needMove = r.soQty - r.san;
+        const moveQty = needMove <= 0 ? 0 : (r.toMove != null ? r.toMove : Math.ceil(needMove));
+        const grp = r.rack > 0 ? 'Rack' : 'Chỉ Sàn';
+        let status = total >= r.soQty ? 'Đủ hàng' : total > 0 ? `Thiếu ${fmtRaw(r.soQty - total)}` : 'Hết hàng';
+        return [i + 1, r.sku, r.name, fmtN(r.soQty), fmtN(r.rack), fmtN(r.san), fmtN(total), moveQty || '', grp, status];
+      });
+
+      const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+      styleResultSheet(ws, data.length);
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Kết quả');
+
+      const now = new Date();
+      const stamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+      XLSX.writeFile(wb, `RackingOps_KetQua_${stamp}.xlsx`);
+    }
+
+    function styleResultSheet(ws, rowCount) {
+      const colWidths = [5, 14, 45, 18, 14, 14, 12, 20, 12, 14];
+      ws['!cols'] = colWidths.map(w => ({ wch: w }));
+      // Header row style (row 0)
+      const range = XLSX.utils.decode_range(ws['!ref']);
+      for (let c = range.s.c; c <= range.e.c; c++) {
+        const cell = ws[XLSX.utils.encode_cell({ r: 0, c })];
+        if (cell) {
+          cell.s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '1A1D27' } }, alignment: { horizontal: 'center', vertical: 'center', wrapText: true }, border: borderStyle() };
+        }
+      }
+      // Data rows
+      for (let r = 1; r <= rowCount; r++) {
+        for (let c = range.s.c; c <= range.e.c; c++) {
+          const cell = ws[XLSX.utils.encode_cell({ r, c })];
+          if (cell) {
+            const isNum = c >= 3 && c <= 7;
+            cell.s = { alignment: { horizontal: isNum ? 'center' : 'left', vertical: 'center' }, border: borderStyle() };
+            if (c === 3) cell.s.font = { bold: true }; // Pallet SO
+            if (c === 7 && cell.v > 0) cell.s.font = { bold: true, color: { rgb: 'F97316' } }; // Move
+          }
+        }
+      }
+      ws['!freeze'] = { xSplit: 0, ySplit: 1 }; // freeze header
+    }
+
+    // ──────────────────────────────────────────────
+    // Export Excel – Moving Plan
+    // ──────────────────────────────────────────────
+    function exportMovingPlan() {
+      if (!movingData.length) return;
+
+      const wb = XLSX.utils.book_new();
+      const fmtDate = d => d ? d.toLocaleDateString('en-GB') : '';
+      const fmtN = v => (v === null || v === undefined) ? '' : Number(v);
+
+      // ─ Sheet 1: Tổng hợp ─
+      const summaryHeaders = ['SKU', 'Tên sản phẩm', 'Kênnh', 'Ngưỡng SL%',
+        'Sàn hiện tại', 'SO demand', 'Cần move (plt)', 'Planè (plt)', 'Kết quả'];
+      const summaryRows = movingData.map(d => {
+        const planned = d.lots.reduce((s, l) => s + l.toMove, 0);
+        return [d.sku, d.name, d.channel, d.threshold + '%',
+        fmtN(d.san), fmtN(d.soQty), d.needToMove, planned,
+        d.fulfilled ? 'Đủ plan' : `Thiếu ${d.needToMove - planned} plt`];
+      });
+      const wsSummary = XLSX.utils.aoa_to_sheet([summaryHeaders, ...summaryRows]);
+      wsSummary['!cols'] = [14, 45, 8, 10, 14, 14, 16, 14, 16].map(w => ({ wch: w }));
+      styleHeaderRow(wsSummary, summaryHeaders.length);
+      XLSX.utils.book_append_sheet(wb, wsSummary, 'Tổng hợp');
+
+      // ─ Sheet 2: Chi tiết từng lot ─
+      const detailHeaders = ['SKU', 'Tên sản phẩm', 'Kênnh', 'Locator', 'Lot Number',
+        'NSX', 'HSD', 'Shelf Life %', 'SL Đạt', 'Pallet (thực)', 'Pallet nguyên', 'To Move'];
+      const detailRows = [];
+      movingData.forEach(d => {
+        d.lots.forEach(l => {
+          detailRows.push([
+            d.sku, d.name, d.channel, l.locator, l.lotNo,
+            fmtDate(l.mfg), fmtDate(l.exp),
+            l.slPct !== null ? Math.round(l.slPct * 10) / 10 : '',
+            l.eligible ? 'Có' : 'Không',
+            fmtN(l.pallets), l.wholePallets,
+            l.toMove > 0 ? l.toMove : ''
+          ]);
+        });
+      });
+      const wsDetail = XLSX.utils.aoa_to_sheet([detailHeaders, ...detailRows]);
+      wsDetail['!cols'] = [14, 40, 8, 14, 20, 12, 12, 12, 8, 14, 14, 10].map(w => ({ wch: w }));
+      styleHeaderRow(wsDetail, detailHeaders.length);
+      // Tô màu cột To Move
+      for (let r = 1; r <= detailRows.length; r++) {
+        const cell = wsDetail[XLSX.utils.encode_cell({ r, c: 11 })];
+        if (cell && cell.v > 0) cell.s = { font: { bold: true, color: { rgb: 'F97316' } }, alignment: { horizontal: 'center' } };
+        const eligCell = wsDetail[XLSX.utils.encode_cell({ r, c: 8 })];
+        if (eligCell) eligCell.s = { font: { color: { rgb: eligCell.v === 'Có' ? '00D4AA' : 'FF4D6D' } }, alignment: { horizontal: 'center' } };
+      }
+      XLSX.utils.book_append_sheet(wb, wsDetail, 'Chi tiết lots');
+
+      const now = new Date();
+      const stamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+      XLSX.writeFile(wb, `RackingOps_MovingPlan_${stamp}.xlsx`);
+    }
+
+    function styleHeaderRow(ws, colCount) {
+      for (let c = 0; c < colCount; c++) {
+        const cell = ws[XLSX.utils.encode_cell({ r: 0, c })];
+        if (cell) cell.s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '22263A' } }, alignment: { horizontal: 'center', vertical: 'center', wrapText: true }, border: borderStyle() };
+      }
+    }
+
+    function borderStyle() {
+      const b = { style: 'thin', color: { rgb: '2D3155' } };
+      return { top: b, bottom: b, left: b, right: b };
+    }
+
+    function fmtRaw(v) { return Number(v).toLocaleString('en-US', { maximumFractionDigits: 1 }); }
+
+
+    function fmt(v) {
+      if (v === null || v === undefined || v === '') return '—';
+      const n = Number(v);
+      if (isNaN(n)) return '—';
+      return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 1 });
+    }
+    function setStatus(msg) { document.getElementById('statusMsg').innerHTML = msg; }
+  </script>
+</body>
+
+</html>
