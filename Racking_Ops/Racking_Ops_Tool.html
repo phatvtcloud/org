@@ -1053,7 +1053,16 @@
         reader.onload = e => {
           try {
             const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array', raw: false, cellDates: false });
-            const ws = wb.Sheets[wb.SheetNames[0]];
+            // Tìm sheet "DATA 1" hoặc "DATA  1" (chuẩn hóa khoảng trắng và viết hoa)
+            let targetSheetName = wb.SheetNames[0];
+            const foundData1 = wb.SheetNames.find(name => {
+              const normName = name.trim().toUpperCase().replace(/\s+/g, ' ');
+              return normName === 'DATA 1';
+            });
+            if (foundData1) {
+              targetSheetName = foundData1;
+            }
+            const ws = wb.Sheets[targetSheetName];
             const data = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '' });
             resolve(data);
           } catch (err) { reject(err); }
